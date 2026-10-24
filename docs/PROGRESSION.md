@@ -7,4 +7,16 @@
 - Divergences sources consignées : 10 cas (voir ANALYSE §5).
 - Branch de travail : `feature/app-complete`.
 
-## Phase 1 — Socle ⏳ non commencée
+## Phase 1 — Socle ⏳ en cours
+- Projet Flutter créé dans le dépôt (`flutter create`, cibles android/ios/web, org `com.primael`).
+- Dépendances : flutter_riverpod, go_router, flutter_svg, shared_preferences ; flutter_lints 6 + lints stricts de projet.
+- Polices TTF téléchargées (Google Fonts, OFL) : Bangers, Poppins x3, RobotoMono (wght).
+- Assets : images maquette (héros + 4 avatars) ; `assets/words/words.json` généré depuis `wordLists.js` (18 listes / 2 226 mots).
+- `lib/core` : AppColors (palette relevée), AppTheme (typographies), WordstormIcons (25 glyphes exacts de la maquette), ArcadeButton (6 variantes), LetterTile 3D, CategoryBadge, ResponseRow, CheckRow (verrouillée/inactive), PlayerCard, CodeField (sans ambigus), CitySkyline + Sunburst (CustomPainter), WordstormLogo (contour épais + dégradés), ScreenScaffold.
+- `lib/app` : go_router (13 routes, transition fade+scale 350 ms ≈ maquette).
+- Écrans : Accueil et Menu (fidèles à la maquette au socle près) ; autres écrans = PlaceholderScreen clairement marqués (phase 4).
+- CI : `.github/workflows/ci.yml` (format --set-exit-if-changed + analyze --fatal-infos + test).
+- `docs/ENVIRONNEMENT.md` : flutter doctor consigné ; Android SDK à installer.
+- **Traitement effectué** : `dart fix --apply`, `dart format` (21 fichiers), `flutter analyze` **No issues found**, `flutter test` **+4 : All tests passed** (salon_code + smoke).
+
+## Phase 2 — Moteur de règles ⏳ non commencée

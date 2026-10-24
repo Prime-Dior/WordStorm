@@ -1,0 +1,28 @@
+name: CI
+
+on:
+  push:
+    branches: [main, feature/app-complete]
+  pull_request:
+
+jobs:
+  analyze-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: flutter pub get
+        run: flutter pub get
+
+      - name: flutter format (verification)
+        run: dart format --output=none --set-exit-if-changed .
+
+      - name: flutter analyze
+        run: flutter analyze --fatal-warnings --fatal-infos
+
+      - name: flutter test
+        run: flutter test
