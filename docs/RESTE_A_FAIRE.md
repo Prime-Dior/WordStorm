@@ -1,14 +1,14 @@
 # RESTE À FAIRE — journal des restes (impératif n°4 : pas de TODO caché)
 
 ## Phase 1 — restes volontaires
-- **Écrans squelettes** (`PlaceholderScreen`) : Configuration, Rejoindre, Salon, Tirage,
-  Manche, Fin de manche, Résultats, Paramètres, Règles, Historique — implémentation
-  fidèle à la maquette à la **phase 4**.
+- **Écrans squelettes** (`PlaceholderScreen`) : résolu — tous les écrans
+  réels sont implémentés à la phase 4 (voir `docs/PROGRESSION.md`).
 - **Bouton « Quitter »** de l'accueil : sans action (l'API de fermeture d'app sera
   branchée à la phase 6 avec SystemNavigator, jamais simulée).
-- **Validation « Rejoindre avec un code »** : l'écran « Salon introuvable » et la
-  liaison au backend sont câblés à la phase 7 ; le champ est fonctionnel (alphabet,
-  casse, 6 caractères) mais l'OK ne navigue pas encore.
+- **Validation « Rejoindre avec un code »** : résolu côté forme (l'OK navigue
+  vers l'écran Rejoindre, validation du code 6 signes sans ambigus). La
+  liaison au backend et l'écran « Salon introuvable » restent câblés à la
+  **phase 7**.
 - **Animations** (chute des lettres du logo, héros flottant, rayons rotatifs animés,
   pulsations) : leurs durées et courbes sont relevées dans `docs/ANALYSE.md` annexe ;
   implémentation à la **phase 8**.
@@ -16,12 +16,33 @@
   monochromes (teinte unique). Le cas échéant, deux couches seront nécessaires pour
   100 % de fidélité — à évaluer à la phase 4.
 
+## Phase 4 — restes volontaires
+- **Animations** : roue (habillage complet — pointeur pivot, anneau central,
+  tick sonore à l'arrêt), pulsation/bip de chrono en fin de temps, chute des
+  lettres du logo — implémentation à la **phase 8** (durations/courbes déjà
+  relevées dans `docs/ANALYSE.md` annexe).
+- **Sons et vibrations** : interrompus dans l'UI (réglages persistés), la
+  lecture réelle est câblée à la phase 8 avec le service audio.
+- **Écran de roue** : la lettre affichée au centre pendant la rotation est
+  celle tirée ; un effet de « roue qui tourne vraiment derrière le disque »
+  (défilement de la lettre sous le pointeur) est lissé à la phase 8.
+- **Rejoindre / Salon** : validation de forme seule ; la recherche réelle du
+  code (écran « Salon introuvable », reconnexion) est la **phase 7**.
+- **Enregistrement des scores** (historique) : phase 6.
+- **Palier 10 en solo** : toute réponse valide vaut 15 (décision prompt §4 :
+  pas d'autres joueurs, palier reste multijoueur). Si l'utilisateur préfère
+  10 en solo aussi, changement de `RulesConfig.soloMode` — question à trancher.
+- **Icônes à deux teintes** : toujours monochromes (détail `#1E2A44` de la
+  maquette) — à évaluer avec les retours visuels.
+- **Test du parcours complet menu→config→roue→manche→résultats→fin** :
+  à la phase 5 (intégration solo), ce test requiert précharger le
+  dictionnaire hors zone FakeAsync (voir `test/game/game_screen_test.dart`,
+  motif `tester.runAsync` documenté dans le test).
+
 ## Phase 3 — restes volontaires
 - **Faux positifs du mapping** : « Fruit ou légume » accepte un légume en Fruit
   (et inversement) ; « Marque » accepte des marques hors voiture. Arbitrage complet
   (duplication et tri des listes, ou enrichissement) traité avec Q2.
-- L'écran Paramètres n'utilise pas encore `SettingsRepository` (branchement UI à la
-  phase 4/6).
 
 ## Phase 2 — restes volontaires
 - **Articles et pluriels** : la normalisation ne transforme pas « le/les » ni les

@@ -72,6 +72,9 @@ class UsedWords {
 
   Set<String> forCategory(String category) =>
       _byCategory[category] ?? const <String>{};
+
+  /// Vide l'ensemble (nouvelle partie).
+  void clear() => _byCategory.clear();
 }
 
 /// Signature du dictionnaire injecté : la catégorie possède-t-elle une

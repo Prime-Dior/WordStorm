@@ -59,21 +59,23 @@ class MenuScreen extends StatelessWidget {
           ),
           const Spacer(),
 
-          // Solo →
-          const ArcadeMenuCard(
+          // Solo → (configuration de la partie).
+          ArcadeMenuCard(
             label: 'Solo',
             detail: 'Joue à ton rythme',
             variant: ArcadeButtonVariant.yellow,
             iconGlyph: 'user',
+            onPressed: () => context.push('/config?mode=solo'),
           ),
           const SizedBox(height: 12),
 
-          // Multijoueur →
-          const ArcadeMenuCard(
+          // Multijoueur → (configuration, créé un salon à la phase 7).
+          ArcadeMenuCard(
             label: 'Multijoueur',
             detail: 'Crée un salon',
             variant: ArcadeButtonVariant.teal,
             iconGlyph: 'users',
+            onPressed: () => context.push('/config?mode=multi'),
           ),
           const SizedBox(height: 14),
 
@@ -104,9 +106,13 @@ class MenuScreen extends StatelessWidget {
                   trailing: const SizedBox.shrink(),
                 ),
                 const SizedBox(height: 8),
-                const Align(
+                Align(
                   alignment: Alignment.centerRight,
-                  child: ArcadeButton(label: 'OK', small: true),
+                  child: ArcadeButton(
+                    label: 'OK',
+                    small: true,
+                    onPressed: () => context.push('/join'),
+                  ),
                 ),
               ],
             ),
@@ -117,7 +123,7 @@ class MenuScreen extends StatelessWidget {
           // commande pas de classement global).
           ArcadeMenuCard(
             label: 'Classement',
-            detail: 'Les meilleurs joueurs',
+            detail: 'Historique & records',
             detailIsStub: true,
             variant: ArcadeButtonVariant.dark,
             iconGlyph: 'trophy',

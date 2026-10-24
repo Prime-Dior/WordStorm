@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import '../core/theme/app_theme.dart';
 import 'router.dart';
 
-/// Racine de l'application : thème Wordstorm et navigation `go_router`.
+/// Racine de l'application : thème Wordstorm et navigation `go_router`
+/// (enveloppé dans ProviderScope par `main.dart`).
 class WordstormApp extends StatelessWidget {
   const WordstormApp({super.key});
 

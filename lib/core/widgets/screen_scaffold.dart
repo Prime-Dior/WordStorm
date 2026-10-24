@@ -88,10 +88,14 @@ class ScreenScaffold extends StatelessWidget {
             ),
           ),
 
-          // Contenu.
+          // Contenu. La Material (translucide) est requise par les
+          // TextField/Switch des écrans ; le décor est dessiné en dessous.
           Positioned.fill(
-            child: SafeArea(
-              child: Padding(padding: padding, child: child),
+            child: Material(
+              type: MaterialType.transparency,
+              child: SafeArea(
+                child: Padding(padding: padding, child: child),
+              ),
             ),
           ),
         ],

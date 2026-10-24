@@ -65,4 +65,56 @@
 - **Exécution réelle** : `dart format` OK, `flutter analyze` **No issues found**,
   `flutter test` **+68 : All tests passed**.
 
-## Phase 4 — Écrans et navigation ⏳ non commencée
+## Phase 4 — Écrans et navigation ✅ (2026-10-24)
+- **Providers applicatifs** (`lib/app/providers.dart`) : dictionnaire, réglages,
+  session de jeu (riverpod) — injections interchangeables, le multi de la phase 7
+  introduira un provider de salon sans toucher au moteur.
+- **Session de jeu** (`lib/features/game/state/solo_session.dart`) :
+  `GameSetup` (liste de catégories figée, durée, manches 1–5, lettres difficiles) →
+  `start` / `drawLetter` (un tirage par manche, sans répétition dans la partie,
+  paramètre `forced` réservé aux tests) / `setAnswer` / `endTurn`
+  (validation + score via le moteur **pur**, mots consommés enregistrés
+  inter-manches) / `nextRound` / `restart`. État immutable ;
+  `RoundResult` prêt pour l'écran de résultats.
+- **Écrans réels** (remplacent tous les placeholders) :
+  - Configuration (Figma 03/08) : Aléatoire (socle 5 + 4, non modifiable, liste
+    figée au lancement) / Personnalisé (max 12, obligatoires cadenassées),
+    durées [20·Speed, 30, 45, 60, 90, 120, sans chrono], stepper manches 1–5,
+    option K W X Y Z, CTA LANCER (solo) ou CRÉER LE SALON (multi).
+  - Tirage/Fig. roue (Figma 10) : roue CustomPaint 21 segments, 3,4 s
+    easeOutCubic +1440°, lettre du moteur sous le pointeur, navigation
+    automatique vers la manche.
+  - Manche (Figma 05/11) : tuile de lettre, chrono (lin, rouge ≤ 10 s),
+    lignes de réponse, progression « n / N », VALIDER (chrono) / STOP
+    (sans chrono, grisé tant que tout n'est pas rempli), **fin automatique
+    à 0 s** (validation + résultats).
+  - Résultats de manche (Figma 12) : réponse, points, justification
+    française par catégorie, total, badge « Règle à trancher » si conflit
+    réutilisation ; bouton Manche suivante (→ roue) ou Terminer (→ fin).
+  - Fin de partie (Figma 07/13) : score total des manches solo,
+    REJOUER (même config, historique remis à zéro) et MENU. Podium multi
+    à la phase 7.
+  - Rejoindre (Figma 06) : code 6 signes sans ambigus + pseudo ; validation
+    de forme locale, recherche du salon honnêtement à la phase 7.
+  - Salon (Figma 04/09) : état honnête « salons en ligne à la phase 7 »,
+    rien de simulé.
+  - Paramètres (Figma 18) : branché sur `SettingsRepository` (pseudo, sons,
+    vibrations, animations réduites).
+  - Règles (Figma 19) : barème, réutilisation provisoire marquée, lettres,
+    manches, règle souple Prénom — fidèles au moteur réel.
+  - Historique : annonce la phase 6 (enregistrement local des parties).
+  - Statut générique (Figma 14–17) : ATTENTE / ERREUR / SALON INTROUVABLE.
+- **Corrections structurelles levées par les tests** :
+  - `ScreenScaffold` : couche `Material` translucide sous le contenu — les
+    `TextField`/`Switch` n'ont plus d'écran rouge (le bug aurait planté
+    l'app réelle, pas seulement les tests).
+  - `UsedWords.clear()` exposé (redémarrage de partie).
+- **Routeur** : 13 routes réelles + /not-found.
+- **Menu** : Solo/Multijoueur → `/config?mode=…`, OK code → `/join`,
+  Classement → `/history`.
+- **Exécution réelle** : `dart format` OK, `flutter analyze`
+  **No issues found**, `flutter test` **+75 : All tests passed**
+  (nouvelles : 6 session contrôleur avec dictionnaire réel + 1 parcours
+  widget manche→VALIDER→résultats).
+
+## Phase 5 — Intégration solo de bout en bout ⏳ non commencée
