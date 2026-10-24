@@ -48,4 +48,21 @@
 - **Exécution réelle** : `dart format` OK, `flutter analyze` **No issues found**,
   `flutter test` **+59 : All tests passed** (55 moteur + 4 socle).
 
-## Phase 3 — Dictionnaire + dépôts locaux ⏳ non commencée
+## Phase 3 — Dictionnaire + dépôts locaux ✅ (2026-10-24)
+- `lib/data/dictionary/dictionary_repository.dart` : contrat + mapping catégories
+  Wordstorm → listes Petit Bac. Couvertes : Prénom, Ville, Pays, Animal, Objet,
+  Métier, Sport, Partie du corps ; partielles : Fruit/Légume ← « Fruit ou légume »
+  (listes mélangées, faux positifs possibles — provision Q2), Marque de voiture ←
+  « Marque », Groupe de musique ← « Chanteur ou groupe ».
+- `lib/data/dictionary/asset_dictionary_repository.dart` : chargement de
+  `assets/words/words.json` (2 226 mots / 18 listes) **hors main isolate** (`compute`),
+  mots normalisés à l'import ; catégories sans liste → `null` → validation souple (Q2).
+- `lib/data/settings/settings_repository.dart` : pseudo, sons, vibrations, animations
+  réduites — persistés (shared_preferences), défauts = tout actif.
+- **Tests** (`test/data/`, 9 cas) : chargement réel de l'asset (18 listes, 2 226 mots,
+  normalisation), mapping complet, branches du moteur avec le dictionnaire réel
+  (« Rat » validé / « Zzzorge » refusé / Fleuve souple), réglages persistés.
+- **Exécution réelle** : `dart format` OK, `flutter analyze` **No issues found**,
+  `flutter test` **+68 : All tests passed**.
+
+## Phase 4 — Écrans et navigation ⏳ non commencée
