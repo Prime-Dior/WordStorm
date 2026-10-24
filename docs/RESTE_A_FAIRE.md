@@ -16,6 +16,13 @@
   monochromes (teinte unique). Le cas échéant, deux couches seront nécessaires pour
   100 % de fidélité — à évaluer à la phase 4.
 
+## Phase 2 — restes volontaires
+- **Articles et pluriels** : la normalisation ne transforme pas « le/les » ni les
+  pluriels (comportement du prototype conservé). À décider si l'arbitre accorde
+  ces formes — tâche léxicale, à traiter avec l'enrichissement du dictionnaire (Q2).
+- **Conflit réutilisation × bonus** : arbitré provisoirement par `reuseWins`
+  (badge « Règle à trancher » prévu dans l'UI des résultats, phase 4).
+
 ## Phase 0 — restes enregistrements
 - Installation du SDK Android + émulateur (étapes dans `docs/ENVIRONNEMENT.md`).
 - Projet Firebase réel + `flutterfire configure` (phase 7 ; `docs/FIREBASE.md` à créer).

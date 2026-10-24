@@ -19,4 +19,33 @@
 - `docs/ENVIRONNEMENT.md` : flutter doctor consigné ; Android SDK à installer.
 - **Traitement effectué** : `dart fix --apply`, `dart format` (21 fichiers), `flutter analyze` **No issues found**, `flutter test` **+4 : All tests passed** (salon_code + smoke).
 
-## Phase 2 — Moteur de règles ⏳ non commencée
+## Phase 2 — Moteur de règles ✅ (2026-10-24)
+- **Dart pur** sous `lib/domain` (aucun import Flutter — testable hors widgets) :
+  - `categories.dart` : 5 obligatoires (cadenas) + 15 optionnelles, max 12/partie,
+    mode aléatoire = socle + 4, manches 1–5, validation de sélection (doublons, plafond).
+  - `rules_config.dart` : barème 15/10/5/0 + réutilisé = 5, `ConflictPolicy`
+    (`reuseWins` par défaut, **provisoire**, question Q1), lettres difficiles K W X Y Z
+    excluses par défaut, durées de manche [20,30,45,60,90,120,0], soloMode.
+  - `normalization.dart` : portage `gameLogic.js` — minuscules, accents supprimés
+    (NFD simulé + œ/æ), filtre de saisie (lettres/accents/espaces/tirets/apostrophes),
+    première lettre insensible casse/accents.
+  - `validation.dart` : vide / mauvaise lettre / trop court (2 l. ; Prénom 3 l.
+    sans dictionnaire, règle souple maquette) / dictionnaire injecté en callback
+    (`true`/`false`/`null` = validation souple pour catégories sans liste,
+    Q2) ; `UsedWords` inter-manches (même mot toléré dans une autre catégorie).
+  - `scoring.dart` : paliers `onlyValid` 15 (bonus, aussi en solo) / `uniqueValid` 10 /
+    `shared` 5 / invalide 0, réutilisé 5, conflit réutilisation × bonus arbitré par
+   ConflictPolicy avec badge « Règle à trancher », justifications en français
+    (« Seule réponse valide · bonus », « Ne commence pas par R », « Pas de réponse »…).
+  - `draws.dart` : tirage de lettre (pool A–Z **moins K W X Y Z, Q inclus** —
+    divergence maquette consignée), sans répétition dans la partie, remise en jeu
+    si pool épuisé ; tirage aléatoire 5 + 4 sans doublon.
+- **Tests** (`test/domain/`, 55 nouveaux cas) : barème, deux politiques de conflit,
+  normalisation, règle Prénom ≥ 3, réutilisation inter-manches (y compris « autre
+  catégorie autorisée »), lettre tirée (exclusions/no-repeat), catégories aléatoires,
+  et **exemple de référence du cahier §16.1 : Anna 35 / Ben 15 / Cyril 15** (scénario
+  inféré couvrant tous les paliers, documenté dans le test lui-même).
+- **Exécution réelle** : `dart format` OK, `flutter analyze` **No issues found**,
+  `flutter test` **+59 : All tests passed** (55 moteur + 4 socle).
+
+## Phase 3 — Dictionnaire + dépôts locaux ⏳ non commencée
