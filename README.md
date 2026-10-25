@@ -82,4 +82,3 @@ Chacun peut travailler sur son écran dans une branche séparée. Pour les inter
 - [Progression](docs/PROGRESSION.md)
 - [Travail restant](docs/RESTE_A_FAIRE.md)
 - [Environnement de développement](docs/ENVIRONNEMENT.md)
-- [Guide pour comprendre et modifier les écrans](docs/Guide_explicatif_des_ecrans.docx)
