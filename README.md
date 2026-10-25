@@ -18,7 +18,8 @@ WordStorm/
 │   └── integration_test/      Parcours de l'application
 ├── backend/                   Services serveur (à venir)
 │   └── firebase/              Emplacement prévu pour Firebase
-├── docs/                      Cahier des charges, plan et suivi
+├── docs/                      Cahier des charges, plan, suivi et maquettes
+│   └── maquettes/             Fichiers de maquette SVG
 └── .github/workflows/         Vérifications automatiques
 ```
 
@@ -77,6 +78,7 @@ Chacun peut travailler sur son écran dans une branche séparée. Pour les inter
 
 ## Documents utiles
 
+- [Maquette SVG](docs/maquettes/wordstorm-maquette.svg)
 - [Cahier des charges](docs/Cahier_des_charges_Wordstorm_Flutter.docx)
 - [Plan des phases](docs/PLAN.md)
 - [Progression](docs/PROGRESSION.md)
