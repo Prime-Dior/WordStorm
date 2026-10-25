@@ -9,22 +9,18 @@ import '../../core/widgets/icons/wordstorm_icons.dart';
 import '../../core/widgets/screen_scaffold.dart';
 import '../../core/widgets/wordstorm_logo.dart';
 
-/// Menu principal (maquette `#menu`) — socle de la phase 1.
-/// Décision prompt §4 : Solo →, Multijoueur →, « Rejoindre avec un code »
-/// (champ + OK + message d'erreur), Classement. Pas de carte Configuration.
+/// Menu principal : choix du mode de jeu ou accès aux autres pages.
 class MenuScreen extends StatelessWidget {
   const MenuScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final controller = TextEditingController();
-
     return ScreenScaffold(
       skylineHeight: 360,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // En-tête : logo compact + engrenage Paramètres.
+          // Logo et accès aux réglages.
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -37,7 +33,7 @@ class MenuScreen extends StatelessWidget {
           ),
           const SizedBox(height: 10),
 
-          // Palier d'identification (maquette : « Salut, champion ! »).
+          // Petit message sous le logo.
           const Row(
             children: [
               // Avatar de la maquette ; personnalisation à la phase 6.
@@ -59,7 +55,7 @@ class MenuScreen extends StatelessWidget {
           ),
           const Spacer(),
 
-          // Solo → (configuration de la partie).
+          // Le mode solo ouvre les réglages de la partie.
           ArcadeMenuCard(
             label: 'Solo',
             detail: 'Joue à ton rythme',
@@ -69,7 +65,7 @@ class MenuScreen extends StatelessWidget {
           ),
           const SizedBox(height: 12),
 
-          // Multijoueur → (configuration, créé un salon à la phase 7).
+          // Le mode multijoueur passe aussi par la configuration.
           ArcadeMenuCard(
             label: 'Multijoueur',
             detail: 'Crée un salon',
@@ -79,7 +75,7 @@ class MenuScreen extends StatelessWidget {
           ),
           const SizedBox(height: 14),
 
-          // Rejoindre avec un code.
+          // La saisie du code se fait sur l'écran dédié.
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
@@ -101,9 +97,13 @@ class MenuScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 8),
-                CodeField(
-                  controller: controller,
-                  trailing: const SizedBox.shrink(),
+                const Text(
+                  'Tu as reçu un code ? Entre dans le salon pour jouer avec tes amis.',
+                  style: TextStyle(
+                    fontFamily: AppTheme.bodyFont,
+                    fontSize: 12,
+                    color: AppColors.offWhite,
+                  ),
                 ),
                 const SizedBox(height: 8),
                 Align(
@@ -119,8 +119,7 @@ class MenuScreen extends StatelessWidget {
           ),
           const SizedBox(height: 14),
 
-          // Classement (historique et meilleurs scores personnels —
-          // commande pas de classement global).
+          // Historique des parties et meilleurs scores.
           ArcadeMenuCard(
             label: 'Classement',
             detail: 'Historique & records',

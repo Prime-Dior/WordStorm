@@ -8,7 +8,7 @@ Chaque phase se termine par : `dart format .`, `flutter analyze` sans avertissem
 - `flutter doctor` exécuté et consigné. Contrainte : Android SDK à installer (cmdline-tools présent dans Downloads).
 
 ## Phase 1 — Socle
-- Projet Flutter (`flutter create`) sur `C:\Users\Zbook\Wordstorm` (racine = dépôt git existant ; la racine contiendra `README.md`, `docs/` + app Flutter).
+- Projet Flutter conservé dans `frontend/` ; la racine du dépôt garde `README.md`, `docs/`, `.github/` et le dossier réservé `backend/`.
 - `pubspec.yaml` : riverpod, go_router, flutter_svg, flutter_animate (pré-évaluée), shared_preferences ; lints stricts (`flutter_lints`), formatage.
 - `lib/core` : thème (palette + polices TTF conversion woff2), décor (CustomPainter : ville de jour/nuit, rayons), composants figma : `ArcadeButton`, `CategoryTile`, `ResponseRow`, `PlayerCard`, `CheckboxRow`, `LockBadge`, `CodeField`, `NavigationChip`…
 - `lib/app` : routage `go_router`, squelette d'écrans non simulés.
