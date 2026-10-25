@@ -35,7 +35,7 @@ cd frontend
 flutter pub get
 ```
 
-Dans VS Code, ouvrir le dossier `frontend/` pour travailler sur l'application. Pour lancer les écrans dans Chrome :
+Dans VS Code, ouvrir le dossier `frontend/` pour travailler sur l'application. Le lancement normal ouvre l'aperçu téléphone des seuls écrans déjà réalisés : accueil, menu, configuration et salon. Les autres écrans du socle ne sont pas accessibles depuis cette présentation. Pour la lancer dans Chrome :
 
 ```powershell
 flutter run -d chrome
