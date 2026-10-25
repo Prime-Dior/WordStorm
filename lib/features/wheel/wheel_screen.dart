@@ -26,14 +26,24 @@ class WheelScreen extends ConsumerStatefulWidget {
 
 class _WheelScreenState extends ConsumerState<WheelScreen>
     with SingleTickerProviderStateMixin {
-  late final AnimationController _spin;
+  AnimationController? _spin;
   late final List<String> _letters = Draws.defaultPool.split('');
-  late final String letter;
+  String letter = '';
 
   @override
   void initState() {
     super.initState();
-    // 1. Le moteur tire la lettre de la manche.
+    // Le tirage + le démarrage de la roue sont différés **après** la
+    // construction : riverpod interdit de modifier un provider pendant
+    // que l'arbre est en cours de construction (rien dans initState).
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _startSpin();
+    });
+  }
+
+  void _startSpin() {
+    // 1. Le moteur tire la lettre de la manche (un tirage par manche).
     ref.read(soloSessionProvider.notifier).drawLetter();
     letter = ref.read(soloSessionProvider).letter;
 
@@ -44,29 +54,30 @@ class _WheelScreenState extends ConsumerState<WheelScreen>
     const fullTurns = 1440 * math.pi / 180;
     final target = fullTurns - index * segment;
 
-    _spin = AnimationController(
+    final spin = _spin = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 3400),
     );
-    final curved = CurvedAnimation(parent: _spin, curve: Curves.easeOutCubic);
+    final curved = CurvedAnimation(parent: spin, curve: Curves.easeOutCubic);
     curved.addListener(() {
+      if (!mounted) return;
       setState(() => _angle = curved.value * target);
     });
-    // Navigation automatique vers la manche quand la roue s'arrête
-    // (enregistré une seule fois, dans initState).
     curved.addStatusListener((status) {
       if (status == AnimationStatus.completed && mounted) {
         context.pushReplacement('/game');
       }
     });
-    _spin.forward();
+    // Navigation automatique vers la manche quand la roue s'arrête
+    // (enregistré une seule fois).
+    spin.forward();
   }
 
   double _angle = 0;
 
   @override
   void dispose() {
-    _spin.dispose();
+    _spin?.dispose();
     super.dispose();
   }
 

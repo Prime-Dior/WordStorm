@@ -88,7 +88,10 @@ class _GameScreenState extends ConsumerState<GameScreen> {
           key: ValueKey(category),
           category: category,
           iconName: categoryIconName(category),
-          onChanged: (_ /* le champ capte lui-même */) {},
+          // Se reconstruire à la saisie : la progression « n / N » et
+          // l'enablement du STOP (sans chrono) doivent refléter les
+          // champs en direct.
+          onChanged: (_) => setState(() {}),
           controller: _controllerFor(category),
           onSubmitted: (_) {
             FocusManager.instance.primaryFocus?.unfocus();

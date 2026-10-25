@@ -16,6 +16,24 @@
   monochromes (teinte unique). Le cas échéant, deux couches seront nécessaires pour
   100 % de fidélité — à évaluer à la phase 4.
 
+## Phase 5 — restes volontaires
+- **Tests `integration_test` non exécutés ici** : le fichier
+  `integration_test/solo_e2e_test.dart` est écrit et prêt
+  (`flutter drive --driver=test_driver/integration_test.dart
+  --target=integration_test/solo_e2e_test.dart -d chrome|windows`), mais
+  cet environnement n'arrive pas à y exécuter : Chrome/Edge restent
+  bloqués au service de debug DWDS (aucune fenêtre ne s'ouvre), et le
+  run natif Windows attend l'activation du **Mode Développeur**. Le
+  même parcours est couvert par `test/app/solo_flow_e2e_test.dart`
+  (headless, exécuté vert) — sur une machine disposant du navigateur,
+  lancer le test d'intégration pour la vérification temps réel.
+- **Le parcours e2e headless avance le temps par pumps** (motif
+  documenté dans le test) : le delta avancé peut être inférieur à la
+  durée pompée — à considérer si d'autres tests sont écrits sur les
+  animations.
+- **Salon multijoueur** (créer/rejoindre temps réel) : phase 7 — les
+  écrans affichent l'état honnête « phase 7 ».
+
 ## Phase 4 — restes volontaires
 - **Animations** : roue (habillage complet — pointeur pivot, anneau central,
   tick sonore à l'arrêt), pulsation/bip de chrono en fin de temps, chute des
@@ -34,10 +52,6 @@
   10 en solo aussi, changement de `RulesConfig.soloMode` — question à trancher.
 - **Icônes à deux teintes** : toujours monochromes (détail `#1E2A44` de la
   maquette) — à évaluer avec les retours visuels.
-- **Test du parcours complet menu→config→roue→manche→résultats→fin** :
-  à la phase 5 (intégration solo), ce test requiert précharger le
-  dictionnaire hors zone FakeAsync (voir `test/game/game_screen_test.dart`,
-  motif `tester.runAsync` documenté dans le test).
 
 ## Phase 3 — restes volontaires
 - **Faux positifs du mapping** : « Fruit ou légume » accepte un légume en Fruit

@@ -117,4 +117,31 @@
   (nouvelles : 6 session contrôleur avec dictionnaire réel + 1 parcours
   widget manche→VALIDER→résultats).
 
-## Phase 5 — Intégration solo de bout en bout ⏳ non commencée
+## Phase 5 — Solo complet hors ligne ✅ (2026-10-24)
+- **Parcours e2e exécuté et vert** (`test/app/solo_flow_e2e_test.dart`) :
+  Menu → Configuration solo (sans chrono, 3→1 manches) → tirage de la roue
+  (3,4 s) → saisie des 5 obligatoires → STOP → résultats de manche
+  (barème appliqué en direct) → fin de partie → **REJOUER** → nouvelle
+  roue → nouvelle manche. Le **dictionnaire réel** est branché partout,
+  les points de scoring réels s'affichent. 76/76 tests, analyze 0.
+- **Deux bugs réels trouvés par l'intégration** :
+  1. `WheelScreen` tirait la lettre **pendant la construction** de l'arbre
+     (riverpod interdit : « Tried to modify a provider while the widget
+     tree was building ») → tirage différé en post-frame callback ;
+     la roue plantait même sur un vrai appareil.
+  2. En **sans-chrono**, STOP restait grisé pour toujours : l'écran de
+     manche ne se reconstruisait pas à la saisie (champ `onChanged` vide)
+     → `setState` branché, la progression « n / N » et le STOP sont
+     désormais en direct. (Sur un appareil réel, le STOP était inutilisable.)
+- **Tests d'intégration écrits, non exécutables dans cet environnement** :
+  `integration_test/solo_e2e_test.dart` + `test_driver/` couvrent le même
+  parcours pour un appareil réel (`flutter drive … -d chrome|windows`).
+  - `flutter drive -d chrome` : Chrome 123 est détecté mais le service de
+    debug DWDS n'aboutit jamais (« Waiting for connection… » figé, aucune
+    fenêtre Chrome n'apparaît, repeat avec `--web-port=8090` : identique).
+  - `flutter drive -d edge` : Edge se lance (9 processus) mais même
+    blocage DWDS figé.
+  - `flutter drive -d windows` : nécessite le **Mode Développeur**
+    (liens symboliques) — à exécuter une fois le réglage activé.
+
+## Phase 6 — Historique / accessibilité / sons ⏳ non commencée

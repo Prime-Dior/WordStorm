@@ -9,6 +9,7 @@ analyzer:
     - web/**
     - '**/*.g.dart'
     - '**/*.freezed.dart'
+    - windows/**
 
 linter:
   rules:
