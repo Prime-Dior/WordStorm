@@ -103,8 +103,9 @@ Chaque nouveau lot logique doit être committé dans un commit séparé, avec un
 
 ### Documentation
 
-- `docs/Guide_explicatif_des_ecrans.docx` explique le démarrage, la navigation, les widgets utilisés et les endroits où modifier les deux premiers écrans.
-- `C:\Users\Zbook\wordstorm_ui\docs\Guide_explicatif_du_code.docx` a aussi été remplacé pour garder le guide à son emplacement local historique.
+- Le guide de code à jour est local uniquement : `C:\Users\Zbook\Downloads\Guide_explicatif_WordStorm.docx`.
+- Ne pas ajouter ce guide au dépôt et ne pas remettre de lien vers lui dans le README. Après chaque modification de code des écrans, mettre à jour ce document dans Téléchargements pour expliquer les changements de code.
+- Le guide comprend une nouvelle partie sur la présentation en smartphone, dessinée par `_PhonePreview` dans `frontend/lib/app/showcase_app.dart` et affichée par Chrome.
 
 ## Lancer l’aperçu
 
