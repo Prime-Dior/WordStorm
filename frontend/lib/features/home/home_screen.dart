@@ -29,7 +29,7 @@ class HomeScreen extends StatelessWidget {
           // Logo et petite phrase d'accueil.
           const Positioned(left: 18, top: 56, child: WordstormLogo()),
           // Slogan « Des mots, un seul champion ! ».
-          Positioned(
+          const Positioned(
             left: 18,
             top: 170,
             child: Text(
@@ -70,7 +70,7 @@ class HomeScreen extends StatelessWidget {
               ),
             ),
           ),
-          const Positioned(
+          Positioned(
             left: 88,
             bottom: 170,
             child: Transform.rotate(angle: 0.31, child: _HomeTile(letter: 'E')),
