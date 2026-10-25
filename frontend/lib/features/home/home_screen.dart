@@ -62,7 +62,7 @@ class HomeScreen extends StatelessWidget {
             bottom: 230,
             child: Transform.rotate(
               angle: -0.42,
-              child: _HomeTile(
+              child: const _HomeTile(
                 letter: 'R',
                 colorTop: Color(0xFFFF9A9D),
                 colorBottom: Color(0xFFFF5A5F),
@@ -73,7 +73,10 @@ class HomeScreen extends StatelessWidget {
           Positioned(
             left: 88,
             bottom: 170,
-            child: Transform.rotate(angle: 0.31, child: _HomeTile(letter: 'E')),
+            child: Transform.rotate(
+              angle: 0.31,
+              child: const _HomeTile(letter: 'E'),
+            ),
           ),
           // Accès au menu, aux réglages et sortie de l'application.
           Positioned(
