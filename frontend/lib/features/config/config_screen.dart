@@ -102,27 +102,6 @@ class _ConfigScreenState extends ConsumerState<ConfigScreen> {
           _Header(isSolo: _isSolo),
           const SizedBox(height: 14),
           _modeChips(),
-          if (!_isSolo) ...[
-            const SizedBox(height: 9),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 8),
-              decoration: BoxDecoration(
-                color: AppColors.teal.withAlpha(0x20),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: AppColors.teal.withAlpha(0x66)),
-              ),
-              child: const Text(
-                'Aperçu frontend : le salon ne sera pas en ligne ni accessible aux autres joueurs.',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontFamily: AppTheme.bodyFont,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.offWhite,
-                ),
-              ),
-            ),
-          ],
           const SizedBox(height: 10),
           Expanded(
             child: SingleChildScrollView(

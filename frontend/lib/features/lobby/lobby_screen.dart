@@ -82,33 +82,6 @@ class _LobbyScreenState extends State<LobbyScreen> {
               const SizedBox(width: 48),
             ],
           ),
-          const SizedBox(height: 8),
-          Container(
-            padding: const EdgeInsets.all(11),
-            decoration: BoxDecoration(
-              color: AppColors.coral.withAlpha(0x22),
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: AppColors.coral.withAlpha(0x99)),
-            ),
-            child: const Row(
-              children: [
-                Icon(Icons.info_outline, color: AppColors.coral, size: 20),
-                SizedBox(width: 9),
-                Expanded(
-                  child: Text(
-                    'APERÇU FRONTEND — ce salon est local. Aucun autre joueur ne peut le rejoindre.',
-                    style: TextStyle(
-                      fontFamily: AppTheme.bodyFont,
-                      fontSize: 11,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.offWhite,
-                      height: 1.35,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
           const SizedBox(height: 14),
           _CodePanel(code: _code, onCopy: _copyCode),
           const SizedBox(height: 14),
@@ -125,7 +98,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
                 ),
               ),
               Text(
-                '1 / 8 · hôte local',
+                '1 / 8 joueurs',
                 style: TextStyle(
                   fontFamily: AppTheme.bodyFont,
                   fontWeight: FontWeight.w700,
@@ -150,16 +123,6 @@ class _LobbyScreenState extends State<LobbyScreen> {
                 setup: setup,
                 durationLabel: _durationLabel(setup.durationSeconds),
               ),
-            ),
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            'Le démarrage sera disponible après la connexion du multijoueur en ligne.',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontFamily: AppTheme.bodyFont,
-              fontSize: 11,
-              color: AppColors.blueGray,
             ),
           ),
           const SizedBox(height: 8),
@@ -228,8 +191,7 @@ class _CodePanel extends StatelessWidget {
   );
 }
 
-/// Emplacements visuels de la maquette, explicitement présentés comme
-/// illustratifs pour éviter de laisser croire à des connexions réelles.
+/// Indique combien de places restent dans le salon.
 class _EmptyPlacesPreview extends StatelessWidget {
   const _EmptyPlacesPreview();
 
@@ -247,7 +209,7 @@ class _EmptyPlacesPreview extends StatelessWidget {
         SizedBox(width: 8),
         Expanded(
           child: Text(
-            '7 places illustratives · joueurs en ligne non connectés',
+            '7 places libres',
             style: TextStyle(
               fontFamily: AppTheme.bodyFont,
               fontSize: 11,

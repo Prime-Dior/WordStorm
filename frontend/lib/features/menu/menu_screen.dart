@@ -4,13 +4,27 @@ import 'package:go_router/go_router.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/arcade_button.dart';
+import '../../core/widgets/code_field.dart';
 import '../../core/widgets/icons/wordstorm_icons.dart';
 import '../../core/widgets/screen_scaffold.dart';
 import '../../core/widgets/wordstorm_logo.dart';
 
 /// Menu principal : choix du mode de jeu ou accès aux autres pages.
-class MenuScreen extends StatelessWidget {
+class MenuScreen extends StatefulWidget {
   const MenuScreen({super.key});
+
+  @override
+  State<MenuScreen> createState() => _MenuScreenState();
+}
+
+class _MenuScreenState extends State<MenuScreen> {
+  final TextEditingController _codeController = TextEditingController();
+
+  @override
+  void dispose() {
+    _codeController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +37,7 @@ class MenuScreen extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const WordstormLogoSmall(),
+              const WordstormLogoSmall(showLightning: true),
               _IconButton(
                 tooltip: 'Paramètres',
                 onPressed: () => context.push('/settings'),
@@ -74,47 +88,31 @@ class MenuScreen extends StatelessWidget {
           ),
           const SizedBox(height: 14),
 
-          // La saisie du code se fait sur l'écran dédié.
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: const Color(0xCC000000),
-              borderRadius: BorderRadius.circular(18),
-              border: Border.all(color: const Color(0x22FFFFFF), width: 2),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Rejoindre avec un code',
-                  style: TextStyle(
-                    fontFamily: AppTheme.bodyFont,
-                    fontSize: 11,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 0.7,
-                    color: AppColors.offWhite.withAlpha(0xEE),
-                  ),
+          // Champ de code comme sur la maquette.
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Rejoindre avec un code',
+                style: TextStyle(
+                  fontFamily: AppTheme.bodyFont,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.7,
+                  color: AppColors.offWhite,
                 ),
-                const SizedBox(height: 8),
-                const Text(
-                  'Tu as reçu un code ? Entre dans le salon pour jouer avec tes amis.',
-                  style: TextStyle(
-                    fontFamily: AppTheme.bodyFont,
-                    fontSize: 12,
-                    color: AppColors.offWhite,
-                  ),
+              ),
+              const SizedBox(height: 8),
+              CodeField(
+                controller: _codeController,
+                onValidated: () => context.push('/join'),
+                trailing: ArcadeButton(
+                  label: 'OK',
+                  small: true,
+                  onPressed: () => context.push('/join'),
                 ),
-                const SizedBox(height: 8),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: ArcadeButton(
-                    label: 'OK',
-                    small: true,
-                    onPressed: () => context.push('/join'),
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
           const SizedBox(height: 14),
 
