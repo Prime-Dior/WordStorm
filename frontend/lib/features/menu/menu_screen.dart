@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/arcade_button.dart';
-import '../../core/widgets/code_field.dart';
 import '../../core/widgets/icons/wordstorm_icons.dart';
 import '../../core/widgets/screen_scaffold.dart';
 import '../../core/widgets/wordstorm_logo.dart';
