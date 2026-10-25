@@ -7,6 +7,7 @@ import '../features/history/history_screen.dart';
 import '../features/home/home_screen.dart';
 import '../features/join/join_screen.dart';
 import '../features/lobby/lobby_screen.dart';
+import '../features/lobby/lobby_setup.dart';
 import '../features/menu/menu_screen.dart';
 import '../features/results/final_results_screen.dart';
 import '../features/results/round_results_screen.dart';
@@ -73,7 +74,14 @@ class AppRouter {
       GoRoute(
         path: '/lobby',
         name: 'lobby',
-        pageBuilder: (context, state) => _fade(state, const LobbyScreen()),
+        pageBuilder: (context, state) => _fade(
+          state,
+          LobbyScreen(
+            setup: state.extra is LobbySetup
+                ? state.extra! as LobbySetup
+                : null,
+          ),
+        ),
       ),
       GoRoute(
         path: '/settings',

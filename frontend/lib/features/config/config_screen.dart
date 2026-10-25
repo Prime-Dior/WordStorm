@@ -13,6 +13,7 @@ import '../../domain/categories.dart';
 import '../../domain/draws.dart';
 import '../../domain/rules_config.dart';
 import '../game/state/solo_session.dart';
+import '../lobby/lobby_setup.dart';
 
 /// Écran « Nouvelle partie » (Figma 03/08) :
 /// - mode de catégories **Aléatoire** (socle + 4, non
@@ -75,6 +76,22 @@ class _ConfigScreenState extends ConsumerState<ConfigScreen> {
     if (mounted) context.push('/wheel');
   }
 
+  void _previewLobby() {
+    final categories = List<String>.unmodifiable(
+      _randomMode ? Draws.pickRandomCategories() : _selected,
+    );
+    context.push(
+      '/lobby',
+      extra: LobbySetup(
+        categories: categories,
+        durationSeconds: _duration,
+        rounds: _rounds,
+        allowHardLetters: _hardLetters,
+        randomCategories: _randomMode,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return ScreenScaffold(
@@ -85,6 +102,27 @@ class _ConfigScreenState extends ConsumerState<ConfigScreen> {
           _Header(isSolo: _isSolo),
           const SizedBox(height: 14),
           _modeChips(),
+          if (!_isSolo) ...[
+            const SizedBox(height: 9),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 8),
+              decoration: BoxDecoration(
+                color: AppColors.teal.withAlpha(0x20),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: AppColors.teal.withAlpha(0x66)),
+              ),
+              child: const Text(
+                'Aperçu frontend : le salon ne sera pas en ligne ni accessible aux autres joueurs.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontFamily: AppTheme.bodyFont,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.offWhite,
+                ),
+              ),
+            ),
+          ],
           const SizedBox(height: 10),
           Expanded(
             child: SingleChildScrollView(
@@ -196,9 +234,7 @@ class _ConfigScreenState extends ConsumerState<ConfigScreen> {
             ArcadeButton(
               label: 'Créer le salon',
               variant: ArcadeButtonVariant.teal,
-              // Le multi-parte en ligne (salons/démarrage) est branché à la
-              // phase 7 — l'écran de salon affiche l'état « attente ».
-              onPressed: _canStart ? () => context.push('/lobby') : null,
+              onPressed: _canStart ? _previewLobby : null,
             ),
         ],
       ),
