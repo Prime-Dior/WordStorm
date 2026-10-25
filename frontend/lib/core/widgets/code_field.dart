@@ -76,6 +76,7 @@ class CodeField extends StatelessWidget {
                   selection: TextSelection.collapsed(offset: cursor),
                 );
               },
+              onSubmitted: (_) => onValidated?.call(),
               style: const TextStyle(
                 fontFamily: AppTheme.monoFont,
                 fontWeight: FontWeight.w700,

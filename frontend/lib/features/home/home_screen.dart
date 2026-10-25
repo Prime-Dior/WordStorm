@@ -28,7 +28,11 @@ class HomeScreen extends StatelessWidget {
       child: Stack(
         children: [
           // Logo et petite phrase d'accueil.
-          const Positioned(left: 18, top: 56, child: WordstormLogo()),
+          const Positioned(
+            left: 18,
+            top: 56,
+            child: WordstormLogo(showLightning: true),
+          ),
           // Slogan « Des mots, un seul champion ! ».
           const Positioned(
             left: 18,
@@ -63,15 +67,25 @@ class HomeScreen extends StatelessWidget {
             bottom: 230,
             child: Transform.rotate(
               angle: -0.42,
-              child: const LetterTile(letter: 'R', size: 46, rotation: -0.42),
+              child: const LetterTile(
+                letter: 'R',
+                size: 46,
+                rotation: -0.42,
+                topColor: Color(0xFFFF9A9D),
+                middleColor: Color(0xFFFF747A),
+                bottomColor: Color(0xFFFF5A5F),
+                shadowColor: Color(0xFFB93A3E),
+                textColor: Colors.white,
+              ),
             ),
           ),
           Positioned(
             left: 88,
-            bottom: 170,
+            // La tuile reste au-dessus des boutons et se voit à côté du R.
+            bottom: 230,
             child: Transform.rotate(
               angle: 0.31,
-              child: const LetterTile(letter: 'E', size: 42, rotation: 0.31),
+              child: const LetterTile(letter: 'E', size: 46, rotation: 0.31),
             ),
           ),
           // Accès au menu, aux réglages et sortie de l'application.

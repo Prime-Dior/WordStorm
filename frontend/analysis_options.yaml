@@ -10,6 +10,7 @@ analyzer:
     - '**/*.g.dart'
     - '**/*.freezed.dart'
     - windows/**
+    - linux/**
 
 linter:
   rules:

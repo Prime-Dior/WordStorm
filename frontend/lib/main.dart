@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'app/app.dart';
+import 'app/showcase_app.dart';
 
-// Le ProviderScope s'occupe de préférences/dictionnaire (providers.dart).
+// Le ProviderScope est nécessaire aux écrans de configuration et au salon.
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const ProviderScope(child: WordstormApp()));
+  runApp(ProviderScope(child: ShowcaseApp()));
 }

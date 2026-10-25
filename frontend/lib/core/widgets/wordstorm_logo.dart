@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
 import '../theme/app_theme.dart';
+import 'icons/wordstorm_icons.dart';
 
 /// Logo « WORDSTORM » : Bangers, deux lignes (« WORD » dégradé jaune,
 /// « STORM » dégradé bleu), contour épais bleu-nuit + ombre portée sombre,
@@ -16,12 +17,14 @@ class WordstormLogo extends StatelessWidget {
     this.fontSize = 84,
     super.key,
     this.rotationDegrees = -5,
+    this.showLightning = false,
   });
 
   final double fontSize;
 
   /// Rotation de l'ensemble (accueil : −5°, menus : −3°).
   final double rotationDegrees;
+  final bool showLightning;
 
   static const List<Color> yellowGradient = [
     Color(0xFFFFF08A),
@@ -38,27 +41,83 @@ class WordstormLogo extends StatelessWidget {
   Widget build(BuildContext context) {
     return Transform.rotate(
       angle: rotationDegrees * math.pi / 180,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Stack(
+        clipBehavior: Clip.none,
         children: [
-          _OutlinedText(
-            text: 'WORD',
-            fontSize: fontSize,
-            gradient: yellowGradient,
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _OutlinedText(
+                text: 'WORD',
+                fontSize: fontSize,
+                gradient: yellowGradient,
+              ),
+              Padding(
+                padding: EdgeInsets.only(left: fontSize * 0.1),
+                child: _OutlinedText(
+                  text: 'STORM',
+                  fontSize: fontSize,
+                  gradient: blueGradient,
+                ),
+              ),
+            ],
           ),
-          Padding(
-            padding: EdgeInsets.only(left: fontSize * 0.1),
-            child: _OutlinedText(
-              text: 'STORM',
-              fontSize: fontSize,
-              gradient: blueGradient,
+          if (showLightning)
+            Positioned(
+              left: fontSize * 1.34,
+              top: fontSize * 1.25,
+              child: Transform.rotate(
+                angle: 0.18,
+                child: WordstormIcons.bolt(
+                  size: fontSize * 0.19,
+                  color: AppColors.yellow,
+                ),
+              ),
             ),
-          ),
+          if (showLightning)
+            Positioned(
+              left: fontSize * 0.04,
+              top: -fontSize * 0.16,
+              child: CustomPaint(
+                size: Size(fontSize * 0.25, fontSize * 0.21),
+                painter: _CrownPainter(),
+              ),
+            ),
         ],
       ),
     );
   }
+}
+
+class _CrownPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final line = Paint()
+      ..color = AppColors.offWhite
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = size.width * 0.07
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round;
+    final crown = Path()
+      ..moveTo(size.width * 0.08, size.height * 0.2)
+      ..lineTo(size.width * 0.18, size.height * 0.78)
+      ..lineTo(size.width * 0.5, size.height * 0.08)
+      ..lineTo(size.width * 0.82, size.height * 0.78)
+      ..lineTo(size.width * 0.92, size.height * 0.2)
+      ..lineTo(size.width * 0.82, size.height * 0.88)
+      ..lineTo(size.width * 0.18, size.height * 0.88)
+      ..close();
+    canvas.drawPath(crown, line);
+    canvas.drawLine(
+      Offset(size.width * 0.21, size.height * 0.98),
+      Offset(size.width * 0.79, size.height * 0.98),
+      line,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant _CrownPainter oldDelegate) => false;
 }
 
 /// Texte Bangers en dégradé, contour épais bleu nuit et ombre portée dure.
@@ -126,11 +185,19 @@ class _OutlinedText extends StatelessWidget {
 
 /// Variante compacte des en-têtes (menu, écrans internes).
 class WordstormLogoSmall extends StatelessWidget {
-  const WordstormLogoSmall({this.fontSize = 46, super.key});
+  const WordstormLogoSmall({
+    this.fontSize = 46,
+    super.key,
+    this.showLightning = false,
+  });
 
   final double fontSize;
+  final bool showLightning;
 
   @override
-  Widget build(BuildContext context) =>
-      WordstormLogo(fontSize: fontSize, rotationDegrees: -3);
+  Widget build(BuildContext context) => WordstormLogo(
+    fontSize: fontSize,
+    rotationDegrees: -3,
+    showLightning: showLightning,
+  );
 }

@@ -13,6 +13,7 @@ import '../../domain/categories.dart';
 import '../../domain/draws.dart';
 import '../../domain/rules_config.dart';
 import '../game/state/solo_session.dart';
+import '../lobby/lobby_setup.dart';
 
 /// Écran « Nouvelle partie » (Figma 03/08) :
 /// - mode de catégories **Aléatoire** (socle + 4, non
@@ -73,6 +74,22 @@ class _ConfigScreenState extends ConsumerState<ConfigScreen> {
     );
     await ref.read(soloSessionProvider.notifier).start(setup);
     if (mounted) context.push('/wheel');
+  }
+
+  void _previewLobby() {
+    final categories = List<String>.unmodifiable(
+      _randomMode ? Draws.pickRandomCategories() : _selected,
+    );
+    context.push(
+      '/lobby',
+      extra: LobbySetup(
+        categories: categories,
+        durationSeconds: _duration,
+        rounds: _rounds,
+        allowHardLetters: _hardLetters,
+        randomCategories: _randomMode,
+      ),
+    );
   }
 
   @override
@@ -196,9 +213,7 @@ class _ConfigScreenState extends ConsumerState<ConfigScreen> {
             ArcadeButton(
               label: 'Créer le salon',
               variant: ArcadeButtonVariant.teal,
-              // Le multi-parte en ligne (salons/démarrage) est branché à la
-              // phase 7 — l'écran de salon affiche l'état « attente ».
-              onPressed: _canStart ? () => context.push('/lobby') : null,
+              onPressed: _canStart ? _previewLobby : null,
             ),
         ],
       ),

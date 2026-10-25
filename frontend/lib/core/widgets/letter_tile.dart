@@ -14,6 +14,11 @@ class LetterTile extends StatelessWidget {
     this.fontSize,
     this.rotation = 0,
     this.done,
+    this.topColor,
+    this.middleColor,
+    this.bottomColor,
+    this.shadowColor,
+    this.textColor,
   });
 
   final String letter;
@@ -23,6 +28,13 @@ class LetterTile extends StatelessWidget {
   /// Rotation légère (`.fx` use `--q`).
   final double rotation;
   final bool? done;
+
+  /// Couleurs personnalisables pour les tuiles de la maquette d'accueil.
+  final Color? topColor;
+  final Color? middleColor;
+  final Color? bottomColor;
+  final Color? shadowColor;
+  final Color? textColor;
 
   @override
   Widget build(BuildContext context) {
@@ -38,20 +50,20 @@ class LetterTile extends StatelessWidget {
           alignment: Alignment.center,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(s * 0.16),
-            gradient: const LinearGradient(
+            gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                AppColors.letterTileTop,
-                AppColors.letterTileMiddle,
-                AppColors.letterTileBottom,
+                topColor ?? AppColors.letterTileTop,
+                middleColor ?? AppColors.letterTileMiddle,
+                bottomColor ?? AppColors.letterTileBottom,
               ],
               stops: [0, 0.6, 1],
             ),
             boxShadow: [
-              const BoxShadow(
-                color: AppColors.yellowDark,
-                offset: Offset(0, 7),
+              BoxShadow(
+                color: shadowColor ?? AppColors.yellowDark,
+                offset: const Offset(0, 7),
               ),
               const BoxShadow(
                 color: AppColors.letterTileShadow,
@@ -70,7 +82,7 @@ class LetterTile extends StatelessWidget {
             style: TextStyle(
               fontFamily: 'Bangers',
               fontSize: fontSize ?? s * 0.52,
-              color: AppColors.letterTileInk,
+              color: textColor ?? AppColors.letterTileInk,
               shadows: const [
                 Shadow(color: Color(0x99FFFFFF), offset: Offset(0, 2)),
               ],
