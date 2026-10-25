@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/widgets/arcade_button.dart';
+import '../../core/widgets/letter_tile.dart';
 import '../../core/widgets/screen_scaffold.dart';
 import '../../core/widgets/wordstorm_logo.dart';
 
@@ -62,12 +63,7 @@ class HomeScreen extends StatelessWidget {
             bottom: 230,
             child: Transform.rotate(
               angle: -0.42,
-              child: const _HomeTile(
-                letter: 'R',
-                colorTop: Color(0xFFFF9A9D),
-                colorBottom: Color(0xFFFF5A5F),
-                shadow: Color(0xFFB93A3E),
-              ),
+              child: const LetterTile(letter: 'R', size: 46, rotation: -0.42),
             ),
           ),
           Positioned(
@@ -75,7 +71,7 @@ class HomeScreen extends StatelessWidget {
             bottom: 170,
             child: Transform.rotate(
               angle: 0.31,
-              child: const _HomeTile(letter: 'E'),
+              child: const LetterTile(letter: 'E', size: 42, rotation: 0.31),
             ),
           ),
           // Accès au menu, aux réglages et sortie de l'application.
@@ -120,59 +116,6 @@ class HomeScreen extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _HomeTile extends StatelessWidget {
-  const _HomeTile({
-    required this.letter,
-    this.colorTop = const Color(0xFFFFE27A),
-    this.colorBottom = const Color(0xFFFFB703),
-    this.shadow = const Color(0xFFC98300),
-  });
-
-  final String letter;
-  final Color colorTop;
-  final Color colorBottom;
-  final Color shadow;
-
-  @override
-  Widget build(BuildContext context) {
-    final s = letter == 'R' ? 46.0 : 42.0;
-    final font = letter == 'R' ? 30.0 : 27.0;
-    return Container(
-      width: s,
-      height: s,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(s * 0.16),
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [colorTop, colorBottom],
-        ),
-        boxShadow: [
-          BoxShadow(color: shadow, offset: const Offset(0, 5)),
-          const BoxShadow(
-            color: Color(0x66000000),
-            offset: Offset(0, 10),
-            blurRadius: 12,
-          ),
-          const BoxShadow(color: Color(0xAAFFFFFF), offset: Offset(0, 2)),
-        ],
-      ),
-      child: Text(
-        letter,
-        style: TextStyle(
-          fontFamily: 'Bangers',
-          fontSize: font,
-          color: letter == 'R' ? Colors.white : const Color(0xFF3A2A00),
-          shadows: letter == 'R'
-              ? null
-              : const [Shadow(color: Color(0x99FFFFFF), offset: Offset(0, 2))],
-        ),
       ),
     );
   }
