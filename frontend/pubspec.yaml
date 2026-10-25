@@ -1,0 +1,61 @@
+name: wordstorm
+description: "Wordstorm — jeu mobile de mots inspiré du Petit Bac. Solo et multijoueur en ligne."
+publish_to: 'none'
+
+version: 0.1.0+1
+
+environment:
+  sdk: ^3.13.5
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+
+  # Gestion d'état (cahier §13 : évalué, retenu)
+  flutter_riverpod: ^2.6.1
+
+  # Navigation
+  go_router: ^14.6.2
+
+  # Icônes vectorielles (aucun emoji dans l'interface)
+  flutter_svg: ^2.0.17
+
+  # Préférences locales (paramètres, dernier pseudo) — cahier §13
+  shared_preferences: ^2.3.4
+  audioplayers: ^6.8.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  # Tests d'intégration phase 5 (parcours solo de bout en bout).
+  integration_test:
+    sdk: flutter
+
+  flutter_lints: ^6.0.0
+
+flutter:
+
+  uses-material-design: true
+
+  assets:
+    - assets/images/
+    - assets/words/
+
+  fonts:
+    - family: Bangers
+      fonts:
+        - asset: assets/fonts/Bangers-Regular.ttf
+    - family: Poppins
+      fonts:
+        - asset: assets/fonts/Poppins-Regular.ttf
+        - asset: assets/fonts/Poppins-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Poppins-Bold.ttf
+          weight: 700
+    - family: RobotoMono
+      fonts:
+        - asset: assets/fonts/RobotoMono.ttf
+          weight: 700
