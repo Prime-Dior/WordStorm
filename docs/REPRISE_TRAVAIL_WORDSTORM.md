@@ -53,7 +53,8 @@ Les fichiers à connaître :
 - `frontend/lib/features/lobby/lobby_screen.dart` : salon de Chris, adapté pour la présentation locale.
 - `frontend/lib/features/wheel/` et les autres fonctionnalités : autres pages du modèle, hors de la présentation actuelle.
 - `frontend/assets/` : images, polices et autres ressources de l’application.
-- `docs/maquettes/wordstorm-maquette.svg` : maquette SVG de référence dans la branche `main`.
+- Maquette de référence disponible localement : `C:\Users\Zbook\WordStorm\docs\maquettes\wordstorm-maquette.svg`.
+- Le fichier a été ajouté dans le commit `26bf403` et est présent dans la copie `WordStorm`. La branche de la PR part d’un état antérieur à son ajout dans `main`, donc le fichier n’est pas physiquement dans le dossier `WordStorm-lobby-review` actuellement. La PR cible `main`, qui contient déjà le SVG.
 
 ## Historique et séparation des commits
 
