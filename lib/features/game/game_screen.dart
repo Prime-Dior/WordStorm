@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../app/providers.dart';
+import '../../core/audio/sound_engine.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/arcade_button.dart';
@@ -37,6 +38,10 @@ class _GameScreenState extends ConsumerState<GameScreen> {
   @override
   void initState() {
     super.initState();
+    // Son + vibration de démarrage de manche (phase 6, best-effort).
+    unawaited(ref.read(soundEngineProvider).play(SoundCue.start));
+    unawaited(ref.read(vibrationProvider).light());
+
     final setup = _state.setupOrDefault;
     if (setup.durationSeconds > 0) {
       _remaining = setup.durationSeconds;
@@ -44,6 +49,11 @@ class _GameScreenState extends ConsumerState<GameScreen> {
         setState(() {
           _remaining--;
         });
+        // Blips des 5 dernières secondes (PLAN phase 6) — pas à 0 : la
+        // validation auto prend le relais.
+        if (_remaining > 0 && _remaining <= 5) {
+          unawaited(ref.read(soundEngineProvider).play(SoundCue.tick));
+        }
         if (_remaining <= 0) {
           _timer?.cancel();
           // Fin du temps : validation automatique, puis écran de résultats.
@@ -68,12 +78,17 @@ class _GameScreenState extends ConsumerState<GameScreen> {
   }
 
   /// Pousse tous les champs dans le contrôleur puis termine la manche.
+  /// `endTurn()` met l'état à jour de façon synchrone (avant son premier
+  /// await) : la navigation vers les résultats est donc sûre sans attente.
   void submitAnswers() {
     final controller = ref.read(soloSessionProvider.notifier);
     for (final entry in _controllers.entries) {
       controller.setAnswer(entry.key, entry.value.text);
     }
-    controller.endTurn();
+    // Son + vibration de validation (phase 6, best-effort).
+    unawaited(ref.read(soundEngineProvider).play(SoundCue.validate));
+    unawaited(ref.read(vibrationProvider).medium());
+    unawaited(controller.endTurn());
   }
 
   @override

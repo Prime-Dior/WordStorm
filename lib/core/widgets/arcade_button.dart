@@ -120,7 +120,9 @@ class _ArcadeButtonState extends State<ArcadeButton> {
       onTapUp: enabled ? (_) => setState(() => _pressed = false) : null,
       onTap: widget.onPressed,
       child: Container(
-        constraints: BoxConstraints(minHeight: widget.minHeight ?? 0),
+        // Cible tactile de confort ≥ 48 dp (accessibilité, phase 6) ;
+        // la maquette garde la main via `minHeight` explicite.
+        constraints: BoxConstraints(minHeight: widget.minHeight ?? 48),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(radius),
           gradient: LinearGradient(

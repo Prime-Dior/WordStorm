@@ -27,47 +27,54 @@ class LetterTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final s = size ?? 56;
-    return Transform.rotate(
-      angle: rotation,
-      child: Container(
-        width: s,
-        height: s,
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(s * 0.16),
-          gradient: const LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              AppColors.letterTileTop,
-              AppColors.letterTileMiddle,
-              AppColors.letterTileBottom,
+    return Semantics(
+      // Les tuiles de lettre sont audibles en lecture d'écran.
+      label: 'Lettre ${letter.toUpperCase()}',
+      child: Transform.rotate(
+        angle: rotation,
+        child: Container(
+          width: s,
+          height: s,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(s * 0.16),
+            gradient: const LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                AppColors.letterTileTop,
+                AppColors.letterTileMiddle,
+                AppColors.letterTileBottom,
+              ],
+              stops: [0, 0.6, 1],
+            ),
+            boxShadow: [
+              const BoxShadow(
+                color: AppColors.yellowDark,
+                offset: Offset(0, 7),
+              ),
+              const BoxShadow(
+                color: AppColors.letterTileShadow,
+                offset: Offset(5, 8),
+              ),
+              const BoxShadow(
+                color: Color(0xB3000000),
+                offset: Offset(0, 14),
+                blurRadius: 16,
+              ),
+              const BoxShadow(color: Color(0xAAFFFFFF), offset: Offset(0, 3)),
             ],
-            stops: [0, 0.6, 1],
           ),
-          boxShadow: [
-            const BoxShadow(color: AppColors.yellowDark, offset: Offset(0, 7)),
-            const BoxShadow(
-              color: AppColors.letterTileShadow,
-              offset: Offset(5, 8),
+          child: Text(
+            letter.toUpperCase(),
+            style: TextStyle(
+              fontFamily: 'Bangers',
+              fontSize: fontSize ?? s * 0.52,
+              color: AppColors.letterTileInk,
+              shadows: const [
+                Shadow(color: Color(0x99FFFFFF), offset: Offset(0, 2)),
+              ],
             ),
-            const BoxShadow(
-              color: Color(0xB3000000),
-              offset: Offset(0, 14),
-              blurRadius: 16,
-            ),
-            const BoxShadow(color: Color(0xAAFFFFFF), offset: Offset(0, 3)),
-          ],
-        ),
-        child: Text(
-          letter.toUpperCase(),
-          style: TextStyle(
-            fontFamily: 'Bangers',
-            fontSize: fontSize ?? s * 0.52,
-            color: AppColors.letterTileInk,
-            shadows: const [
-              Shadow(color: Color(0x99FFFFFF), offset: Offset(0, 2)),
-            ],
           ),
         ),
       ),
@@ -85,8 +92,10 @@ class CategoryBadge extends StatelessWidget {
   final Color? color;
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
+  Widget build(BuildContext context) => ExcludeSemantics(
+    // Pastille décorative : la lecture d'écran lit le libellé de
+    // catégorie (texte à côté), pas l'identifiant de glyphe.
+    child: Container(
       width: 34,
       height: 34,
       decoration: BoxDecoration(
@@ -103,8 +112,8 @@ class CategoryBadge extends StatelessWidget {
         width: 19,
         height: 19,
       ),
-    );
-  }
+    ),
+  );
 
   String _iconInner(String name) => switch (name) {
     'user' => '<circle cx="12" cy="8" r="4.5"/><path d="M3.5 21c0-5 4-7.5 8.5-7.5s8.5 2.5 8.5 7.5z"/>',

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -5,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../app/providers.dart';
+import '../../core/audio/sound_engine.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/screen_scaffold.dart';
@@ -53,6 +55,18 @@ class _WheelScreenState extends ConsumerState<WheelScreen>
     // Le pointeur est en haut ; il faut -(index * segment) + manches.
     const fullTurns = 1440 * math.pi / 180;
     final target = fullTurns - index * segment;
+
+    // Son + vibration (phase 6, best-effort : aucun impact sur le flux).
+    unawaited(ref.read(soundEngineProvider).play(SoundCue.wheel));
+    unawaited(ref.read(vibrationProvider).heavy());
+
+    // Accessibilité (phase 6) : « animations réduites » du système →
+    // la lettre apparaît immédiatement, aucune animation de roue.
+    if (MediaQuery.of(context).disableAnimations) {
+      setState(() => _angle = target);
+      context.pushReplacement('/game');
+      return;
+    }
 
     final spin = _spin = AnimationController(
       vsync: this,

@@ -24,6 +24,7 @@ dependencies:
 
   # Préférences locales (paramètres, dernier pseudo) — cahier §13
   shared_preferences: ^2.3.4
+  audioplayers: ^6.8.1
 
 dev_dependencies:
   flutter_test:

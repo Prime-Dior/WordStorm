@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../app/providers.dart';
+import '../../core/audio/sound_engine.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/arcade_button.dart';
@@ -15,11 +18,25 @@ import '../../core/widgets/wordstorm_logo.dart';
 ///
 /// La variante multijoueur (podium animé + confettis + départage
 /// affiché égalité — Q6) est branchée à la phase 7 avec les salons.
-class FinalResultsScreen extends ConsumerWidget {
+class FinalResultsScreen extends ConsumerStatefulWidget {
   const FinalResultsScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<FinalResultsScreen> createState() => _FinalResultsScreenState();
+}
+
+class _FinalResultsScreenState extends ConsumerState<FinalResultsScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Fanfare + vibration (phase 6, best-effort) : une fois par entrée
+    // à l'écran (initState), pas à chaque rebuild.
+    unawaited(ref.read(soundEngineProvider).play(SoundCue.victory));
+    unawaited(ref.read(vibrationProvider).heavy());
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final state = ref.watch(soloSessionProvider);
     final total = state.roundHistory.fold(
       0,

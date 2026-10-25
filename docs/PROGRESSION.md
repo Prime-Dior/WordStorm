@@ -144,4 +144,50 @@
   - `flutter drive -d windows` : nécessite le **Mode Développeur**
     (liens symboliques) — à exécuter une fois le réglage activé.
 
-## Phase 6 — Historique / accessibilité / sons ⏳ non commencée
+## Phase 6 — Historique / accessibilité / sons ✅ (2026-10-25)
+- **Historique réel** (`lib/data/history/history_repository.dart`) :
+  `GameRecord` (id, date ISO, mode, manches, total, catégories, lettres) ;
+  persistance `shared_preferences` (clé `wordstorm.history.v1`), tri du
+  plus récent, déduplication par id, plafond 100 parties, `clear()`,
+  `statsOf()` (parties / meilleur / moyenne arrondie sup. / dernier).
+  Controller solo : toute partie **terminée** s'enregistre
+  (`endTurn` async, état mis à jour de façon synchrone avant le premier
+  await — l'écran de résultats est affiché sans délai).
+- **Écran historique** (menu → classement) : liste des parties (date
+  « 24/10 2026 », mode, lettres tirées, total + PTS), bandeau stats
+  PARTIES / MEILLEUR / MOYENNE, état vide honnête + bouton JOUER,
+  bouton EFFACER (confirmation) ; pas de classement global (décision §5-10).
+- **Sons générés** (`lib/core/audio/sound_engine.dart`, dépendance ajoutée :
+  `audioplayers ^6.8.1`) : 5 sons **synthétisés en Dart** (WAV PCM 16 bits
+  mono 22 kHz, notes sine + enveloppe anti-clic, glissando) — roue
+  (glissando descendant 0,9 s), démarrage de manche, blips des **5
+  dernières secondes**, validation (arpège majeur), victoire (fanfare).
+  Aucun asset binaire. Lecture `BytesSource`, lecteur déchargé après
+  lecture, tout en try/catch best-effort (ne casse jamais le flux de jeu,
+  y compris dans les tests sans plugin).
+- **Vibrations** (`HapticFeedback` light/medium/heavy) gouvernées par le
+  réglage local, aux mêmes déclencheurs.
+- **Accessibilité** :
+  - cibles tactiles ≥ 48 dp sur tous les `ArcadeButton` ;
+  - sémantique : tuiles de lettre audibles (« Lettre R »), pastilles
+    décoratives exclues de la lecture, boutons déjà `Semantics(button)`;
+  - « animations réduites » **au réglage système ET applicatif** (fusion
+    à la racine de l'app dans `MediaQuery.disableAnimations`) :
+    Sunburst fixe, roue sans animation (lettre directe, navigation
+    immédiate).
+- **Quitter branché** (restant phase 1) : `SystemNavigator.pop()`.
+- **Tests** : 10 dépôt d'historique (persistance, dédup, tri, plaf 100,
+  clear, aller-retour JSON, dateLabel, stats) + 2 session (enregistrement
+  session (enregistrement réellement appelé en fin de partie avec total
+  juste, **non** appelé si la partie continue) + 6 audio (en-têtes RIFF/WAVE valides, non silence,
+  gate du réglage sans toucher au canal plateforme) ; 2 bugs trouvés par
+  les tests : `const []` non modifiable passée au cache (dédup plantait),
+  `await` dans `endTurn` non-async + type non importé (le build natif/web
+  ne compilait plus — attrapé par un build web de contrôle).
+- **Build web release exécuté** : `flutter build web --release` OK
+  (la démo tourne dans Chrome via un serveur statique — contourne le
+  blocage DWDS du debug uniquement, le debug reste bloqué).
+- **Exécution réelle** : `dart format` OK, `flutter analyze`
+  **No issues found**, `flutter test` **+93 : All tests passed**.
+
+## Phase 7 — Salons Firebase (prochaine)

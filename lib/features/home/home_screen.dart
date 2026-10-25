@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/widgets/arcade_button.dart';
@@ -66,11 +67,16 @@ class HomeScreen extends StatelessWidget {
               const SizedBox(height: 10),
               SizedBox(
                 width: MediaQuery.sizeOf(context).width * 0.5,
-                child: const ArcadeButton(
+                child: ArcadeButton(
                   label: 'Quitter',
                   fontSize: 16,
                   small: true,
                   variant: ArcadeButtonVariant.dark,
+                  // Ferme l'app proprement (phase 1 restée sans action).
+                  onPressed: () {
+                    HapticFeedback.lightImpact().ignore();
+                    SystemNavigator.pop();
+                  },
                 ),
               ),
             ],

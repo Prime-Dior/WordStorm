@@ -3,8 +3,7 @@
 ## Phase 1 — restes volontaires
 - **Écrans squelettes** (`PlaceholderScreen`) : résolu — tous les écrans
   réels sont implémentés à la phase 4 (voir `docs/PROGRESSION.md`).
-- **Bouton « Quitter »** de l'accueil : sans action (l'API de fermeture d'app sera
-  branchée à la phase 6 avec SystemNavigator, jamais simulée).
+- **Bouton « Quitter »** de l'accueil : résolu à la phase 6 — `SystemNavigator.pop()`.
 - **Validation « Rejoindre avec un code »** : résolu côté forme (l'OK navigue
   vers l'écran Rejoindre, validation du code 6 signes sans ambigus). La
   liaison au backend et l'écran « Salon introuvable » restent câblés à la
@@ -15,6 +14,26 @@
 - **Icônes à deux teintes** de la maquette (détails en `#1E2A44`) : le socle les rend
   monochromes (teinte unique). Le cas échéant, deux couches seront nécessaires pour
   100 % de fidélité — à évaluer à la phase 4.
+
+## Phase 6 — restes volontaires
+- **Pas de classement global / réputation en ligne** : décision §5-10,
+  hors périmètre sans serveur ; l'écran « classement » est l'historique
+  personnel (stats locales réelles).
+- **Sons synthétisés = démarrage volontairement simples** (tones sine,
+  pas de samples percussifs) : habillage sonore plus riche possible à la
+  phase 8 (hasard « sons générés » reconnecté à l'habillage roue).
+- **Lecture sonore non exécutable dans les tests** : lecteur réel
+  (audioplayers) non exécuté dans cet environnement — tests unitaires
+  sur les bytes générés + gate du réglage ; à l'oreille à vérifier sur
+  un vrai appareil (phase 8 ou émulateur Android).
+- **Tests `integration_test` toujours non exécutés** (cf. phase 5) —
+  le build **release** web, lui, est passé (`flutter build web`) :
+  le blocage est propre au service de debug DWDS.
+- **Historique multi** : le multi enregistrera dans le même dépôt à la
+  phase 7 (`mode: 'multi'`, écran gère déjà le label Multijoueur).
+- Annonce honnête des capacités : le parcours web **release** tourne
+  dans Chrome via serveur statique (`build/web` + `python -m http.server`),
+  le debug web reste bloqué (DWDS) — cf. `docs/ENVIRONNEMENT.md`.
 
 ## Phase 5 — restes volontaires
 - **Tests `integration_test` non exécutés ici** : le fichier

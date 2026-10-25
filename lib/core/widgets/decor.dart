@@ -168,9 +168,12 @@ class _SunburstState extends State<Sunburst>
 
   @override
   Widget build(BuildContext context) {
+    // Accessibilité (phase 6) : « animations réduites » du système
+    // → rayons fixes, aucune rotation (60 s de ticker économisés).
+    final spins = !MediaQuery.of(context).disableAnimations;
     return RepaintBoundary(
       child: RotationTransition(
-        turns: _spin,
+        turns: spins ? _spin : const AlwaysStoppedAnimation(0.0),
         child: CustomPaint(
           size: Size.square(widget.size),
           isComplex: true,

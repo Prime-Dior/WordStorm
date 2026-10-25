@@ -1,8 +1,9 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+﻿import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:wordstorm/app/providers.dart';
 import 'package:wordstorm/data/dictionary/asset_dictionary_repository.dart';
+import 'package:wordstorm/data/history/history_repository.dart';
 import 'package:wordstorm/features/game/state/solo_session.dart';
 
 /// Contrôleur de session testé avec le **vrai dictionnaire embarqué**
@@ -19,6 +20,10 @@ void main() {
     container = ProviderContainer(
       overrides: [
         dictionaryProvider.overrideWithValue(AssetDictionaryRepository()),
+        // Historique remplacé par un faux en mémoire : aucune dépendance
+        // plateforme (shared_preferences) dans ce test, et on inspecte
+        // l'enregistrement en fin de partie.
+        historyProvider.overrideWithValue(_FakeHistoryRepository()),
       ],
     );
     addTearDown(container.dispose);
@@ -40,7 +45,7 @@ void main() {
     await controller.start(setup(rounds: 1));
 
     expect(container.read(soloSessionProvider).round, 0);
-    expect(controller.endTurn(), isNull, reason: 'pas de lettre active');
+    expect(await controller.endTurn(), isNull, reason: 'pas de lettre active');
 
     controller.drawLetter();
     final state = container.read(soloSessionProvider);
@@ -68,7 +73,7 @@ void main() {
 
     controller.drawLetter(forced: 'R');
     controller.setAnswer('Animal', 'Rat');
-    final result = controller.endTurn();
+    final result = await controller.endTurn();
     expect(result, isNotNull);
     expect(result!.score.lineFor('solo', 'Animal').points, 15);
 
@@ -77,7 +82,7 @@ void main() {
     await c2.start(setup(categories: ['Pays'], rounds: 1));
     c2.drawLetter(forced: 'Z');
     c2.setAnswer('Pays', 'Zzzorge');
-    final r2 = c2.endTurn();
+    final r2 = await c2.endTurn();
     expect(r2!.score.lineFor('solo', 'Pays').points, 0);
     expect(
       r2.score.lineFor('solo', 'Pays').reason,
@@ -93,7 +98,7 @@ void main() {
 
       controller.drawLetter(forced: 'R');
       controller.setAnswer('Animal', 'Rat');
-      final first = controller.endTurn();
+      final first = await controller.endTurn();
       expect(first!.score.lineFor('solo', 'Animal').points, 15);
 
       // Manche 2 : la roue tire (call nextRound avant en conditions réelles).
@@ -101,7 +106,7 @@ void main() {
       expect(container.read(soloSessionProvider).round, 2);
       controller.drawLetter(forced: 'R'); // cas limite moteur (test only)
       controller.setAnswer('Animal', 'Rat');
-      final result = controller.endTurn();
+      final result = await controller.endTurn();
       final line = result!.score.lineFor('solo', 'Animal');
       expect(line.points, 5);
       expect(line.reused, isTrue);
@@ -113,7 +118,7 @@ void main() {
     final controller = container.read(soloSessionProvider.notifier);
     await controller.start(setup(categories: ['Animal'], rounds: 1));
     controller.drawLetter(forced: 'R');
-    controller.endTurn();
+    await controller.endTurn();
     final state = container.read(soloSessionProvider);
     expect(state.finished, isTrue);
     expect(state.roundHistory.length, 1);
@@ -125,7 +130,7 @@ void main() {
     await controller.start(setup(categories: ['Animal'], rounds: 3));
     controller.drawLetter(forced: 'R');
     controller.setAnswer('Animal', 'Rat');
-    controller.endTurn();
+    await controller.endTurn();
     controller.nextRound();
     controller.drawLetter(forced: 'A');
 
@@ -136,4 +141,47 @@ void main() {
     expect(s.roundHistory, isEmpty);
     expect(s.finished, isFalse);
   });
+
+  test('partie terminée → enregistrée dans l\'historique', () async {
+    final controller = container.read(soloSessionProvider.notifier);
+    await controller.start(setup(categories: ['Animal'], rounds: 1));
+    controller.drawLetter(forced: 'R');
+    controller.setAnswer('Animal', 'Rat');
+    await controller.endTurn();
+
+    final history = container.read(historyProvider) as _FakeHistoryRepository;
+    expect(history.records.length, 1);
+    final saved = history.records.single;
+    expect(saved.mode, 'solo');
+    expect(saved.rounds, 1);
+    // Rat au R = 15 (validation + scoring réels).
+    expect(saved.totalScore, 15);
+    expect(saved.categories, ['Animal']);
+    expect(saved.letters, ['R']);
+  });
+
+  test('partie NON terminée → rien n\'est enregistré', () async {
+    final controller = container.read(soloSessionProvider.notifier);
+    await controller.start(setup(categories: ['Animal']));
+    controller.drawLetter(forced: 'R');
+    controller.setAnswer('Animal', 'Rat');
+    await controller.endTurn(); // manche 1/2 : la partie continue.
+
+    final history = container.read(historyProvider) as _FakeHistoryRepository;
+    expect(history.records, isEmpty);
+  });
+}
+
+/// Dépôt en mémoire : aucune plateforme, inspectable dans les tests.
+class _FakeHistoryRepository implements HistoryRepository {
+  final List<GameRecord> records = [];
+
+  @override
+  Future<void> save(GameRecord record) async => records.add(record);
+
+  @override
+  Future<List<GameRecord>> all() async => [...records];
+
+  @override
+  Future<void> clear() async => records.clear();
 }

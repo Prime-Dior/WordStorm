@@ -11,6 +11,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../app/providers.dart';
 import '../../../data/dictionary/dictionary_repository.dart';
+import '../../../data/history/history_repository.dart';
 import '../../../domain/categories.dart';
 import '../../../domain/draws.dart';
 import '../../../domain/rules_config.dart';
@@ -150,7 +151,9 @@ class SoloSessionController extends StateNotifier<SoloSessionState> {
 
   /// Termine la manche : validation + score via le moteur pur, dans
   /// l'historique ; les mots consommés feed les manches suivantes.
-  RoundResult? endTurn() {
+  /// La mise à jour d'état est **synchrone** (avant le premier await) :
+  /// l'écran de résultats voit la manche terminée immédiatement.
+  Future<RoundResult?> endTurn() async {
     final setup = state.setupOrDefault;
     if (!state.hasActiveTurn) return null;
 
@@ -188,7 +191,40 @@ class SoloSessionController extends StateNotifier<SoloSessionState> {
       roundHistory: [...state.roundHistory, result],
       finished: state.round >= setup.rounds,
     );
+
+    // Partie terminée : enregistrement local (phase 6, cahier §5.1).
+    if (state.finished) {
+      await _recordGame(setup);
+    }
     return result;
+  }
+
+  /// Sauvegarde la partie dans l'historique (dépriorité sur les règles :
+  /// c'est de la persistance, pas du scoring — une erreur d'écriture ne
+  /// doit pas faire planter la fin de partie).
+  Future<void> _recordGame(GameSetup setup) async {
+    try {
+      final history = _ref.read(historyProvider);
+      final now = DateTime.now().toUtc();
+      await history.save(
+        GameRecord(
+          id: '${now.millisecondsSinceEpoch}solo',
+          dateIso:
+              '${now.year.toString().padLeft(4, '0')}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}T${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}',
+          mode: 'solo',
+          rounds: state.roundHistory.length,
+          totalScore: state.roundHistory.fold(
+            0,
+            (sum, r) => sum + r.score.totalFor('solo'),
+          ),
+          categories: [...setup.categories],
+          letters: [for (final r in state.roundHistory) r.letter],
+        ),
+      );
+    } catch (_) {
+      // L'historique est de la persistance best-effort : à ne pas
+      // documenter ailleurs, aucun relevé silencieux de règle métier.
+    }
   }
 }
 

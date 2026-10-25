@@ -28,7 +28,27 @@
   la cible iOS restera non testée par exécution.
 
 ## Visual Studio (desktop Windows)
-- Build Tools 2019 incomplets → cible desktop Windows non utilisée (hors périmètre du cahier).
+- Build Tools 2019 incomplets (« Développement pour le bureau avec C++ » à
+  cocher dans Visual Studio Installer : MSVC v142 + Windows 10 SDK 10.0.19041
+  + CMake) → `flutter drive -d windows` bloqué tant que la réparation n'est
+  pas faite. Desktop Windows reste hors périmètre du cahier (bonus seul).
+
+## Web debug / release (2026-10-25)
+- `flutter build web --release` : **OK** (build exécuté, `build/web`).
+- `flutter drive/run` web/Tdebug : **bloqué** — Chrome et Edge se lancent
+  mais restent sur « Waiting for connection from debug service » sans
+  fenêtre visible (répété, port fixe modifié : identique). Premier suspect :
+  pare-feu/antivirus sur le websocket du debug Dart ; Chrome se lance
+  pourtant seul (`chrome.exe about:blank` a ouvert une vraie fenêtre).
+- **Contourne pour la démo** : serveur statique sur le build release —
+  ```powershell
+  Set-Location C:\Users\Zbook\Wordstorm
+  python -m http.server 8500 --directory build\web
+  # → http://localhost:8500 dans Chrome (lecture seule, pas de rechargement
+  #   à chaud ni debug — c'est un build release).
+  ```
+  Le mot clé : le debug web reste à éclaircir (pare-feu ?), le release
+  fonctionne et sert la démonstration.
 
 ## Git
 - Dépôt de mission : `C:\Users\Zbook\Wordstorm` (remote `origin/main`).
