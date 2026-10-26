@@ -277,7 +277,11 @@ class _IconButton extends StatelessWidget {
               BoxShadow(color: AppColors.darkButtonDeep, offset: Offset(0, 4)),
             ],
           ),
-          child: WordstormIcons.gear(size: 22, color: AppColors.offWhite),
+          child: const Icon(
+            Icons.settings_outlined,
+            size: 22,
+            color: AppColors.blueGray,
+          ),
         ),
       ),
     ),

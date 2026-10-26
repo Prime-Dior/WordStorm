@@ -30,14 +30,14 @@ class HomeScreen extends StatelessWidget {
           // Logo et petite phrase d'accueil.
           const Positioned(
             left: 18,
-            top: 56,
+            top: 76,
             child: WordstormLogo(showLightning: true),
           ),
           // Slogan « Des mots, un seul champion ! ».
-          const Positioned(
+          Positioned(
             left: 18,
-            top: 170,
-            child: Text(
+            top: size.height * 0.37,
+            child: const Text(
               'Des mots,\nun seul champion !',
               style: TextStyle(
                 fontFamily: 'Poppins',
@@ -54,17 +54,17 @@ class HomeScreen extends StatelessWidget {
           // Illustration principale.
           Positioned(
             right: -20,
-            bottom: 190,
+            bottom: size.height * 0.33,
             child: Image.asset(
               'assets/images/personnage_w.png',
-              width: size.width * 0.62,
+              width: size.width * 0.73,
               fit: BoxFit.contain,
             ),
           ),
           // Quelques lettres pour rappeler le principe du jeu.
           Positioned(
             left: 18,
-            bottom: 230,
+            bottom: size.height * 0.44,
             child: Transform.rotate(
               angle: -0.42,
               child: const LetterTile(
@@ -82,7 +82,7 @@ class HomeScreen extends StatelessWidget {
           Positioned(
             left: 88,
             // La tuile reste au-dessus des boutons et se voit à côté du R.
-            bottom: 230,
+            bottom: size.height * 0.34,
             child: Transform.rotate(
               angle: 0.31,
               child: const LetterTile(letter: 'E', size: 46, rotation: 0.31),
