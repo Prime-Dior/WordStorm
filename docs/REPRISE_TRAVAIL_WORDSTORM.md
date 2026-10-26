@@ -1,115 +1,83 @@
 # Reprise du travail WordStorm
 
-Ce document permet de reprendre le travail dans une autre session ou avec un autre assistant sans repartir de zéro. Il décrit l’état connu au 25 octobre 2026.
+État vérifié le 26 octobre 2026. Ce document sert de point de reprise à une autre session ou à un autre agent. Lire d’abord cette page, puis le guide local indiqué plus bas avant de modifier les écrans.
 
-## Objectif en cours
+## État actuel du dépôt
 
-Le dépôt avance écran par écran, selon la consigne de l’enseignante. Pour l’instant, la présentation locale doit montrer seulement les écrans réalisés par l’équipe, dans un cadre de téléphone : accueil, menu, configuration et salon. L’application complète fournie dans le projet modèle ne doit pas être présentée comme si toutes ses pages étaient terminées.
+- Dépôt GitHub : `https://github.com/Prime-Dior/WordStorm`
+- `origin/main` : `281cf74` — PR #6, dernière intégration visible au moment de cette mise à jour.
+- PR #3, #4, #5 et #6 sont fusionnées. Il n’y avait aucune autre PR ouverte à la dernière vérification.
+- PR #7 : [Décrire l’aperçu centré dans le README](https://github.com/Prime-Dior/WordStorm/pull/7), branche `fix/retablir-cadre-smartphone`, vers `main`.
+- La PR #7 conserve le rendu centré actuel et met à jour le README. Elle ne réintroduit pas de coque dessinée autour du téléphone.
+- Après l’ajout de cette note de reprise, vérifier à nouveau la CI de la PR #7 : le nouveau commit déclenchera un contrôle.
 
-Le travail de cette branche consiste à intégrer l’écran de salon de Chris, garder son commit distinct, retirer les éléments d’aperçu technique visibles dans l’interface, rapprocher l’accueil et le menu de la maquette, et documenter la façon de modifier les écrans.
+Le rendu voulu est celui déjà présent dans `main` : sur ordinateur, l’aperçu est centré dans Chrome, sans fausse coque. Sur un écran plus étroit, il s’adapte à la largeur disponible jusqu’à 430 pixels. Dans `frontend/lib/app/showcase_app.dart`, ce comportement est porté par `_ShowcaseViewport` (`ColoredBox`, `Center`, `ConstrainedBox(maxWidth: 430)`).
 
-## Dossiers locaux et rôle de chacun
+La présentation expose les routes `/`, `/menu`, `/config`, `/lobby`, `/settings`, `/rules`, `/waiting`, `/loading`, `/connection-error` et `/not-found`. Les pages de règles et paramètres et les états de salon s’affichent comme overlays. Le README indique maintenant cette portée.
 
-### Branche de travail et pull request
+## Copies locales et branches
+
+### Copie de travail à utiliser
 
 - Dossier : `C:\Users\Zbook\WordStorm-lobby-review`
-- Branche : `review/salon-multijoueur`
-- Dépôt distant : `https://github.com/Prime-Dior/WordStorm.git`
-- Pull request : [PR #3](https://github.com/Prime-Dior/WordStorm/pull/3)
-- Branche de destination : `main`
-- Cette branche contient le commit de Chris et des commits séparés de Prime Dior. Elle a été poussée sur GitHub.
-- Ne pas fusionner dans `main` sans instruction explicite de l’équipe.
+- Branche courante attendue : `fix/retablir-cadre-smartphone`
+- Dossier Flutter : `C:\Users\Zbook\WordStorm-lobby-review\frontend`
+- Cette copie est à jour avec le `main` récent et contient la branche de la PR #7.
+- Pour reprendre la PR, vérifier `git status --short`, puis `git log -5 --oneline` et `gh pr view 7`.
 
-Cette copie de travail est la bonne pour poursuivre les modifications de la PR. Ouvrir ce dossier dans VS Code pour voir l’état de la PR.
-
-### Autre copie locale du dépôt
+### Autre copie locale à préserver
 
 - Dossier : `C:\Users\Zbook\WordStorm`
-- Branche locale observée : `feature/app-complete`
-- Ce dossier est un worktree Git distinct, rattaché au même dépôt local.
-- Une modification locale préexistante est présente dans `frontend/lib/features/wheel/wheel_screen.dart`.
-- Cette modification n’a pas été incluse dans les commits de la PR. Ne pas la restaurer, la supprimer, la déplacer ou la committer par inadvertance.
+- Branche : `feature/app-complete`, pointe localement vers `26bf403` au moment de cette note.
+- Une modification locale non commitée existe dans `frontend/lib/features/wheel/wheel_screen.dart`.
+- Ne pas la supprimer, la restaurer, la déplacer ni l’ajouter à un commit. Cette autre copie n’est pas à jour avec `origin/main`.
 
-### Ancien dossier de projet d’interface
+### Maquette et guide explicatif
 
-- Dossier : `C:\Users\Zbook\wordstorm_ui`
-- L’ancien guide `docs/Guide_explicatif_du_code.docx` y a été remplacé par une version mise à jour.
-- Ce dossier n’est pas le dossier publié sous le nom du dépôt WordStorm et ne doit pas être copié en entier dans la PR.
+- Maquette SVG dans la copie de travail actuelle : `C:\Users\Zbook\WordStorm-lobby-review\docs\maquettes\wordstorm-maquette.svg`.
+- Une copie existe aussi dans `C:\Users\Zbook\WordStorm\docs\maquettes\wordstorm-maquette.svg`.
+- Guide de code, local seulement : `C:\Users\Zbook\Downloads\Guide_explicatif_WordStorm.docx`.
+- Ne pas ajouter le guide de code au dépôt ni créer de lien vers lui dans le README. Après une modification du code des écrans, mettre à jour le guide local afin qu’il décrive les fichiers et le rendu présents.
+- Le guide explique maintenant le viewport centré et le comportement sur smartphone. Le document de reprise, lui, peut rester dans `docs/` pour aider l’équipe et les prochains agents.
 
-### Dossier de l’application Flutter
+## Organisation du code
 
-Dans le dossier de la branche de travail, le projet Flutter se trouve ici :
-
-`C:\Users\Zbook\WordStorm-lobby-review\frontend`
-
-Les fichiers à connaître :
-
-- `frontend/lib/main.dart` : point de démarrage Flutter.
-- `frontend/lib/app/` : application de présentation et navigation.
-- `frontend/lib/core/widgets/` : composants partagés, dont logo, boutons et tuiles.
+- `frontend/lib/main.dart` : point de départ Flutter et `ProviderScope`.
+- `frontend/lib/app/showcase_app.dart` : routes de la présentation, overlays et viewport centré.
+- `frontend/lib/app/router.dart` : routes de l’application complète.
+- `frontend/lib/core/widgets/` : widgets partagés, dont logo, boutons, champ de code et tuiles.
 - `frontend/lib/features/home/home_screen.dart` : accueil.
-- `frontend/lib/features/menu/menu_screen.dart` : menu et champ du code de salon.
+- `frontend/lib/features/menu/menu_screen.dart` : menu et saisie du code.
 - `frontend/lib/features/config/config_screen.dart` : configuration.
-- `frontend/lib/features/lobby/lobby_screen.dart` : salon de Chris, adapté pour la présentation locale.
-- `frontend/lib/features/wheel/` et les autres fonctionnalités : autres pages du modèle, hors de la présentation actuelle.
-- `frontend/assets/` : images, polices et autres ressources de l’application.
-- Maquette de référence disponible localement : `C:\Users\Zbook\WordStorm\docs\maquettes\wordstorm-maquette.svg`.
-- Le fichier a été ajouté dans le commit `26bf403` et est présent dans la copie `WordStorm`. La branche de la PR part d’un état antérieur à son ajout dans `main`, donc le fichier n’est pas physiquement dans le dossier `WordStorm-lobby-review` actuellement. La PR cible `main`, qui contient déjà le SVG.
+- `frontend/lib/features/lobby/` : écran de salon et données de préparation.
+- `frontend/lib/features/settings/`, `rules/` et `skeleton/` : paramètres, règles et états de démonstration ajoutés dans les dernières PR.
+- Les autres dossiers sous `frontend/lib/features/` contiennent d’autres écrans du jeu ; ils ne sont pas tous reliés à la présentation.
 
-## Historique et séparation des commits
+### Parcours des routes de présentation
 
-Le commit de Chris reste distinct des commits faits pour adapter et présenter son écran. L’historique observé est :
+`ShowcaseApp` est l’application d’aperçu utilisée par `main.dart`. Les routes qu’elle autorise sont définies dans `showcase_app.dart`. Une nouvelle page doit être ajoutée à cette liste pour être accessible dans la présentation ; ajouter une route uniquement dans `router.dart` ne l’ajoute pas automatiquement à l’aperçu.
 
-| Commit | Auteur affiché | Message | Rôle |
-|---|---|---|---|
-| `3ac999f` | `Chris20071234` | `Ajout du salon multi-joueur à travers la création du dossier lobby dans features` | Ajout initial de l’écran de salon |
-| `4bc0087` | `Prime Dior` | `Retirer le test Flutter du projet modèle` | Retrait du test du modèle qui empêchait la validation du projet reçu |
-| `57f3dcf` | `Prime Dior` | `Limiter l’aperçu aux écrans réalisés` | Présentation limitée aux écrans faits et cadre téléphone |
-| `7e1fa12` | `Prime Dior` | `Rapprocher les écrans de la maquette` | Retouches d’interface, nettoyage des messages techniques et guide explicatif |
+Les chemins disponibles sont :
 
-Le commit `7e1fa12` n’est pas le commit de Chris : il est séparé dans l’historique Git et signé par Prime Dior. Il contient les changements d’accueil, de menu et de composants communs, le retrait des messages techniques sur configuration et salon, ainsi que le guide Word explicatif. Il est déjà poussé dans `review/salon-multijoueur`.
+- `/` : accueil
+- `/menu` : menu
+- `/config` : configuration
+- `/lobby` : salon
+- `/settings` : paramètres
+- `/rules` : règles
+- `/waiting`, `/loading`, `/connection-error`, `/not-found` : états de démonstration
 
-Pour contrôler l’historique :
+## Historique utile
 
-```powershell
-cd C:\Users\Zbook\WordStorm-lobby-review
-git log --oneline --decorate --graph -10
-git show --stat 3ac999f
-git show --stat 7e1fa12
-```
+- Chris a créé le salon dans le commit `3ac999f` (`Chris20071234`).
+- Les changements d’intégration et de présentation sont dans des commits séparés, puis ont été fusionnés avec la PR #3.
+- La PR #4 avait échoué à l’analyse parce que le test du projet modèle instançait `MyApp`, qui n’existait plus après le changement d’entrée. Le retrait de ce test avait ensuite permis à la CI de passer dans la PR #3. Les PR #5 et #6 ont aussi passé leur CI et sont fusionnées.
+- Les PR #5 et #6 ont ajouté des écrans de paramètres, de règles et d’états, puis corrigé leur apparence. La présentation actuelle n’est donc plus limitée aux quatre routes initiales.
+- La modification de cadre smartphone faite dans une première version de la PR #7 n’a pas été fusionnée. Le commit actuel de cette PR garde le viewport centré et corrige le README.
 
-Chaque nouveau lot logique doit être committé dans un commit séparé, avec un message en français. Ne pas utiliser `git reset`, `git rebase` ou `git commit --amend` sur le commit de Chris.
+## Lancer l’application
 
-## Changements déjà réalisés
-
-### Présentation et navigation
-
-- L’application de présentation se lance en mode téléphone et ne donne accès qu’aux écrans actuellement réalisés : accueil, menu, configuration et salon.
-- Le dépôt conserve les fonctionnalités complètes du modèle pour le travail ultérieur, mais elles ne sont pas proposées depuis cette présentation.
-
-### Accueil et menu
-
-- Le logo de l’accueil et du menu affiche la couronne et le petit éclair de la maquette.
-- La tuile `R` de l’accueil est rouge avec une lettre blanche.
-- La tuile `E` a été remontée et agrandie : elle était placée trop bas et disparaissait derrière la zone des boutons.
-- Le menu contient à nouveau le champ de saisie du code et le bouton `OK`, comme sur la maquette.
-- Le champ de code utilise un `TextEditingController`, libéré dans `dispose()`.
-
-### Configuration et salon
-
-- Les bandeaux « Aperçu frontend » ont été retirés de la configuration et du salon.
-- La note technique en bas du salon a été retirée.
-- Les textes qui exposaient les limites de l’aperçu local ont été remplacés par des libellés adaptés à la maquette.
-
-### Documentation
-
-- Le guide de code à jour est local uniquement : `C:\Users\Zbook\Downloads\Guide_explicatif_WordStorm.docx`.
-- Ne pas ajouter ce guide au dépôt et ne pas remettre de lien vers lui dans le README. Après chaque modification de code des écrans, mettre à jour ce document dans Téléchargements pour expliquer les changements de code.
-- Le guide comprend une nouvelle partie sur la présentation en smartphone, dessinée par `_PhonePreview` dans `frontend/lib/app/showcase_app.dart` et affichée par Chrome.
-
-## Lancer l’aperçu
-
-Dans un terminal PowerShell :
+Dans PowerShell :
 
 ```powershell
 cd C:\Users\Zbook\WordStorm-lobby-review\frontend
@@ -117,60 +85,50 @@ flutter pub get
 flutter run -d chrome
 ```
 
-Le serveur Chrome peut être relancé si l’ancienne fenêtre est fermée. Une session de terminal Flutter ouverte dans une ancienne session Codex ne sera pas forcément disponible dans la nouvelle session.
+Chrome affiche le rendu Flutter. Le centrage et la largeur maximale sont gérés par `_ShowcaseViewport` dans Flutter ; Chrome ne dessine pas de téléphone.
 
-## Vérification
-
-Commandes à lancer depuis `frontend` :
-
-```powershell
-dart format lib test
-flutter analyze
-flutter test
-```
-
-Les tests avaient réussi avant les toutes dernières petites retouches de placement. Une tentative de vérification locale après le déplacement de la tuile `E` est restée sans sortie au démarrage de Flutter. Après le push du commit `7e1fa12`, la vérification GitHub de la PR était encore indiquée `pending`. Une consultation plus récente a échoué car l’accès à l’API GitHub n’était pas disponible ; il faut donc consulter l’état actuel avant de conclure que la CI a réussi.
-
-Pour consulter les vérifications :
-
-```powershell
-gh pr checks 3
-gh pr view 3 --json url,state,isDraft,mergeStateStatus
-```
-
-## Reprendre sur la branche de la PR
+## Vérifier la PR #7
 
 ```powershell
 cd C:\Users\Zbook\WordStorm-lobby-review
 git status --short
-git pull --ff-only origin review/salon-multijoueur
+gh pr view 7 --json url,state,isDraft,mergeStateStatus,mergeable,statusCheckRollup
+gh pr checks 7
 ```
 
-Si de nouveaux changements sont faits :
+Au dernier contrôle avant cette mise à jour documentaire, la PR était sans conflit et la CI avait réussi. Le nouveau commit de ce document déclenche une nouvelle CI : attendre son résultat avant de la fusionner. La règle de `main` demandait zéro approbation à la dernière vérification ; revérifier la règle si GitHub bloque la fusion.
+
+## Après la PR #7
+
+Quand la PR #7 est fusionnée, synchroniser la branche locale `main` dans cette copie de travail, puis créer une branche séparée pour le prochain écran :
 
 ```powershell
-git add <fichiers-modifies>
-git commit -m "Décrire le changement en français"
-git push origin review/salon-multijoueur
+cd C:\Users\Zbook\WordStorm-lobby-review
+git switch main
+git pull --ff-only origin main
+git switch -c feature/ui-nom-ecran
 ```
 
-Toujours vérifier `git status --short` avant et après le commit. N’ajouter que les fichiers visés ; ne pas ajouter la modification de la roue située dans l’autre worktree.
+Développer l’écran sous `frontend/lib/features/<nom>/`. Réutiliser `core/widgets/` et `core/theme/`. Si l’écran doit être visible dans l’aperçu, mettre à jour `ShowcaseApp` et son registre de routes ; mettre aussi à jour le guide Word local dans Téléchargements.
 
-## Priorités suggérées
+Commits en français. Avant chaque commit, vérifier l’état du dépôt et n’ajouter que les fichiers de la tâche :
 
-1. Vérifier visuellement l’accueil dans Chrome et confirmer que `R` et `E` restent visibles au-dessus des boutons dans plusieurs tailles de fenêtre.
-2. Consulter la CI de la PR #3 et corriger toute erreur dans un nouveau commit français.
-3. Comparer les deux premiers écrans avec le SVG en se limitant aux écrans faits par Prime Dior.
-4. Garder la navigation de présentation limitée aux écrans effectivement réalisés par l’équipe.
-5. Laisser la décision de fusion dans `main` à l’équipe.
+```powershell
+git status --short
+git add <fichiers-de-la-tache>
+git commit -m "Décrire le changement en français"
+git push -u origin feature/ui-nom-ecran
+```
 
-## Note sur l’auteur Git
+Créer une PR vers `main` ; ne pas pousser directement sur `main`. La PR #7 et les règles de branche doivent être vérifiées séparément avant fusion.
 
-Git utilise l’identité configurée localement au moment du commit. Dans l’historique observé, le commit de Chris est signé `Chris20071234` et les commits de retouche sont affichés `Prime Dior`. Si l’identité du nouvel environnement est différente, vérifier avant de créer un commit :
+## Identité Git
+
+Avant de créer un commit dans un nouvel environnement :
 
 ```powershell
 git config user.name
 git config user.email
 ```
 
-Ne pas changer l’identité d’un commit déjà poussé ; configurer l’identité uniquement pour les prochains commits si l’équipe le demande.
+L’identité actuelle observée est `Prime Dior` / `princeprimo43@gmail.com`. Ne pas réécrire les commits de Chris ni modifier son auteur.
