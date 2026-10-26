@@ -134,26 +134,28 @@ class _OptionRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Container(
     margin: const EdgeInsets.only(bottom: 8),
-    decoration: BoxDecoration(
+    child: Material(
       color: const Color(0xCC38475F),
       borderRadius: BorderRadius.circular(11),
-    ),
-    child: CheckboxListTile(
-      value: value,
-      onChanged: (v) => onChanged(v ?? false),
-      activeColor: AppColors.yellow,
-      checkColor: AppColors.navyBlue,
-      controlAffinity: ListTileControlAffinity.leading,
-      dense: true,
-      visualDensity: VisualDensity.compact,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 8),
-      title: Text(
-        label,
-        style: const TextStyle(
-          fontFamily: AppTheme.bodyFont,
-          fontSize: 11,
-          fontWeight: FontWeight.w600,
-          color: AppColors.offWhite,
+      clipBehavior: Clip.antiAlias,
+      child: CheckboxListTile(
+        value: value,
+        onChanged: (v) => onChanged(v ?? false),
+        mouseCursor: SystemMouseCursors.click,
+        activeColor: AppColors.yellow,
+        checkColor: AppColors.navyBlue,
+        controlAffinity: ListTileControlAffinity.leading,
+        dense: true,
+        visualDensity: VisualDensity.compact,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+        title: Text(
+          label,
+          style: const TextStyle(
+            fontFamily: AppTheme.bodyFont,
+            fontSize: 11,
+            fontWeight: FontWeight.w600,
+            color: AppColors.offWhite,
+          ),
         ),
       ),
     ),
