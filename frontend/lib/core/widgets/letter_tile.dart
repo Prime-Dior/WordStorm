@@ -119,7 +119,8 @@ class CategoryBadge extends StatelessWidget {
       ),
       alignment: Alignment.center,
       child: SvgPicture.string(
-        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">'
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" '
+        'fill="#1E2A44">'
         '${_iconInner(iconName)}</svg>',
         width: 19,
         height: 19,

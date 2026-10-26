@@ -14,43 +14,47 @@ class RulesScreen extends StatelessWidget {
     child: ConstrainedBox(
       constraints: const BoxConstraints(maxWidth: 350, maxHeight: 650),
       child: Material(
-        color: const Color(0xEE17223A),
-        borderRadius: BorderRadius.circular(22),
+        type: MaterialType.transparency,
         child: Padding(
           padding: const EdgeInsets.fromLTRB(18, 18, 18, 14),
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
               const Text(
                 'RÈGLES',
                 style: TextStyle(
                   fontFamily: AppTheme.displayFont,
-                  fontSize: 29,
+                  fontSize: 32,
                   color: AppColors.offWhite,
+                  shadows: [
+                    Shadow(color: Color(0xFF0C1429), offset: Offset(0, 3)),
+                  ],
                 ),
               ),
               const SizedBox(height: 8),
-              const Expanded(
+              const Flexible(
                 child: SingleChildScrollView(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _RuleText(
-                        'Manche : une lettre tirée, un mot par catégorie qui commence par cette lettre.',
+                        'Manche : une lettre tirée, un mot par catégorie qui '
+                        'commence par cette lettre.',
+                      ),
+                      _RuleText('Barème : 15 pt', bold: true),
+                      _RuleText(
+                        '5 catégories obligatoires (cadenas) : Prénom, Ville, '
+                        'Pays, Animal, Objet.',
                       ),
                       _RuleText(
-                        'Barème : 15 pt si ta réponse valide est la seule.',
+                        'Catégories : Aléatoire (4 tirées au sort au '
+                        'lancement) ou Personnalisé.\n12 catégories au total '
+                        'maximum.',
                       ),
                       _RuleText(
-                        '5 catégories obligatoires (cadenas) : Prénom, Ville, Pays, Animal, Objet.',
-                      ),
-                      _RuleText(
-                        'Catégories : Aléatoire (4 tirées au sort par lancement) ou Personnalisé. 12 catégories au total maximum.',
-                      ),
-                      _RuleText(
-                        'En multijoueur : 10 pt pour une réponse valide unique, 5 pt si elle est partagée, 0 pt si elle est invalide.',
-                      ),
-                      _RuleText(
-                        'Mots réutilisés et limites du dictionnaire : voir la configuration appliquée à la partie.',
+                        'En multijoueur : 15 pt si tu es le seul à trouver, '
+                        '10 pt pour une réponse valide unique, 5 pt si '
+                        'elle est partagée, 0 pt si elle est invalide.',
                       ),
                     ],
                   ),
@@ -71,19 +75,20 @@ class RulesScreen extends StatelessWidget {
 }
 
 class _RuleText extends StatelessWidget {
-  const _RuleText(this.text);
+  const _RuleText(this.text, {this.bold = false});
 
   final String text;
+  final bool bold;
 
   @override
   Widget build(BuildContext context) => Padding(
     padding: const EdgeInsets.symmetric(vertical: 8),
     child: Text(
       text,
-      style: const TextStyle(
+      style: TextStyle(
         fontFamily: AppTheme.bodyFont,
-        fontSize: 11,
-        fontWeight: FontWeight.w600,
+        fontSize: 12,
+        fontWeight: bold ? FontWeight.w700 : FontWeight.w600,
         height: 1.35,
         color: AppColors.offWhite,
       ),

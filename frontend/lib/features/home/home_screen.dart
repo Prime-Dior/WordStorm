@@ -95,6 +95,7 @@ class HomeScreen extends StatelessWidget {
             bottom: 28,
             child: Column(
               mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 ArcadeButton(
                   label: 'Jouer',
@@ -104,7 +105,7 @@ class HomeScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 10),
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: size.width * 0.17),
+                  padding: EdgeInsets.symmetric(horizontal: size.width * 0.2),
                   child: ArcadeButton(
                     label: 'Paramètres',
                     small: true,
@@ -114,7 +115,7 @@ class HomeScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 10),
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: size.width * 0.25),
+                  padding: EdgeInsets.symmetric(horizontal: size.width * 0.27),
                   child: ArcadeButton(
                     label: 'Quitter',
                     fontSize: 16,

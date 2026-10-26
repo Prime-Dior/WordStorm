@@ -13,7 +13,11 @@ import 'router.dart';
 /// (`MediaQuery.disableAnimations`) pour toute la sous-arborescence —
 /// wheel et Sunburst consultent `MediaQuery` (phase 6).
 class WordstormApp extends ConsumerStatefulWidget {
-  const WordstormApp({super.key});
+  const WordstormApp({super.key, this.desktopViewport = false});
+
+  /// Sur ordinateur : centre l'application dans une colonne de la
+  /// largeur d'un téléphone (présentation).
+  final bool desktopViewport;
 
   @override
   ConsumerState<WordstormApp> createState() => _WordstormAppState();
@@ -51,11 +55,21 @@ class _WordstormAppState extends ConsumerState<WordstormApp> {
       // réactivation d'animations si le système les réduit).
       builder: (context, child) {
         final mq = MediaQuery.of(context);
-        return MediaQuery(
+        final content = MediaQuery(
           data: mq.copyWith(
             disableAnimations: mq.disableAnimations || _reduceAnimations,
           ),
           child: child ?? const SizedBox.shrink(),
+        );
+        if (!widget.desktopViewport) return content;
+        return ColoredBox(
+          color: const Color(0xFF151925),
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 430),
+              child: content,
+            ),
+          ),
         );
       },
     );

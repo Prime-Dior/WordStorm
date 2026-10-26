@@ -7,6 +7,7 @@ import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/arcade_button.dart';
 import '../../core/widgets/screen_scaffold.dart';
+import '../../core/widgets/ui_kit.dart';
 import '../../data/history/history_repository.dart';
 
 /// Historique personnel (phase 6 — cahier §5.1 « historique » et §5.2
@@ -81,15 +82,8 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Text(
-            'TON HISTORIQUE',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontFamily: AppTheme.displayFont,
-              fontSize: 30,
-              color: AppColors.yellow,
-            ),
-          ),
+          const SizedBox(height: 6),
+          ScreenTitle('Classement', onBack: () => context.pop()),
           const SizedBox(height: 14),
           Expanded(
             child: records == null

@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import '../features/config/config_screen.dart';
 import '../features/game/game_screen.dart';
+import '../features/game/time_up_screen.dart';
 import '../features/history/history_screen.dart';
 import '../features/home/home_screen.dart';
 import '../features/join/join_screen.dart';
@@ -10,16 +11,18 @@ import '../features/lobby/lobby_screen.dart';
 import '../features/lobby/lobby_setup.dart';
 import '../features/menu/menu_screen.dart';
 import '../features/results/final_results_screen.dart';
+import '../features/results/podium_screen.dart';
 import '../features/results/round_results_screen.dart';
 import '../features/rules/rules_screen.dart';
 import '../features/settings/settings_screen.dart';
 import '../features/skeleton/status_screen.dart';
 import '../features/wheel/wheel_screen.dart';
 
-/// Routage de l'application (`go_router`). Chemins = flux de la maquette :
-/// accueil → menu → (solo|multi) config → roue → manche → résultats de
-/// manche → (roue | fin de partie). /lobby, /join, états d'erreur et
-/// salon introuvable : cinéma de la phase 7 salons réels.
+/// Routage de l'application (`go_router`), dans l'ordre de la maquette :
+/// accueil → menu → nouvelle partie → (solo) roue → manche → temps
+/// écoulé → résultats de manche → (roue | score final) ;
+/// (multi) salon → roue → … → classement final (podium).
+/// Rejoindre : menu ou /join → salon invité, ou « Salon introuvable ».
 class AppRouter {
   const AppRouter._();
 
@@ -55,6 +58,11 @@ class AppRouter {
         pageBuilder: (context, state) => _fade(state, const GameScreen()),
       ),
       GoRoute(
+        path: '/time-up',
+        name: 'time-up',
+        pageBuilder: (context, state) => _fade(state, const TimeUpScreen()),
+      ),
+      GoRoute(
         path: '/results',
         name: 'results',
         pageBuilder: (context, state) =>
@@ -67,9 +75,17 @@ class AppRouter {
             _fade(state, const FinalResultsScreen()),
       ),
       GoRoute(
+        path: '/podium',
+        name: 'podium',
+        pageBuilder: (context, state) => _fade(state, const PodiumScreen()),
+      ),
+      GoRoute(
         path: '/join',
         name: 'join',
-        pageBuilder: (context, state) => _fade(state, const JoinScreen()),
+        pageBuilder: (context, state) => _fade(
+          state,
+          JoinScreen(initialCode: state.uri.queryParameters['code']),
+        ),
       ),
       GoRoute(
         path: '/lobby',
@@ -80,6 +96,10 @@ class AppRouter {
             setup: state.extra is LobbySetup
                 ? state.extra! as LobbySetup
                 : null,
+            role: state.uri.queryParameters['role'] == 'guest'
+                ? LobbyRole.guest
+                : LobbyRole.host,
+            code: state.uri.queryParameters['code'],
           ),
         ),
       ),

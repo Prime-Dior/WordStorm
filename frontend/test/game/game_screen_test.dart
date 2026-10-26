@@ -110,7 +110,7 @@ void main() {
 
     // Résultats : points affichés + total.
     final expected = letter == 'R' ? 15 : 0;
-    expect(find.text('+$expected'), findsOneWidget);
+    expect(find.text(expected > 0 ? '$expected pt' : '–'), findsOneWidget);
     expect(find.text('VALIDER'), findsNothing); // navigation OK
   });
 }

@@ -15,7 +15,11 @@ class ScreenScaffold extends StatelessWidget {
     this.showSunburst = false,
     this.burstTop = 0.38,
     this.padding = const EdgeInsets.fromLTRB(18, 8, 18, 18),
+    this.alertFrame = false,
   });
+
+  /// Cadre corail autour de l'écran (alerte des 10 dernières secondes).
+  final bool alertFrame;
 
   /// Jour : accueil only (`.sky` avec `data-d="1"`).
   final bool day;
@@ -78,13 +82,36 @@ class ScreenScaffold extends StatelessWidget {
               child: const IgnorePointer(child: Sunburst()),
             ),
 
-          // Décor d'immeubles en bas.
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: 0,
+          // Décor d'immeubles en bas (absent si la hauteur vaut 0).
+          if (skylineHeight > 0)
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: IgnorePointer(
+                child: CitySkyline(day: day, height: skylineHeight),
+              ),
+            ),
+
+          // Cadre d'alerte (maquette 11) : bordure corail lumineuse.
+          Positioned.fill(
             child: IgnorePointer(
-              child: CitySkyline(day: day, height: skylineHeight),
+              child: AnimatedOpacity(
+                opacity: alertFrame ? 1 : 0,
+                duration: const Duration(milliseconds: 250),
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    border: Border.all(color: AppColors.coral, width: 5),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.coral.withAlpha(0x66),
+                        blurRadius: 24,
+                        spreadRadius: -6,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ),
           ),
 
