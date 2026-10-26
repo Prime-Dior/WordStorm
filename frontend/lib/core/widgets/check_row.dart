@@ -103,6 +103,9 @@ class CheckRow extends StatelessWidget {
           decoration: deco,
           child: InkWell(
             onTap: locked || inactive ? null : onToggle,
+            mouseCursor: locked || inactive
+                ? SystemMouseCursors.basic
+                : SystemMouseCursors.click,
             borderRadius: BorderRadius.circular(12),
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),

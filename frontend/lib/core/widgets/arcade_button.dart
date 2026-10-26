@@ -149,13 +149,18 @@ class _ArcadeButtonState extends State<ArcadeButton> {
       ),
     );
 
+    final interactive = MouseRegion(
+      cursor: enabled ? SystemMouseCursors.click : SystemMouseCursors.basic,
+      child: child,
+    );
+
     return Semantics(
       button: true,
       enabled: enabled,
       label: widget.label,
       child: widget.flex > 1
-          ? Expanded(flex: widget.flex, child: child)
-          : child,
+          ? Expanded(flex: widget.flex, child: interactive)
+          : interactive,
     );
   }
 }
