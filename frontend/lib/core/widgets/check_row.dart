@@ -89,10 +89,14 @@ class CheckRow extends StatelessWidget {
     }
 
     if (!interactive) {
+      // Catégorie obligatoire ou mode aléatoire : non modifiable.
       return Semantics(
-        checked: locked ? true : selected,
+        checked: locked || selected,
         label: locked ? '$label (obligatoire)' : label,
-        child: content(null),
+        child: MouseRegion(
+          cursor: SystemMouseCursors.forbidden,
+          child: content(null),
+        ),
       );
     }
 

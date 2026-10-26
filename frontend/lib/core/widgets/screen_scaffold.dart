@@ -85,13 +85,13 @@ class ScreenScaffold extends StatelessWidget {
           // Décor d'immeubles en bas (absent si la hauteur vaut 0).
           if (skylineHeight > 0)
             Positioned(
-              left: 0,
-              right: 0,
-              bottom: 0,
-              child: IgnorePointer(
-                child: CitySkyline(day: day, height: skylineHeight),
-              ),
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: IgnorePointer(
+              child: CitySkyline(day: day, height: skylineHeight),
             ),
+          ),
 
           // Cadre d'alerte (maquette 11) : bordure corail lumineuse.
           Positioned.fill(

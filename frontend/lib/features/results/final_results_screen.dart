@@ -127,7 +127,11 @@ class _FinalResultsScreenState extends ConsumerState<FinalResultsScreen> {
           const SizedBox(height: 10),
           Row(
             children: [
-              ArcadeButton(label: 'Rejouer', flex: 2, onPressed: _replay),
+              ArcadeButton(
+                label: 'Rejouer',
+                flex: 2,
+                onPressed: _replay,
+              ),
               const SizedBox(width: 12),
               Expanded(
                 child: ArcadeButton(

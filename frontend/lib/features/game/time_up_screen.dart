@@ -42,7 +42,9 @@ class TimeUpScreen extends ConsumerWidget {
               fontFamily: AppTheme.displayFont,
               fontSize: 40,
               color: AppColors.coral,
-              shadows: [Shadow(color: Color(0xFF0C1429), offset: Offset(0, 3))],
+              shadows: [
+                Shadow(color: Color(0xFF0C1429), offset: Offset(0, 3)),
+              ],
             ),
           ),
           const SizedBox(height: 10),
@@ -67,7 +69,9 @@ class TimeUpScreen extends ConsumerWidget {
                     answer: (answers[category] ?? '').trim(),
                   ),
                 const SizedBox(height: 10),
-                GradientProgressBar(value: total == 0 ? 0 : filled / total),
+                GradientProgressBar(
+                  value: total == 0 ? 0 : filled / total,
+                ),
                 const SizedBox(height: 12),
                 const Text(
                   'Réponses verrouillées · vérification à la fin de la manche…',

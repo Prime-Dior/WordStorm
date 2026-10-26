@@ -30,7 +30,8 @@ class PressState {
 
 /// Socle commun de tous les éléments cliquables de l'interface.
 ///
-/// Il apporte les trois retours visuels demandés :
+/// Il apporte les retours visuels demandés :
+/// - **curseur** : la main au survol, le sens interdit si désactivé ;
 /// - **survol** (souris) : l'élément se soulève de 2 px et s'éclaircit ;
 /// - **focus** (clavier, touche Tab) : un anneau clair entoure l'élément ;
 /// - **appui** : l'élément s'enfonce (géré par le `builder` si besoin).
@@ -50,6 +51,8 @@ class Pressable extends StatefulWidget {
     this.hoverOverlay = const Color(0x1AFFFFFF),
     this.focusRingColor = AppColors.offWhite,
     this.autofocus = false,
+    this.cursor = SystemMouseCursors.click,
+    this.disabledCursor = SystemMouseCursors.forbidden,
   });
 
   /// Construit le contenu selon l'état (survol, focus, appui).
@@ -69,6 +72,13 @@ class Pressable extends StatefulWidget {
   final Color hoverOverlay;
   final Color focusRingColor;
   final bool autofocus;
+
+  /// Curseur de la souris au survol : la main (« click ») par défaut.
+  final MouseCursor cursor;
+
+  /// Curseur quand l'élément est désactivé : sens interdit par défaut
+  /// (ex. « DÉMARRER · 1 JOUEUR » grisé).
+  final MouseCursor disabledCursor;
 
   @override
   State<Pressable> createState() => _PressableState();
@@ -145,9 +155,7 @@ class _PressableState extends State<Pressable> {
       enabled: enabled,
       autofocus: widget.autofocus,
       actions: _actions,
-      mouseCursor: enabled
-          ? SystemMouseCursors.click
-          : SystemMouseCursors.basic,
+      mouseCursor: enabled ? widget.cursor : widget.disabledCursor,
       onShowHoverHighlight: (value) {
         if (_hovered != value) setState(() => _hovered = value);
       },

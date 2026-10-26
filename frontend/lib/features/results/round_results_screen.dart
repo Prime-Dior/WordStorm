@@ -207,7 +207,9 @@ class _CategoryResultRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final empty = answer.isEmpty;
     final points = line.points;
-    final detail = empty ? '— · Pas de réponse' : '$answer · ${line.reason}';
+    final detail = empty
+        ? '— · Pas de réponse'
+        : '$answer · ${line.reason}';
     final pointsColor = switch (line.tier) {
       ScoreTier.invalid => AppColors.blueGray,
       _ => AppColors.yellow,

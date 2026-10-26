@@ -358,7 +358,10 @@ class _DurationSliderState extends State<_DurationSlider> {
   @override
   Widget build(BuildContext context) {
     return FocusableActionDetector(
-      mouseCursor: SystemMouseCursors.click,
+      // Main ouverte au survol, main fermée pendant le glissement.
+      mouseCursor: _dragging
+          ? SystemMouseCursors.grabbing
+          : SystemMouseCursors.grab,
       onShowHoverHighlight: (v) => setState(() => _hovered = v),
       onShowFocusHighlight: (v) => setState(() => _focused = v),
       shortcuts: const <ShortcutActivator, Intent>{

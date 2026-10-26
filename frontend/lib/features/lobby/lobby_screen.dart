@@ -299,9 +299,7 @@ class _CodePanel extends StatelessWidget {
         ),
         ArcadeButton(
           label: copied ? 'Copié !' : 'Copier',
-          variant: copied
-              ? ArcadeButtonVariant.green
-              : ArcadeButtonVariant.dark,
+          variant: copied ? ArcadeButtonVariant.green : ArcadeButtonVariant.dark,
           small: true,
           minHeight: 40,
           tooltip: 'Copier le code',
@@ -324,8 +322,7 @@ class _PlayerRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final name =
-        '${player.me ? 'Toi' : player.name}'
+    final name = '${player.me ? 'Toi' : player.name}'
         '${player.host ? ' (Hôte)' : ''}';
     return TweenAnimationBuilder<double>(
       tween: Tween<double>(begin: 0.0, end: 1.0),
@@ -333,10 +330,7 @@ class _PlayerRow extends StatelessWidget {
       curve: Curves.easeOutCubic,
       builder: (context, t, child) => Opacity(
         opacity: t,
-        child: Transform.translate(
-          offset: Offset(0, 12 * (1 - t)),
-          child: child,
-        ),
+        child: Transform.translate(offset: Offset(0, 12 * (1 - t)), child: child),
       ),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
@@ -346,7 +340,7 @@ class _PlayerRow extends StatelessWidget {
         ),
         child: Row(
           children: [
-            PlayerAvatar(asset: player.avatar),
+            PlayerAvatar(asset: player.avatar, size: 40),
             const SizedBox(width: 12),
             Expanded(
               child: Text(

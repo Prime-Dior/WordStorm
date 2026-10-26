@@ -56,21 +56,20 @@ class _CodeFieldState extends State<CodeField> {
   }
 
   // Majuscules uniquement, alphabet sans caractères ambigus.
-  static final TextInputFormatter _formatter = TextInputFormatter.withFunction((
-    oldValue,
-    newValue,
-  ) {
-    final cleaned = newValue.text
-        .toUpperCase()
-        .split('')
-        .where(CodeField.allowedAlphabet.contains)
-        .join();
-    if (cleaned == newValue.text) return newValue;
-    return TextEditingValue(
-      text: cleaned,
-      selection: TextSelection.collapsed(offset: cleaned.length),
-    );
-  });
+  static final TextInputFormatter _formatter = TextInputFormatter.withFunction(
+    (oldValue, newValue) {
+      final cleaned = newValue.text
+          .toUpperCase()
+          .split('')
+          .where(CodeField.allowedAlphabet.contains)
+          .join();
+      if (cleaned == newValue.text) return newValue;
+      return TextEditingValue(
+        text: cleaned,
+        selection: TextSelection.collapsed(offset: cleaned.length),
+      );
+    },
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -96,18 +95,14 @@ class _CodeFieldState extends State<CodeField> {
           borderRadius: BorderRadius.circular(10),
           border: Border.all(color: borderColor, width: 2),
           boxShadow: focused
-              ? [
-                  BoxShadow(
-                    color: AppColors.teal.withAlpha(0x66),
-                    blurRadius: 10,
-                  ),
-                ]
+              ? [BoxShadow(color: AppColors.teal.withAlpha(0x66), blurRadius: 10)]
               : const [],
         ),
         child: TextField(
           controller: widget.controller,
           focusNode: _focus,
           autofocus: widget.autofocus,
+          mouseCursor: SystemMouseCursors.text,
           maxLength: 6,
           autocorrect: false,
           enableSuggestions: false,

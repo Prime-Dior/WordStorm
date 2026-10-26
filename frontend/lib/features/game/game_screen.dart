@@ -269,7 +269,9 @@ class _TimerRing extends StatelessWidget {
     final noTimer = total == 0;
     final progress = noTimer ? 1.0 : (remaining / total).clamp(0.0, 1.0);
     return Semantics(
-      label: noTimer ? 'Sans chrono' : 'Temps restant : $remaining secondes',
+      label: noTimer
+          ? 'Sans chrono'
+          : 'Temps restant : $remaining secondes',
       liveRegion: alert,
       child: SizedBox(
         width: 80,
@@ -327,11 +329,7 @@ class _RingPainter extends CustomPainter {
     final center = size.center(Offset.zero);
     final radius = size.width / 2;
     // Disque sombre.
-    canvas.drawCircle(
-      center,
-      radius - 6,
-      Paint()..color = const Color(0xFF0C1429),
-    );
+    canvas.drawCircle(center, radius - 6, Paint()..color = const Color(0xFF0C1429));
     // Piste de l'anneau.
     final stroke = Paint()
       ..style = PaintingStyle.stroke

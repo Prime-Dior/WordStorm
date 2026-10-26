@@ -76,7 +76,9 @@ class ScreenTitle extends StatelessWidget {
         fontSize: fontSize,
         letterSpacing: .5,
         color: AppColors.offWhite,
-        shadows: const [Shadow(color: Color(0xFF0C1429), offset: Offset(0, 3))],
+        shadows: const [
+          Shadow(color: Color(0xFF0C1429), offset: Offset(0, 3)),
+        ],
       ),
     );
     return SizedBox(
@@ -85,7 +87,9 @@ class ScreenTitle extends StatelessWidget {
         children: [
           SizedBox(
             width: 44,
-            child: onBack == null ? null : BackArrowButton(onPressed: onBack!),
+            child: onBack == null
+                ? null
+                : BackArrowButton(onPressed: onBack!),
           ),
           Expanded(child: title),
           const SizedBox(width: 44),

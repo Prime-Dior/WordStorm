@@ -41,9 +41,7 @@ class _MenuScreenState extends State<MenuScreen> {
       return;
     }
     if (!SalonCode.isWellFormed(code)) {
-      setState(
-        () => _error = 'Code : 6 lettres ou chiffres (sans 0, O, 1, I).',
-      );
+      setState(() => _error = 'Code : 6 lettres ou chiffres (sans 0, O, 1, I).');
       return;
     }
     setState(() => _error = null);
@@ -55,115 +53,118 @@ class _MenuScreenState extends State<MenuScreen> {
     return ScreenScaffold(
       skylineHeight: 360,
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const SizedBox(height: 8),
-          // Logo et accès aux réglages.
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Padding(
-                padding: EdgeInsets.only(left: 4),
-                child: WordstormLogoSmall(showLightning: true),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 14),
-                child: RoundIconButton(
-                  tooltip: 'Paramètres',
-                  icon: WordstormIcons.gear(
-                    size: 22,
-                    color: AppColors.offWhite,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const SizedBox(height: 8),
+                  // Logo et accès aux réglages.
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Padding(
+                        padding: EdgeInsets.only(left: 4),
+                        child: WordstormLogoSmall(showLightning: true),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 14),
+                        child: RoundIconButton(
+                          tooltip: 'Paramètres',
+                          icon: WordstormIcons.gear(
+                            size: 22,
+                            color: AppColors.offWhite,
+                          ),
+                          onPressed: () => context.push('/settings'),
+                        ),
+                      ),
+                    ],
                   ),
-                  onPressed: () => context.push('/settings'),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
-          const Align(alignment: Alignment.centerLeft, child: _GreetingPill()),
-          Expanded(
-            child: Align(
-              alignment: const Alignment(0, .35),
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    ArcadeMenuCard(
-                      label: 'Solo',
-                      detail: 'Joue à ton rythme',
-                      variant: ArcadeButtonVariant.yellow,
-                      iconGlyph: 'user',
-                      onPressed: () => context.push('/config?mode=solo'),
-                    ),
-                    const SizedBox(height: 14),
-                    ArcadeMenuCard(
-                      label: 'Multijoueur',
-                      detail: 'Crée un salon',
-                      variant: ArcadeButtonVariant.teal,
-                      iconGlyph: 'users',
-                      onPressed: () => context.push('/config?mode=multi'),
-                    ),
-                    const SizedBox(height: 14),
+                  const SizedBox(height: 10),
+                  const Align(
+                    alignment: Alignment.centerLeft,
+                    child: _GreetingPill(),
+                  ),
+                  Expanded(
+                    child: Align(
+                      alignment: const Alignment(0, .35),
+                      child: SingleChildScrollView(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                  ArcadeMenuCard(
+                    label: 'Solo',
+                    detail: 'Joue à ton rythme',
+                    variant: ArcadeButtonVariant.yellow,
+                    iconGlyph: 'user',
+                    onPressed: () => context.push('/config?mode=solo'),
+                  ),
+                  const SizedBox(height: 14),
+                  ArcadeMenuCard(
+                    label: 'Multijoueur',
+                    detail: 'Crée un salon',
+                    variant: ArcadeButtonVariant.teal,
+                    iconGlyph: 'users',
+                    onPressed: () => context.push('/config?mode=multi'),
+                  ),
+                  const SizedBox(height: 14),
 
-                    // Bloc « Rejoindre avec un code ».
-                    Container(
-                      padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
-                      decoration: BoxDecoration(
-                        color: const Color(0xF0142038),
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          const Text(
-                            'REJOINDRE AVEC UN CODE',
-                            style: TextStyle(
-                              fontFamily: AppTheme.bodyFont,
-                              fontSize: 10,
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: .4,
-                              color: AppColors.offWhite,
+                  // Bloc « Rejoindre avec un code ».
+                  Container(
+                    padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
+                    decoration: BoxDecoration(
+                      color: const Color(0xF0142038),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        const Text(
+                          'REJOINDRE AVEC UN CODE',
+                          style: TextStyle(
+                            fontFamily: AppTheme.bodyFont,
+                            fontSize: 10,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: .4,
+                            color: AppColors.offWhite,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        CodeField(
+                          controller: _codeController,
+                          errorText: _error,
+                          onValidated: _join,
+                          trailing: SizedBox(
+                            width: 48,
+                            child: ArcadeButton(
+                              label: 'OK',
+                              small: true,
+                              padding: EdgeInsets.zero,
+                              minHeight: 44,
+                              tooltip: 'Rejoindre le salon',
+                              onPressed: _join,
                             ),
                           ),
-                          const SizedBox(height: 10),
-                          CodeField(
-                            controller: _codeController,
-                            errorText: _error,
-                            onValidated: _join,
-                            trailing: SizedBox(
-                              width: 48,
-                              child: ArcadeButton(
-                                label: 'OK',
-                                small: true,
-                                padding: EdgeInsets.zero,
-                                minHeight: 44,
-                                tooltip: 'Rejoindre le salon',
-                                onPressed: _join,
-                              ),
-                            ),
-                          ),
-                        ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+
+                  ArcadeMenuCard(
+                    label: 'Classement',
+                    detail: 'Les meilleurs joueurs',
+                    variant: ArcadeButtonVariant.dark,
+                    iconGlyph: 'trophy',
+                    onPressed: () => context.push('/history'),
+                  ),
+                          ],
+                        ),
                       ),
                     ),
-                    const SizedBox(height: 14),
-
-                    ArcadeMenuCard(
-                      label: 'Classement',
-                      detail: 'Les meilleurs joueurs',
-                      variant: ArcadeButtonVariant.dark,
-                      iconGlyph: 'trophy',
-                      onPressed: () => context.push('/history'),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ),
-          ),
-        ],
-      ),
     );
   }
 }
@@ -253,10 +254,7 @@ class ArcadeMenuCard extends StatelessWidget {
           boxShadow: [
             BoxShadow(
               color: deep,
-              offset: Offset(
-                0,
-                state.pressed ? 1 : (state.highlighted ? 7 : 5),
-              ),
+              offset: Offset(0, state.pressed ? 1 : (state.highlighted ? 7 : 5)),
             ),
             const BoxShadow(
               color: Color(0x55000000),
@@ -320,10 +318,7 @@ class ArcadeMenuCard extends StatelessWidget {
               AnimatedSlide(
                 duration: const Duration(milliseconds: 140),
                 offset: Offset(state.highlighted ? .25 : 0, 0),
-                child: WordstormIcons.arrow(
-                  size: 22,
-                  color: AppColors.navyBlue,
-                ),
+                child: WordstormIcons.arrow(size: 22, color: AppColors.navyBlue),
               ),
             const SizedBox(width: 16),
           ],
