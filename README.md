@@ -36,7 +36,7 @@ cd frontend
 flutter pub get
 ```
 
-Dans VS Code, ouvrir le dossier `frontend/` pour travailler sur l'application. Le lancement normal ouvre l'aperçu téléphone des seuls écrans déjà réalisés : accueil, menu, configuration et salon. Les autres écrans du socle ne sont pas accessibles depuis cette présentation. Pour la lancer dans Chrome :
+Dans VS Code, ouvrir le dossier `frontend/` pour travailler sur l'application. Le lancement centre l'aperçu dans Chrome, sans dessiner de coque de téléphone. Sur un écran de téléphone, la zone de présentation s'adapte à la largeur disponible, jusqu'à 430 pixels. Les pages accessibles sont l'accueil, le menu, la configuration, le salon, les paramètres, les règles et les états de démonstration (attente, chargement et erreurs). Les autres écrans du jeu ne sont pas accessibles depuis cette présentation. Pour la lancer dans Chrome :
 
 ```powershell
 flutter run -d chrome
