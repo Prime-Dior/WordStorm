@@ -257,13 +257,16 @@ class _Header extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Row(
     children: [
-      GestureDetector(
-        onTap: () => context.pop(),
-        child: Padding(
-          padding: const EdgeInsets.all(8),
-          child: RotatedBox(
-            quarterTurns: 2,
-            child: WordstormIcons.arrow(size: 22, color: AppColors.offWhite),
+      MouseRegion(
+        cursor: SystemMouseCursors.click,
+        child: GestureDetector(
+          onTap: () => context.pop(),
+          child: Padding(
+            padding: const EdgeInsets.all(8),
+            child: RotatedBox(
+              quarterTurns: 2,
+              child: WordstormIcons.arrow(size: 22, color: AppColors.offWhite),
+            ),
           ),
         ),
       ),
@@ -296,22 +299,25 @@ class _ModeChip extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
-    onTap: onTap,
-    child: Container(
-      margin: const EdgeInsets.only(right: 10),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
-      decoration: BoxDecoration(
-        color: selected ? AppColors.yellow : const Color(0x14FFFFFF),
-        borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: Colors.transparent, width: 0),
-      ),
-      child: Text(
-        label.toUpperCase(),
-        style: TextStyle(
-          fontFamily: AppTheme.displayFont,
-          fontSize: 18,
-          color: selected ? AppColors.navyBlue : AppColors.offWhite,
+  Widget build(BuildContext context) => MouseRegion(
+    cursor: SystemMouseCursors.click,
+    child: GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.only(right: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
+        decoration: BoxDecoration(
+          color: selected ? AppColors.yellow : const Color(0x14FFFFFF),
+          borderRadius: BorderRadius.circular(999),
+          border: Border.all(color: Colors.transparent, width: 0),
+        ),
+        child: Text(
+          label.toUpperCase(),
+          style: TextStyle(
+            fontFamily: AppTheme.displayFont,
+            fontSize: 18,
+            color: selected ? AppColors.navyBlue : AppColors.offWhite,
+          ),
         ),
       ),
     ),
@@ -337,20 +343,23 @@ class _DurationChip extends StatelessWidget {
         : duration == 20
         ? '20 s · Speed'
         : '$duration s';
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        decoration: BoxDecoration(
-          color: selected ? AppColors.teal : const Color(0x14FFFFFF),
-          borderRadius: BorderRadius.circular(999),
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            fontFamily: AppTheme.displayFont,
-            fontSize: 17,
-            color: selected ? AppColors.navyBlue : AppColors.offWhite,
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          decoration: BoxDecoration(
+            color: selected ? AppColors.teal : const Color(0x14FFFFFF),
+            borderRadius: BorderRadius.circular(999),
+          ),
+          child: Text(
+            label,
+            style: TextStyle(
+              fontFamily: AppTheme.displayFont,
+              fontSize: 17,
+              color: selected ? AppColors.navyBlue : AppColors.offWhite,
+            ),
           ),
         ),
       ),
@@ -406,22 +415,27 @@ class _Stepper extends StatelessWidget {
   );
 
   Widget _roundIconButton({required IconData icon, VoidCallback? onTap}) =>
-      GestureDetector(
-        onTap: onTap,
-        child: Container(
-          width: 30,
-          height: 30,
-          margin: const EdgeInsets.all(2),
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: onTap == null
-                ? const Color(0x0AFFFFFF)
-                : const Color(0x33FFFFFF),
-          ),
-          child: Icon(
-            icon,
-            size: 18,
-            color: onTap == null ? AppColors.blueGray : AppColors.offWhite,
+      MouseRegion(
+        cursor: onTap == null
+            ? SystemMouseCursors.basic
+            : SystemMouseCursors.click,
+        child: GestureDetector(
+          onTap: onTap,
+          child: Container(
+            width: 30,
+            height: 30,
+            margin: const EdgeInsets.all(2),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: onTap == null
+                  ? const Color(0x0AFFFFFF)
+                  : const Color(0x33FFFFFF),
+            ),
+            child: Icon(
+              icon,
+              size: 18,
+              color: onTap == null ? AppColors.blueGray : AppColors.offWhite,
+            ),
           ),
         ),
       );
@@ -440,43 +454,46 @@ class _ToggleRow extends StatelessWidget {
   final ValueChanged<bool> onChange;
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
-    onTap: () => onChange(!value),
-    child: Row(
-      children: [
-        Container(
-          width: 40,
-          height: 24,
-          padding: const EdgeInsets.all(2),
-          decoration: BoxDecoration(
-            color: value ? AppColors.teal : const Color(0x22FFFFFF),
-            borderRadius: BorderRadius.circular(999),
-          ),
-          alignment: value ? Alignment.centerRight : Alignment.centerLeft,
-          child: Container(
-            width: 20,
-            height: 20,
-            decoration: const BoxDecoration(
-              shape: BoxShape.circle,
-              color: Colors.white,
+  Widget build(BuildContext context) => MouseRegion(
+    cursor: SystemMouseCursors.click,
+    child: GestureDetector(
+      onTap: () => onChange(!value),
+      child: Row(
+        children: [
+          Container(
+            width: 40,
+            height: 24,
+            padding: const EdgeInsets.all(2),
+            decoration: BoxDecoration(
+              color: value ? AppColors.teal : const Color(0x22FFFFFF),
+              borderRadius: BorderRadius.circular(999),
+            ),
+            alignment: value ? Alignment.centerRight : Alignment.centerLeft,
+            child: Container(
+              width: 20,
+              height: 20,
+              decoration: const BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white,
+              ),
             ),
           ),
-        ),
-        const SizedBox(width: 8),
-        Flexible(
-          child: Text(
-            label,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              fontFamily: AppTheme.bodyFont,
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              color: AppColors.offWhite,
+          const SizedBox(width: 8),
+          Flexible(
+            child: Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                fontFamily: AppTheme.bodyFont,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: AppColors.offWhite,
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     ),
   );
 }

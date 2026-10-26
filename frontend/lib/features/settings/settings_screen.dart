@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../app/providers.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
-import '../../core/widgets/icons/wordstorm_icons.dart';
-import '../../core/widgets/screen_scaffold.dart';
+import '../../core/widgets/arcade_button.dart';
 import '../../data/settings/settings_repository.dart';
+import '../skeleton/status_screen.dart';
 
-/// Réglages (Figma 18) : pseudo, sons, vibrations, animations réduites
-/// — branchés sur `SettingsRepository` (phase 3).
+/// Fenêtre Paramètres (maquette 18), au-dessus du menu.
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
 
@@ -18,8 +18,6 @@ class SettingsScreen extends ConsumerStatefulWidget {
 }
 
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
-  final _nickname = TextEditingController();
-
   bool _sound = SettingsRepository.kDefaultSound;
   bool _vibration = SettingsRepository.kDefaultVibration;
   bool _reduceAnimations = SettingsRepository.kDefaultReduceAnimations;
@@ -32,164 +30,132 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 
   Future<void> _load() async {
-    final s = ref.read(settingsProvider);
-    _nickname.text = await s.nickname();
-    _sound = await s.soundOn();
-    _vibration = await s.vibrationOn();
-    _reduceAnimations = await s.reduceAnimations();
+    final settings = ref.read(settingsProvider);
+    _sound = await settings.soundOn();
+    _vibration = await settings.vibrationOn();
+    _reduceAnimations = await settings.reduceAnimations();
     if (mounted) setState(() => _loaded = true);
   }
 
   @override
-  void dispose() {
-    _nickname.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final s = ref.read(settingsProvider);
-
-    return ScreenScaffold(
-      skylineHeight: 220,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const Text(
-            'PARAMÈTRES',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontFamily: AppTheme.displayFont,
-              fontSize: 30,
-              color: AppColors.offWhite,
-            ),
-          ),
-          const SizedBox(height: 18),
-          Expanded(
+    final settings = ref.read(settingsProvider);
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 350, maxHeight: 650),
+        child: Material(
+          color: const Color(0xEE17223A),
+          borderRadius: BorderRadius.circular(22),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(18, 20, 18, 16),
             child: !_loaded
-                ? const SizedBox.shrink()
-                : ListView(
-                    padding: EdgeInsets.zero,
+                ? const Center(child: CircularProgressIndicator())
+                : Column(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      const _FieldLabel('PSEUDO'),
-                      TextField(
-                        controller: _nickname,
-                        maxLength: 12,
-                        decoration: _inputDecoration('Champion'),
-                        style: const TextStyle(
-                          fontFamily: AppTheme.bodyFont,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.navyBlue,
+                      const Text(
+                        'PARAMÈTRES',
+                        style: TextStyle(
+                          fontFamily: AppTheme.displayFont,
+                          fontSize: 28,
+                          color: AppColors.offWhite,
                         ),
-                        onChanged: (v) => s.setNickname(v),
                       ),
-                      _SwitchRow(
-                        icon: 'wave',
+                      const SizedBox(height: 10),
+                      _OptionRow(
                         label: 'Sons',
                         value: _sound,
-                        onChange: (v) {
+                        onChanged: (v) {
                           setState(() => _sound = v);
-                          s.setSoundOn(v);
+                          settings.setSoundOn(v);
                         },
                       ),
-                      _SwitchRow(
-                        icon: 'bolt',
-                        label: 'Vibrations',
+                      _OptionRow(
+                        label: 'Vibrations (si le mobile le permet)',
                         value: _vibration,
-                        onChange: (v) {
+                        onChanged: (v) {
                           setState(() => _vibration = v);
-                          s.setVibrationOn(v);
+                          settings.setVibrationOn(v);
                         },
                       ),
-                      _SwitchRow(
-                        icon: 'leaf',
+                      _OptionRow(
                         label: 'Réduire les animations',
                         value: _reduceAnimations,
-                        onChange: (v) {
+                        onChanged: (v) {
                           setState(() => _reduceAnimations = v);
-                          s.setReduceAnimations(v);
+                          settings.setReduceAnimations(v);
                         },
+                      ),
+                      const SizedBox(height: 12),
+                      ArcadeButton(
+                        label: 'Règles du jeu',
+                        variant: ArcadeButtonVariant.dark,
+                        small: true,
+                        onPressed: () => context.push('/rules'),
+                      ),
+                      const SizedBox(height: 8),
+                      const Text(
+                        'Démonstration',
+                        style: TextStyle(
+                          fontFamily: AppTheme.bodyFont,
+                          fontSize: 11,
+                          color: AppColors.blueGray,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      const StatusDemoButtons(),
+                      const SizedBox(height: 12),
+                      ArcadeButton(
+                        label: 'Fermer',
+                        variant: ArcadeButtonVariant.dark,
+                        small: true,
+                        onPressed: () => context.pop(),
                       ),
                     ],
                   ),
           ),
-        ],
+        ),
       ),
     );
   }
-
-  InputDecoration _inputDecoration(String hint) => InputDecoration(
-    isDense: true,
-    counterText: '',
-    filled: true,
-    fillColor: AppColors.offWhite,
-    hintText: hint,
-    border: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(12),
-      borderSide: BorderSide.none,
-    ),
-  );
 }
 
-class _FieldLabel extends StatelessWidget {
-  const _FieldLabel(this.label);
-
-  final String label;
-
-  @override
-  Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.only(bottom: 6, left: 4),
-    child: Text(
-      label,
-      style: const TextStyle(
-        fontFamily: AppTheme.bodyFont,
-        fontSize: 11,
-        fontWeight: FontWeight.w700,
-        letterSpacing: .8,
-        color: AppColors.blueGray,
-      ),
-    ),
-  );
-}
-
-class _SwitchRow extends StatelessWidget {
-  const _SwitchRow({
-    required this.icon,
+class _OptionRow extends StatelessWidget {
+  const _OptionRow({
     required this.label,
     required this.value,
-    required this.onChange,
+    required this.onChanged,
   });
 
-  final String icon;
   final String label;
   final bool value;
-  final ValueChanged<bool> onChange;
+  final ValueChanged<bool> onChanged;
 
   @override
   Widget build(BuildContext context) => Container(
-    margin: const EdgeInsets.only(top: 12),
-    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+    margin: const EdgeInsets.only(bottom: 8),
     decoration: BoxDecoration(
-      color: const Color(0x14FFFFFF),
-      borderRadius: BorderRadius.circular(12),
+      color: const Color(0xCC38475F),
+      borderRadius: BorderRadius.circular(11),
     ),
-    child: Row(
-      children: [
-        WordstormIcons.gear(size: 20, color: AppColors.blueGray),
-        const SizedBox(width: 10),
-        Expanded(
-          child: Text(
-            label,
-            style: const TextStyle(
-              fontFamily: AppTheme.bodyFont,
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: AppColors.offWhite,
-            ),
-          ),
+    child: CheckboxListTile(
+      value: value,
+      onChanged: (v) => onChanged(v ?? false),
+      activeColor: AppColors.yellow,
+      checkColor: AppColors.navyBlue,
+      controlAffinity: ListTileControlAffinity.leading,
+      dense: true,
+      visualDensity: VisualDensity.compact,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+      title: Text(
+        label,
+        style: const TextStyle(
+          fontFamily: AppTheme.bodyFont,
+          fontSize: 11,
+          fontWeight: FontWeight.w600,
+          color: AppColors.offWhite,
         ),
-        Switch(value: value, onChanged: onChange),
-      ],
+      ),
     ),
   );
 }

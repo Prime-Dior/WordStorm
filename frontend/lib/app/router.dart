@@ -86,12 +86,47 @@ class AppRouter {
       GoRoute(
         path: '/settings',
         name: 'settings',
-        pageBuilder: (context, state) => _fade(state, const SettingsScreen()),
+        pageBuilder: (context, state) =>
+            _overlay(state, const SettingsScreen()),
       ),
       GoRoute(
         path: '/rules',
         name: 'rules',
-        pageBuilder: (context, state) => _fade(state, const RulesScreen()),
+        pageBuilder: (context, state) => _overlay(state, const RulesScreen()),
+      ),
+      GoRoute(
+        path: '/waiting',
+        pageBuilder: (context, state) => _overlay(
+          state,
+          const StatusScreen(
+            title: 'En attente d’autres joueurs…',
+            message: 'En attente d’autres joueurs',
+            kind: StatusKind.waiting,
+          ),
+        ),
+      ),
+      GoRoute(
+        path: '/loading',
+        pageBuilder: (context, state) => _overlay(
+          state,
+          const StatusScreen(
+            title: 'Ça se prépare…',
+            message: 'Écran de démonstration',
+            kind: StatusKind.waiting,
+          ),
+        ),
+      ),
+      GoRoute(
+        path: '/connection-error',
+        pageBuilder: (context, state) => _overlay(
+          state,
+          const StatusScreen(
+            title: 'Problème de connexion',
+            message: 'Vérifie ta connexion Internet et réessaie. Tes réponses restent sur l’appareil.',
+            kind: StatusKind.error,
+            actionLabel: 'Réessayer',
+          ),
+        ),
       ),
       GoRoute(
         path: '/history',
@@ -103,15 +138,12 @@ class AppRouter {
       GoRoute(
         path: '/not-found',
         name: 'not-found',
-        pageBuilder: (context, state) => _fade(
+        pageBuilder: (context, state) => _overlay(
           state,
           const StatusScreen(
             title: 'Salon introuvable',
-            message:
-                'Vérifie le code (6 lettres/chiffres, sans 0 O 1 I) '
-                'et réessaie.',
+            message: 'Aucun salon ne correspond à ce code.',
             kind: StatusKind.error,
-            actionLabel: 'Retour',
           ),
         ),
       ),
@@ -136,4 +168,25 @@ class AppRouter {
               ),
             ),
       );
+
+  /// Route transparente qui conserve l’écran précédent sous la fenêtre.
+  static CustomTransitionPage<void> _overlay(
+    GoRouterState state,
+    Widget child,
+  ) => CustomTransitionPage<void>(
+    key: state.pageKey,
+    opaque: false,
+    barrierColor: const Color(0xB3121A2B),
+    barrierDismissible: true,
+    child: child,
+    transitionDuration: const Duration(milliseconds: 220),
+    transitionsBuilder: (context, animation, secondary, child) =>
+        FadeTransition(
+          opacity: animation,
+          child: ScaleTransition(
+            scale: Tween<double>(begin: .97, end: 1).animate(animation),
+            child: child,
+          ),
+        ),
+  );
 }

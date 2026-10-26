@@ -161,7 +161,14 @@ class ArcadeMenuCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextButton(
       onPressed: onPressed,
-      style: TextButton.styleFrom(padding: EdgeInsets.zero),
+      style: ButtonStyle(
+        padding: const WidgetStatePropertyAll(EdgeInsets.zero),
+        mouseCursor: WidgetStateProperty.resolveWith(
+          (states) => states.contains(WidgetState.disabled)
+              ? SystemMouseCursors.basic
+              : SystemMouseCursors.click,
+        ),
+      ),
       child: Ink(
         height: 70,
         decoration: BoxDecoration(
@@ -252,11 +259,27 @@ class _IconButton extends StatelessWidget {
   final VoidCallback onPressed;
 
   @override
-  Widget build(BuildContext context) => ArcadeButton(
-    label: '',
-    variant: ArcadeButtonVariant.dark,
-    small: true,
-    padding: const EdgeInsets.all(8),
-    onPressed: onPressed,
+  Widget build(BuildContext context) => Tooltip(
+    message: tooltip,
+    child: Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onPressed,
+        customBorder: const CircleBorder(),
+        mouseCursor: SystemMouseCursors.click,
+        child: Ink(
+          width: 42,
+          height: 42,
+          decoration: const BoxDecoration(
+            shape: BoxShape.circle,
+            color: AppColors.darkButton,
+            boxShadow: [
+              BoxShadow(color: AppColors.darkButtonDeep, offset: Offset(0, 4)),
+            ],
+          ),
+          child: WordstormIcons.gear(size: 22, color: AppColors.offWhite),
+        ),
+      ),
+    ),
   );
 }
