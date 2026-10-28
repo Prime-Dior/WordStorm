@@ -15,8 +15,8 @@ import '../../core/widgets/response_row.dart';
 import '../../core/widgets/screen_scaffold.dart';
 import 'state/solo_session.dart';
 
-/// Écran de manche (Figma 05/11) : tuile de lettre, anneau de chrono,
-/// lignes de réponse, progression « n / N réponses ».
+/// Écran de manche (Figma 05/11) : anneau de chrono, progression
+/// « n / N réponses », tuile de lettre, lignes de réponse.
 /// - Chrono (20–120 s) : fin automatique à 0 (heure côté client en solo ;
 ///   le serveur fixera l'heure de fin en ligne, phase 7) ;
 /// - Sans chrono : bouton STOP, grisé tant que toutes les catégories ne
@@ -96,6 +96,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     final state = ref.watch(soloSessionProvider);
     final setup = state.setupOrDefault;
     final noTimer = setup.durationSeconds == 0;
+    final total = setup.categories.length;
 
     final rows = [
       for (final category in setup.categories)
@@ -122,10 +123,10 @@ class _GameScreenState extends ConsumerState<GameScreen> {
       padding: const EdgeInsets.fromLTRB(18, 6, 18, 14),
       child: Column(
         children: [
-          // En-tête : lettre + chrono.
+          // En-tête : anneau de chrono + manche (maquette).
           Row(
             children: [
-              LetterTile(letter: state.letter, size: 62),
+              _TimerRing(remaining: _remaining, total: setup.durationSeconds),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
@@ -136,32 +137,58 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                       style: const TextStyle(
                         fontFamily: AppTheme.displayFont,
                         fontSize: 22,
-                        color: AppColors.yellow,
+                        color: AppColors.offWhite,
                       ),
                     ),
-                    const SizedBox(height: 10),
-                    if (!noTimer)
-                      _TimerLabel(
-                        remaining: _remaining,
-                        total: setup.durationSeconds,
-                        red: _remaining <= 10,
-                      )
-                    else
-                      const Text(
-                        'SANS CHRONO',
-                        style: TextStyle(
-                          fontFamily: AppTheme.monoFont,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.teal,
-                        ),
+                    Text(
+                      noTimer ? 'Sans chronomètre' : 'Temps restant',
+                      style: const TextStyle(
+                        fontFamily: AppTheme.bodyFont,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.offWhite,
                       ),
+                    ),
                   ],
                 ),
               ),
             ],
           ),
           const SizedBox(height: 10),
+
+          // Progression « n / N réponses » avec barre.
+          Row(
+            children: [
+              Text(
+                '$_filledCount / $total réponses',
+                style: const TextStyle(
+                  fontFamily: AppTheme.monoFont,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.offWhite,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(999),
+                  child: LinearProgressIndicator(
+                    value: total == 0 ? 0 : _filledCount / total,
+                    minHeight: 8,
+                    backgroundColor: const Color(0x66000000),
+                    valueColor: const AlwaysStoppedAnimation<Color>(
+                      AppColors.teal,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+
+          // Grosse tuile de la lettre tirée.
+          Center(child: LetterTile(letter: state.letter, size: 100)),
+          const SizedBox(height: 8),
 
           // Lignes de réponses.
           Expanded(
@@ -172,17 +199,6 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                 padding: const EdgeInsets.only(bottom: 8),
                 child: rows[i],
               ),
-            ),
-          ),
-
-          // Progression.
-          Text(
-            '$_filledCount / ${setup.categories.length} réponses',
-            style: const TextStyle(
-              fontFamily: AppTheme.monoFont,
-              fontSize: 13,
-              fontWeight: FontWeight.w700,
-              color: AppColors.offWhite,
             ),
           ),
           const SizedBox(height: 10),
@@ -220,54 +236,44 @@ class _GameScreenState extends ConsumerState<GameScreen> {
   }
 }
 
-/// Compte à rebours (aiguille maquette : mono, rouge ≤ 10 s — la pulsation
-/// et le bip sont ajoutés à la phase 8).
-class _TimerLabel extends StatelessWidget {
-  const _TimerLabel({
-    required this.remaining,
-    required this.total,
-    required this.red,
-  });
+/// Anneau de chrono (maquette) : jaune, rouge dans les 10 dernières
+/// secondes ; « ∞ » quand il n'y a pas de chrono.
+class _TimerRing extends StatelessWidget {
+  const _TimerRing({required this.remaining, required this.total});
 
   final int remaining;
   final int total;
-  final bool red;
 
   @override
   Widget build(BuildContext context) {
-    final m = remaining ~/ 60;
-    final s = (remaining % 60).toString().padLeft(2, '0');
-    return Row(
-      children: [
-        WordstormIcons.clock(
-          size: 18,
-          color: red ? AppColors.coral : AppColors.teal,
-        ),
-        const SizedBox(width: 8),
-        Text(
-          '$m:$s',
-          style: TextStyle(
-            fontFamily: AppTheme.monoFont,
-            fontSize: 20,
-            fontWeight: FontWeight.w700,
-            color: red ? AppColors.coral : AppColors.offWhite,
-          ),
-        ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(999),
-            child: LinearProgressIndicator(
-              value: total > 0 ? remaining / total : 0,
-              minHeight: 6,
-              backgroundColor: const Color(0x22FFFFFF),
-              valueColor: AlwaysStoppedAnimation<Color>(
-                red ? AppColors.coral : AppColors.teal,
-              ),
+    final noTimer = total == 0;
+    final red = !noTimer && remaining <= 10;
+    final color = red ? AppColors.coral : AppColors.yellow;
+    return SizedBox(
+      width: 84,
+      height: 84,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          SizedBox.expand(
+            child: CircularProgressIndicator(
+              value: noTimer ? 1 : remaining / total,
+              strokeWidth: 9,
+              backgroundColor: const Color(0xFF0B1330),
+              valueColor: AlwaysStoppedAnimation<Color>(color),
             ),
           ),
-        ),
-      ],
+          Text(
+            noTimer ? '∞' : '$remaining',
+            style: TextStyle(
+              fontFamily: AppTheme.monoFont,
+              fontSize: 30,
+              fontWeight: FontWeight.w700,
+              color: red ? AppColors.coral : AppColors.offWhite,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
