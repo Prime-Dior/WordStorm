@@ -1,9 +1,10 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../core/routes/app_routes.dart';
 import '../../domain/categories.dart';
 import '../../domain/draws.dart';
-import '../../domain/models/lobby_setup.dart';
+import 'multiplayer_controller.dart';
 import 'solo_session_controller.dart';
 
 class ConfigController extends GetxController {
@@ -15,6 +16,7 @@ class ConfigController extends GetxController {
   final RxInt duration = 60.obs;
   final RxInt rounds = 3.obs;
   final RxSet<String> selected = <String>{...Categories.mandatory}.obs;
+  final nickname = TextEditingController(text: 'Champion');
 
   bool get isSolo => mode == 'solo';
   bool get canStart =>
@@ -45,15 +47,13 @@ class ConfigController extends GetxController {
     Get.toNamed<void>(AppRoutes.wheel);
   }
 
-  void previewLobby() => Get.toNamed<void>(
-    AppRoutes.lobby,
-    arguments: LobbySetup(
-      categories: _categories(),
-      durationSeconds: duration.value,
-      rounds: rounds.value,
-      allowHardLetters: hardLetters.value,
-      randomCategories: randomMode.value,
-    ),
+  Future<void> createLobby() => Get.find<MultiplayerController>().createRoom(
+    nickname: nickname.text.trim(),
+    categories: _categories(),
+    durationSeconds: duration.value,
+    rounds: rounds.value,
+    allowHardLetters: hardLetters.value,
+    randomCategories: randomMode.value,
   );
 
   void chooseRandom() => randomMode.value = true;
@@ -62,4 +62,10 @@ class ConfigController extends GetxController {
   void chooseRounds(int value) => rounds.value = value;
   void toggleHardLetters(bool value) => hardLetters.value = value;
   void back() => Get.back<void>();
+
+  @override
+  void onClose() {
+    nickname.dispose();
+    super.onClose();
+  }
 }

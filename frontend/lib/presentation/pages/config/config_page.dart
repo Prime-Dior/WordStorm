@@ -10,6 +10,7 @@ import '../../../core/widgets/screen_scaffold.dart';
 import '../../../domain/categories.dart';
 import '../../../domain/rules_config.dart';
 import '../../controllers/config_controller.dart';
+import '../../controllers/multiplayer_controller.dart';
 
 /// Écran « Nouvelle partie » (Figma 03/08) :
 /// - mode de catégories **Aléatoire** (socle + 4, non
@@ -50,8 +51,8 @@ class _ConfigScreenState extends State<ConfigScreen> {
     await _config.launchSolo();
   }
 
-  void _previewLobby() {
-    _config.previewLobby();
+  Future<void> _createLobby() async {
+    await _config.createLobby();
   }
 
   @override
@@ -106,6 +107,17 @@ class _ConfigScreenState extends State<ConfigScreen> {
                         color: AppColors.blueGray,
                       ),
                     ),
+                    if (!_isSolo) ...[
+                      _sectionLabel('TON PSEUDO'),
+                      TextField(
+                        controller: _config.nickname,
+                        maxLength: 12,
+                        decoration: const InputDecoration(
+                          counterText: '',
+                          hintText: 'Champion',
+                        ),
+                      ),
+                    ],
                     _sectionLabel('DURÉE'),
                     Wrap(
                       spacing: 10,
@@ -173,6 +185,16 @@ class _ConfigScreenState extends State<ConfigScreen> {
                   ),
                 ),
               ),
+            if (!_isSolo &&
+                Get.find<MultiplayerController>().error.value != null)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Text(
+                  Get.find<MultiplayerController>().error.value!,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(color: AppColors.coral),
+                ),
+              ),
             if (_isSolo)
               ArcadeButton(
                 label: 'Lancer',
@@ -182,7 +204,10 @@ class _ConfigScreenState extends State<ConfigScreen> {
               ArcadeButton(
                 label: 'Créer le salon',
                 variant: ArcadeButtonVariant.teal,
-                onPressed: _canStart ? _previewLobby : null,
+                onPressed:
+                    _canStart && !Get.find<MultiplayerController>().busy.value
+                    ? _createLobby
+                    : null,
               ),
           ],
         ),

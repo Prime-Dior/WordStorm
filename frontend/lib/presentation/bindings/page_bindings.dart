@@ -51,7 +51,9 @@ class JoinBinding extends Bindings {
 
 class LobbyBinding extends Bindings {
   @override
-  void dependencies() => Get.lazyPut(LobbyController.new);
+  void dependencies() {
+    Get.lazyPut(LobbyController.new);
+  }
 }
 
 class SettingsBinding extends Bindings {

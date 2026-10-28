@@ -9,6 +9,8 @@ abstract final class AppRoutes {
   static const finalResults = '/final';
   static const join = '/join';
   static const lobby = '/lobby';
+  static const multiGame = '/multi-game';
+  static const multiResults = '/multi-results';
   static const settings = '/settings';
   static const rules = '/rules';
   static const waiting = '/waiting';

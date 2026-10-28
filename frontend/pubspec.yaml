@@ -23,6 +23,12 @@ dependencies:
   shared_preferences: ^2.3.4
   audioplayers: ^6.8.1
 
+  # Appels HTTP vers l'API Laravel WordStorm.
+  http: ^1.6.0
+
+  # Jeton Bearer du joueur invité, stocké dans le coffre sécurisé du système.
+  flutter_secure_storage: ^11.2.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

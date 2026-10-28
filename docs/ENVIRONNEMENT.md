@@ -1,5 +1,19 @@
 # ENVIRONNEMENT — relevé `flutter doctor` (2026-10-24)
 
+## Multijoueur Laravel (mise à jour 2026-10-28)
+- Le client utilise le dépôt séparé `https://github.com/Alecdev-10/wordstorm-api`.
+  Suivre son README pour PHP, Composer, MySQL, migration et lancement.
+- URL Flutter : `--dart-define=WORDSTORM_API_URL=https://adresse/api/v1`.
+  Défaut web/Windows : `http://127.0.0.1:8000/api/v1` ; Android Emulator :
+  `http://10.0.2.2:8000/api/v1`. Sur téléphone physique, utiliser l'IP LAN du
+  poste qui lance Laravel avec `php artisan serve --host=0.0.0.0`.
+- Flutter Web requiert une origine de développement autorisée par CORS dans
+  l'API. Le build Android debug accepte HTTP local ; la version publiée doit
+  pointer vers HTTPS. Jetons invités conservés dans le coffre sécurisé système.
+- L'API possède une copie de `frontend/assets/words/words.json`. Les mises à jour
+  du lexique doivent être copiées et documentées dans le README du dépôt API.
+- Aucun service d'IA ni clé d'API d'IA n'est utilisé.
+
 ## Poste de travail
 - Windows 11 Professionnel 22H2, locale `fr-BJ`.
 

@@ -190,4 +190,22 @@
 - **Exécution réelle** : `dart format` OK, `flutter analyze`
   **No issues found**, `flutter test` **+93 : All tests passed**.
 
-## Phase 7 — Salons Firebase (prochaine)
+## Phase 7 — API Laravel et validation lexicale (en cours, 2026-10-28)
+
+- Frontend raccordé au dépôt `Alecdev-10/wordstorm-api` sur la branche de travail
+  `feature/api-dictionary-validation` : création/rejointure, code réel, pseudo,
+  actualisation du salon, démarrage et tirage des manches côté serveur,
+  sauvegarde des réponses, résultats et arbitrage hôte des réponses « à vérifier ».
+- Solo hors ligne conservé. Jeton joueur stocké avec `flutter_secure_storage` ;
+  URL d'API configurable par `WORDSTORM_API_URL`. Android debug autorise HTTP
+  pour le serveur local ; les builds release doivent utiliser HTTPS.
+- API : copie versionnée du dictionnaire Flutter, consultation locale puis
+  Wiktionnaire, cache, statut `unverified` en cas de doute et route de revue hôte.
+- Vérifications : `flutter pub get` ; `dart format lib test` ; `flutter analyze`
+  sans problème ; `flutter test` : 92 tests réussis ; build web release réussi ;
+  PHPUnit sous PHP 8.4.27 : 10 tests et 61 assertions ; Pint et
+  `git diff --check` réussis.
+- Reste : déployer/configurer l'API et sa base pour un essai réel entre appareils ;
+  tester sur Android physique/émulateur et navigateur avec l'URL cible ; améliorer
+  les correspondances lexicales partielles. Pas de classement/podium multi ni
+  d'historique multijoueur enregistré localement pour le moment.

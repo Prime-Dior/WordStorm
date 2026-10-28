@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../core/utils/salon_code.dart';
 import '../../data/history/history_repository.dart';
 import '../../domain/models/lobby_setup.dart';
 import 'solo_session_controller.dart';
@@ -39,17 +38,6 @@ class FinalResultsController extends GetxController {
 class JoinController extends GetxController {
   final code = TextEditingController();
   final nickname = TextEditingController();
-  final error = RxnString();
-
-  void submit() {
-    final normalized = code.text.trim().toUpperCase();
-    if (!SalonCode.isWellFormed(normalized)) {
-      error.value = 'Code : 6 lettres/chiffres (sans 0, O, 1, I).';
-      return;
-    }
-    error.value = null;
-    Get.toNamed<void>('/lobby', parameters: {'code': normalized});
-  }
 
   @override
   void onClose() {

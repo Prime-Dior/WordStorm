@@ -38,12 +38,11 @@ Chaque phase se termine par : `dart format .`, `flutter analyze` sans avertissem
 - Historique (`HistoryRepository`), statistiques de base ; réglages (sons, vibrations, animations) ; accessibilité (Semantics, tailles, contrastes, min 48dp, réduction automatique d'animations OS).
 - Sons générés (roue, démarrage, 5 dernières secondes, validation, victoire) et vibrations désactivables.
 
-## Phase 7 — Firebase (émulateur d'abord)
-- Modèle de données (cahier §14) : salons / joueurs / manches / réponses.
-- Auth anonyme ; règles de sécurité strictes + tests émulateur ; Cloud Functions (lettre, heure de fin, verrouillage, score, vérification mots + cache).
-- `RoomRepository` (interface, impl. mémoire + Firestore). Salon : créer/joindre/pseudo/liste temps réel/hôte/démarrage/manches synchronisées/réponses/verrouillage/départ d'un joueur/inactivité 20 min sans chrono/contestation+vote/fin/classement.
-- Tests d'intégration contre l'émulateur.
-- **Vert** : parcours multi validé contre l'émulateur OU documentation précise de ce qui n'a pas pu être testé.
+## Phase 7 — Multijoueur Laravel (raccordement en cours)
+- API maintenue dans le dépôt séparé `Alecdev-10/wordstorm-api` : sessions invitées, salons, joueurs, manches, réponses, validation lexicale et scores.
+- Flutter raccordé pour créer/rejoindre un salon, actualiser la liste, démarrer les manches, envoyer les réponses et afficher les résultats ; les réponses incertaines peuvent être revues par l'hôte.
+- Firebase a été écarté pour cette implémentation ; ne pas ajouter de configuration Firestore ou Cloud Functions au dépôt Flutter.
+- **Reste pour valider la phase** : déployer/configurer l'API et une base accessible, puis réaliser un essai réel à plusieurs appareils. Le podium et l'historique multijoueur restent à faire.
 
 ## Phase 8 — Animations et finitions
 - Logo lettres tombantes, tuiles 3D, roue, anneau + alerte rouge, validation, podium+confettis, transitions écran. RepaintBoundary, 60fps visé (mesures notées, jamais affirmées).
@@ -52,4 +51,4 @@ Chaque phase se termine par : `dart format .`, `flutter analyze` sans avertissem
 - Implémenter ce qui est réaliste (vérification en ligne côté serveur, envoi…), lister précisément ce qui est écarté et pourquoi (équipes, même téléphone, bots IA, spectateurs, défi quotidien, badges, packs, thèmes, anglais).
 
 ## Phase 10 — Recette finale
-- Relecture de la section 10 du prompt (critères), README complet, `docs/FIREBASE.md`, `docs/ARCHITECTURE.md`, `docs/PROGRESSION.md`, `docs/TRACABILITE.md` complet, `docs/RESTE_A_FAIRE.md`, compte rendu final structuré (§12 du prompt).
+- Relecture des critères, README complet, documentation de l'API Laravel, `docs/ARCHITECTURE.md`, `docs/PROGRESSION.md`, `docs/TRACABILITE.md`, `docs/RESTE_A_FAIRE.md`, compte rendu final structuré.

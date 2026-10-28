@@ -7,12 +7,10 @@ import '../../../core/widgets/arcade_button.dart';
 import '../../../core/widgets/code_field.dart';
 import '../../../core/widgets/screen_scaffold.dart';
 import '../../../core/widgets/wordstorm_logo.dart';
+import '../../controllers/multiplayer_controller.dart';
 import '../../controllers/page_controllers.dart';
 
-/// Écran « Rejoindre un salon » (Figma, ajout prévu) : code 6 signes
-/// sans ambigus + pseudo. Validation de la **forme** locale ici ; la
-/// recherche réelle du salon (et l'écran « Salon introuvable ») passe
-/// par le scrutin Firestore à la phase 7 — rien n'est simulé.
+/// Saisie du code et du pseudo avant la recherche du salon par l'API.
 class JoinScreen extends StatefulWidget {
   const JoinScreen({super.key});
 
@@ -23,9 +21,12 @@ class JoinScreen extends StatefulWidget {
 class _JoinScreenState extends State<JoinScreen> {
   late final JoinController _controller = Get.find<JoinController>();
 
-  void _submit() {
-    _controller.submit();
-    setState(() {});
+  Future<void> _submit() async {
+    await Get.find<MultiplayerController>().joinRoom(
+      _controller.code.text,
+      _controller.nickname.text.trim(),
+    );
+    if (mounted) setState(() {});
   }
 
   @override
@@ -52,7 +53,7 @@ class _JoinScreenState extends State<JoinScreen> {
             const _Label('CODE DU SALON'),
             CodeField(
               controller: _controller.code,
-              errorText: _controller.error.value,
+              errorText: Get.find<MultiplayerController>().error.value,
               onValidated: _submit,
               trailing: Padding(
                 padding: const EdgeInsets.only(left: 8),

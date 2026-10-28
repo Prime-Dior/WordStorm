@@ -1,4 +1,18 @@
-# RESTE À FAIRE — journal des restes (impératif n°4 : pas de TODO caché)
+# RESTE À FAIRE — journal des restes (mise à jour 2026-10-28)
+
+## État actuel du multijoueur
+- Le faux salon local est remplacé par le raccordement à l'API Laravel
+  `Alecdev-10/wordstorm-api` : création, rejointure, attente des joueurs,
+  lancement, manches, enregistrement des réponses, résultats et revue hôte.
+- La validation lexicale multijoueur combine le dictionnaire local du projet,
+  le Wiktionnaire côté serveur et l'arbitrage manuel pour les réponses incertaines.
+- Le solo reste hors ligne. Aucun secret IA n'est utilisé.
+- À faire avant une présentation connectée : déployer et configurer l'API avec
+  une base accessible, définir `WORDSTORM_API_URL`, puis essayer le parcours avec
+  deux appareils. Pour Flutter Web, autoriser l'origine de l'application dans
+  `WORDSTORM_CORS_ALLOWED_ORIGINS` ; en production, utiliser HTTPS.
+- Les notes historiques des phases précédentes ci-dessous décrivent l'état au
+  moment de leur rédaction ; cette section indique l'état le plus récent.
 
 ## Phase 1 — restes volontaires
 - **Écrans squelettes** (`PlaceholderScreen`) : résolu — tous les écrans
