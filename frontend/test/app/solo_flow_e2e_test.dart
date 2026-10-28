@@ -5,15 +5,15 @@
 library;
 
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:wordstorm/app/app.dart';
-import 'package:wordstorm/app/providers.dart';
 import 'package:wordstorm/core/widgets/letter_tile.dart';
 import 'package:wordstorm/core/widgets/response_row.dart';
 import 'package:wordstorm/data/dictionary/asset_dictionary_repository.dart';
-import 'package:wordstorm/features/game/game_screen.dart';
+import 'package:wordstorm/presentation/pages/game/game_page.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -21,22 +21,14 @@ void main() {
   testWidgets(
     'Parcours solo : menu, config, tirage, manche, résultats, fin, rejouer',
     (tester) async {
-      final container = ProviderContainer(
-        overrides: [
-          dictionaryProvider.overrideWithValue(AssetDictionaryRepository()),
-        ],
-      );
-      addTearDown(container.dispose);
-
-      // Précharger le dictionnaire avant de commencer le parcours.
-      await tester.runAsync(() => container.read(dictionaryProvider).load());
-
-      await tester.pumpWidget(
-        UncontrolledProviderScope(
-          container: container,
-          child: const WordstormApp(),
-        ),
-      );
+      tester.view.physicalSize = const Size(393, 852);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      SharedPreferences.setMockInitialValues({});
+      await tester.pumpWidget(const WordstormApp());
+      await tester.pump(const Duration(milliseconds: 500));
+      await tester.runAsync(() => Get.find<AssetDictionaryRepository>().load());
 
       // Accueil → Menu
       await tester.tap(find.text('JOUER'));
