@@ -11,8 +11,6 @@ import '../../presentation/pages/home/home_page.dart';
 import '../../presentation/pages/join/join_page.dart';
 import '../../presentation/pages/lobby/lobby_page.dart';
 import '../../presentation/pages/menu/menu_page.dart';
-import '../../presentation/pages/multiplayer/multiplayer_game_page.dart';
-import '../../presentation/pages/multiplayer/multiplayer_results_page.dart';
 import '../../presentation/pages/results/round_results_page.dart';
 import '../../presentation/pages/rules/rules_page.dart';
 import '../../presentation/pages/settings/settings_page.dart';
@@ -66,14 +64,6 @@ abstract final class AppPages {
       name: AppRoutes.lobby,
       page: () => LobbyScreen(setup: Get.arguments as LobbySetup?),
       binding: LobbyBinding(),
-    ),
-    GetPage(
-      name: AppRoutes.multiGame,
-      page: () => const MultiplayerGameScreen(),
-    ),
-    GetPage(
-      name: AppRoutes.multiResults,
-      page: () => const MultiplayerResultsScreen(),
     ),
     GetPage(
       name: AppRoutes.settings,

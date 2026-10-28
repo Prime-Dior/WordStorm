@@ -1,14 +1,17 @@
 # RESTE À FAIRE — journal des restes (mise à jour 2026-10-28)
 
 ## État actuel du multijoueur
-- Le faux salon local est remplacé par le raccordement à l'API Laravel
-  `Alecdev-10/wordstorm-api` : création, rejointure, attente des joueurs,
-  lancement, manches, enregistrement des réponses, résultats et revue hôte.
+- Flutter est raccordé à l'API Laravel `Alecdev-10/wordstorm-api` pour les
+  sessions invitées, la création/rejointure et l'actualisation du salon. Le salon
+  peut demander le démarrage côté API.
+- **Les écrans de manche et de résultats multijoueur restent à faire.** Les
+  routes API de manches, réponses, scores et revue hôte existent, mais le parcours
+  Flutter correspondant n'est pas finalisé.
 - La validation lexicale multijoueur combine le dictionnaire local du projet,
   le Wiktionnaire côté serveur et l'arbitrage manuel pour les réponses incertaines.
 - Le solo reste hors ligne. Aucun secret IA n'est utilisé.
-- À faire avant une présentation connectée : déployer et configurer l'API avec
-  une base accessible, définir `WORDSTORM_API_URL`, puis essayer le parcours avec
+- À faire : créer les écrans manquants, déployer et configurer l'API avec une base
+  accessible, définir `WORDSTORM_API_URL`, puis essayer le parcours avec
   deux appareils. Pour Flutter Web, autoriser l'origine de l'application dans
   `WORDSTORM_CORS_ALLOWED_ORIGINS` ; en production, utiliser HTTPS.
 - Les notes historiques des phases précédentes ci-dessous décrivent l'état au

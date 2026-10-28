@@ -16,7 +16,6 @@ class MultiplayerController extends GetxController {
   final error = RxnString();
   Timer? _poll;
   Timer? _resultPoll;
-  bool _enteringRound = false;
   bool _refreshing = false;
 
   Future<void> createRoom({
@@ -65,12 +64,11 @@ class MultiplayerController extends GetxController {
       final mappedRoom = mapApiRoom(raw, isHost: current.isHost);
       room.assignAll(mappedRoom.toMap());
       final rounds = mappedRoom.rounds;
-      final active = rounds.cast<Map>().cast<Map<String, dynamic>>().where(
+      final started = rounds.cast<Map>().cast<Map<String, dynamic>>().where(
         (item) => item['status'] == 'active',
       );
-      if (active.isNotEmpty && !_enteringRound) {
-        _enteringRound = true;
-        await loadRound((active.first['number'] as num).toInt());
+      if (started.isNotEmpty) {
+        await loadRound((started.first['number'] as num).toInt());
       }
     } on WordstormApiException catch (e) {
       error.value = e.message;
@@ -86,7 +84,6 @@ class MultiplayerController extends GetxController {
       final raw = await api.startRoom(current.code);
       room.assignAll(mapApiRoom(raw, isHost: current.isHost).toMap());
     });
-    if (error.value == null) await beginRound(1);
   }
 
   Future<void> beginRound(int number) async {
@@ -102,15 +99,6 @@ class MultiplayerController extends GetxController {
     final raw = await api.getRound(current.code, number);
     round.assignAll(raw);
     _poll?.cancel();
-    if (raw['status'] == 'active') {
-      _enteringRound = true;
-      Get.offNamed<void>(AppRoutes.multiGame);
-    } else if (raw['status'] == 'completed') {
-      _enteringRound = true;
-      Get.offNamed<void>(AppRoutes.multiResults);
-    } else {
-      _enteringRound = false;
-    }
   }
 
   Future<void> submitAnswers(Map<String, String> answers) async {
@@ -162,7 +150,6 @@ class MultiplayerController extends GetxController {
             round.assignAll(latest);
             if (latest['status'] == 'completed') {
               _resultPoll?.cancel();
-              Get.offNamed<void>(AppRoutes.multiResults);
             }
           } on WordstormApiException catch (e) {
             error.value = e.message;
@@ -170,7 +157,6 @@ class MultiplayerController extends GetxController {
         });
         return;
       }
-      Get.offNamed<void>(AppRoutes.multiResults);
       _startPolling();
     });
   }
@@ -183,11 +169,8 @@ class MultiplayerController extends GetxController {
       leaveToMenu();
       return;
     }
-    _enteringRound = false;
     if (current.isHost) {
       await beginRound(number + 1);
-    } else {
-      Get.offNamed<void>(AppRoutes.lobby);
     }
     _startPolling();
   }
@@ -242,7 +225,6 @@ class MultiplayerController extends GetxController {
     session.value = null;
     room.clear();
     round.clear();
-    _enteringRound = false;
     Get.offAllNamed<void>(AppRoutes.menu);
   }
 

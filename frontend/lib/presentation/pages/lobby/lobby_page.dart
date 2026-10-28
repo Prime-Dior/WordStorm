@@ -174,13 +174,22 @@ class _LobbyScreenState extends State<LobbyScreen> {
                 style: const TextStyle(color: AppColors.coral),
               ),
             ),
-          if (session?.isHost == true)
+          if (session?.isHost == true && _multi.room['status'] == 'waiting')
             ArcadeButton(
               label: canStart ? 'Démarrer' : 'En attente d’un joueur',
               variant: ArcadeButtonVariant.teal,
               onPressed: canStart && !_multi.busy.value
                   ? _multi.startGame
                   : null,
+            )
+          else if (_multi.room['status'] == 'in_progress')
+            const Padding(
+              padding: EdgeInsets.all(12),
+              child: Text(
+                'Salon démarré côté API. Les écrans de jeu multijoueur restent à réaliser.',
+                textAlign: TextAlign.center,
+                style: TextStyle(color: AppColors.yellow),
+              ),
             )
           else
             const Padding(

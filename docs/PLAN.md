@@ -40,9 +40,10 @@ Chaque phase se termine par : `dart format .`, `flutter analyze` sans avertissem
 
 ## Phase 7 — Multijoueur Laravel (raccordement en cours)
 - API maintenue dans le dépôt séparé `Alecdev-10/wordstorm-api` : sessions invitées, salons, joueurs, manches, réponses, validation lexicale et scores.
-- Flutter raccordé pour créer/rejoindre un salon, actualiser la liste, démarrer les manches, envoyer les réponses et afficher les résultats ; les réponses incertaines peuvent être revues par l'hôte.
+- Flutter raccordé aux sessions invitées, à la création/rejointure et à l'actualisation des salons ; le démarrage peut être demandé à l'API.
+- **Les écrans Flutter de manche et de résultats et leur raccordement aux endpoints de manches/réponses restent à implémenter.**
 - Firebase a été écarté pour cette implémentation ; ne pas ajouter de configuration Firestore ou Cloud Functions au dépôt Flutter.
-- **Reste pour valider la phase** : déployer/configurer l'API et une base accessible, puis réaliser un essai réel à plusieurs appareils. Le podium et l'historique multijoueur restent à faire.
+- **Reste pour valider la phase** : créer les écrans manquants, déployer/configurer l'API, puis tester sur plusieurs appareils. Le podium et l'historique multijoueur restent à faire.
 
 ## Phase 8 — Animations et finitions
 - Logo lettres tombantes, tuiles 3D, roue, anneau + alerte rouge, validation, podium+confettis, transitions écran. RepaintBoundary, 60fps visé (mesures notées, jamais affirmées).

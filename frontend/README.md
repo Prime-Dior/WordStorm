@@ -23,11 +23,11 @@ flutter run -d chrome --dart-define=WORDSTORM_API_URL=http://127.0.0.1:8000/api/
 
 Valeurs locales par défaut : navigateur/Windows `http://127.0.0.1:8000/api/v1`, émulateur Android `http://10.0.2.2:8000/api/v1`. Pour tester sur Android, lancer Laravel avec `php artisan serve --host=0.0.0.0`, garder le téléphone et l'ordinateur sur le même réseau et remplacer l'adresse par l'IP locale de l'ordinateur. L'API doit être configurée pour autoriser l'origine web locale si Flutter Web est utilisé.
 
-## Parcours en ligne
+## Raccordement multijoueur actuel
 
-L'hôte choisit les catégories, la durée et le nombre de manches, puis crée le salon. Les autres joueurs le rejoignent avec le code et leur pseudo. L'état du salon est actualisé toutes les deux secondes ; le serveur tire les lettres, conserve les réponses et calcule les scores. Une réponse non concluante du dictionnaire apparaît « à vérifier » et l'hôte peut l'accepter ou la refuser.
+La configuration et le salon sont reliés à l'API : session invitée, création/rejointure, affichage des joueurs, actualisation et demande de démarrage. Les écrans Flutter de manche et de résultats multijoueur restent à réaliser ; le jeu en ligne n'est donc pas complet.
 
-Le dictionnaire local `assets/words/words.json` sert au solo. L'API possède sa copie pour valider les parties multijoueurs ; la synchronisation est expliquée dans le README du dépôt API. Aucune clé d'IA n'est requise.
+L'API possède déjà les routes de manches, réponses et validation lexicale, à relier aux futurs écrans. Le dictionnaire local `assets/words/words.json` sert au solo et sa copie serveur est décrite dans le README du dépôt API. Aucune clé d'IA n'est requise.
 
 ## Vérification
 

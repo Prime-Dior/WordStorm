@@ -192,10 +192,11 @@
 
 ## Phase 7 — API Laravel et validation lexicale (en cours, 2026-10-28)
 
-- Frontend raccordé au dépôt `Alecdev-10/wordstorm-api` sur la branche de travail
-  `feature/api-dictionary-validation` : création/rejointure, code réel, pseudo,
-  actualisation du salon, démarrage et tirage des manches côté serveur,
-  sauvegarde des réponses, résultats et arbitrage hôte des réponses « à vérifier ».
+- Raccordement Flutter au dépôt `Alecdev-10/wordstorm-api` : session invitée,
+  création/rejointure, pseudo, actualisation du salon et demande de démarrage.
+- L'API possède aussi les routes et services de manches, réponses, scores,
+  validation lexicale et revue hôte. **Les écrans Flutter de manche et de
+  résultats multijoueur ne sont pas implémentés** ; le salon signale cette limite.
 - Solo hors ligne conservé. Jeton joueur stocké avec `flutter_secure_storage` ;
   URL d'API configurable par `WORDSTORM_API_URL`. Android debug autorise HTTP
   pour le serveur local ; les builds release doivent utiliser HTTPS.
@@ -205,7 +206,7 @@
   sans problème ; `flutter test` : 92 tests réussis ; build web release réussi ;
   PHPUnit sous PHP 8.4.27 : 10 tests et 61 assertions ; Pint et
   `git diff --check` réussis.
-- Reste : déployer/configurer l'API et sa base pour un essai réel entre appareils ;
-  tester sur Android physique/émulateur et navigateur avec l'URL cible ; améliorer
-  les correspondances lexicales partielles. Pas de classement/podium multi ni
-  d'historique multijoueur enregistré localement pour le moment.
+- Reste : créer les écrans Flutter de manche et de résultats et les raccorder aux
+  endpoints existants, déployer/configurer l'API puis tester entre appareils.
+  Le podium, l'historique multijoueur et les correspondances lexicales partielles
+  restent également à traiter.
