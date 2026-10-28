@@ -175,21 +175,6 @@ class MultiplayerController extends GetxController {
     _startPolling();
   }
 
-  Future<void> review(int answerId, {required bool valid}) async {
-    final current = session.value;
-    final number = (round['number'] as num?)?.toInt();
-    if (current == null || number == null || !current.isHost) return;
-    await _run(() async {
-      final updated = await api.reviewAnswer(
-        current.code,
-        number,
-        answerId,
-        valid: valid,
-      );
-      round.assignAll(updated);
-    });
-  }
-
   void _acceptRoom(Map<String, dynamic> raw, {required bool isHost}) {
     final mapped = mapApiRoom(raw, isHost: isHost);
     session.value = MultiplayerSession(

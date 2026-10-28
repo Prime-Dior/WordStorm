@@ -5,10 +5,11 @@
   sessions invitées, la création/rejointure et l'actualisation du salon. Le salon
   peut demander le démarrage côté API.
 - **Les écrans de manche et de résultats multijoueur restent à faire.** Les
-  routes API de manches, réponses, scores et revue hôte existent, mais le parcours
+  routes API de manches, réponses et scores existent, mais le parcours
   Flutter correspondant n'est pas finalisé.
-- La validation lexicale multijoueur combine le dictionnaire local du projet,
-  le Wiktionnaire côté serveur et l'arbitrage manuel pour les réponses incertaines.
+- La validation lexicale multijoueur combine le dictionnaire local du projet et
+  le Wiktionnaire côté serveur. Une réponse incertaine reste non vérifiée et vaut
+  0 point ; aucune validation manuelle par l'hôte n'est prévue.
 - Le solo reste hors ligne. Aucun secret IA n'est utilisé.
 - À faire : créer les écrans manquants, déployer et configurer l'API avec une base
   accessible, définir `WORDSTORM_API_URL`, puis essayer le parcours avec

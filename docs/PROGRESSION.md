@@ -194,17 +194,18 @@
 
 - Raccordement Flutter au dépôt `Alecdev-10/wordstorm-api` : session invitée,
   création/rejointure, pseudo, actualisation du salon et demande de démarrage.
-- L'API possède aussi les routes et services de manches, réponses, scores,
-  validation lexicale et revue hôte. **Les écrans Flutter de manche et de
+- L'API possède aussi les routes et services de manches, réponses, scores et
+  validation lexicale. **Les écrans Flutter de manche et de
   résultats multijoueur ne sont pas implémentés** ; le salon signale cette limite.
 - Solo hors ligne conservé. Jeton joueur stocké avec `flutter_secure_storage` ;
   URL d'API configurable par `WORDSTORM_API_URL`. Android debug autorise HTTP
   pour le serveur local ; les builds release doivent utiliser HTTPS.
 - API : copie versionnée du dictionnaire Flutter, consultation locale puis
-  Wiktionnaire, cache, statut `unverified` en cas de doute et route de revue hôte.
+  Wiktionnaire, cache et statut `unverified` en cas de doute ; aucune revue
+  manuelle par l'hôte n'est prévue.
 - Vérifications : `flutter pub get` ; `dart format lib test` ; `flutter analyze`
   sans problème ; `flutter test` : 92 tests réussis ; build web release réussi ;
-  PHPUnit sous PHP 8.4.27 : 10 tests et 61 assertions ; Pint et
+  PHPUnit sous PHP 8.4.27 : 10 tests et 62 assertions ; Pint et
   `git diff --check` réussis.
 - Reste : créer les écrans Flutter de manche et de résultats et les raccorder aux
   endpoints existants, déployer/configurer l'API puis tester entre appareils.

@@ -140,17 +140,6 @@ class WordstormApi {
     '/rooms/${Uri.encodeComponent(code.toUpperCase())}/rounds/$number/lock',
   ).then((response) => _map(response['data']));
 
-  Future<Map<String, dynamic>> reviewAnswer(
-    String code,
-    int number,
-    int answerId, {
-    required bool valid,
-  }) => _send(
-    'POST',
-    '/rooms/${Uri.encodeComponent(code.toUpperCase())}/rounds/$number/answers/$answerId/review',
-    body: {'valid': valid},
-  ).then((response) => _map(response['data']));
-
   Future<void> clearSession() async {
     final token = await accessToken;
     if (token != null) {
