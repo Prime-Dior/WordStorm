@@ -9,6 +9,7 @@ import '../../core/audio/sound_engine.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/arcade_button.dart';
+import '../../core/widgets/icons/wordstorm_icons.dart';
 import '../../core/widgets/letter_tile.dart';
 import '../../core/widgets/response_row.dart';
 import '../../core/widgets/screen_scaffold.dart';
