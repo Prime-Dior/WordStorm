@@ -2,8 +2,8 @@
 //
 // Identique au scénario d'`integration_test/solo_e2e_test.dart` (phase 5),
 // mais via les roues du framework de test : menu → config (sans chrono,
-// 1 manche) → tirage → saisie → STOP → résultats → fin de partie →
-// REJOUER.
+// 1 manche) → tirage (C'EST PARTI) → saisie → STOP → résultats →
+// score final → REJOUER.
 //
 // Motivation : sur cette machine, `flutter drive -d chrome|edge` reste
 // bloqué au service de debug DWDS (aucune fenêtre navigateur ne
@@ -18,6 +18,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:wordstorm/app/app.dart';
 import 'package:wordstorm/app/providers.dart';
+import 'package:wordstorm/core/widgets/arcade_button.dart';
 import 'package:wordstorm/core/widgets/letter_tile.dart';
 import 'package:wordstorm/core/widgets/response_row.dart';
 import 'package:wordstorm/data/dictionary/asset_dictionary_repository.dart';
@@ -52,7 +53,7 @@ void main() {
       await tester.tap(find.text('JOUER'));
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 400));
-      expect(find.text('Rejoindre avec un code'), findsOneWidget);
+      expect(find.text('REJOINDRE AVEC UN CODE'), findsOneWidget);
 
       // ── Menu → Configuration solo ──────────────────────────────────
       await tester.tap(find.text('SOLO'));
@@ -60,40 +61,21 @@ void main() {
       await tester.pump(const Duration(milliseconds: 400));
       expect(find.text('NOUVELLE PARTIE'), findsOneWidget);
 
-      // ── Config : sans chrono + 1 manche ────────────────────────────
-      // La liste des puces est dans un scroll (17 catégories au-dessus),
-      // on pilote le défilement pour rejoindre la durée puis les manches.
-      await tester.scrollUntilVisible(
-        find.text('Sans chrono'),
-        280,
-        scrollable: find.byType(Scrollable).first,
-      );
-      await tester.tap(find.text('Sans chrono'));
+      // ── Config : sans chrono (dernier cran du curseur) + 1 manche ──
+      final slider = tester.getRect(find.byKey(const Key('duration-slider')));
+      await tester.tapAt(Offset(slider.right - 2, slider.center.dy));
       await tester.pump();
+      expect(find.text('Sans chrono'), findsOneWidget);
 
       // Manches 3 → 1 (deux appuis sur le bouton « − »).
       for (var i = 0; i < 2; i++) {
-        await tester.scrollUntilVisible(
-          find.byIcon(Icons.remove),
-          280,
-          scrollable: find.byType(Scrollable).first,
-        );
-        await tester.tap(find.byIcon(Icons.remove));
+        await tester.tap(find.byTooltip('Une manche de moins'));
         await tester.pump();
       }
 
-      // ── LANCER → roue (3,4 s) → manche ─────────────────────────────
-      // Dans le framework de test, le temps des tickers est délivré
-      // frame par frame (le delta peut être inférieur à la durée pompée) :
-      // on boucle borné sur les pumps jusqu'à l'arrivée sur la manche
-      // (60 × 300 ms ≈ 18 s de temps avancé, roue 3,4 s).
+      // ── LANCER → roue (3,4 s) → C'EST PARTI → manche ───────────────
       await tester.tap(find.text('LANCER'));
-      var pushManche = false;
-      for (var i = 0; i < 60 && !pushManche; i++) {
-        await tester.pump(const Duration(milliseconds: 300));
-        pushManche = find.byType(GameScreen).evaluate().isNotEmpty;
-      }
-      expect(pushManche, isTrue);
+      await _spinWheelAndGo(tester);
       expect(find.byType(GameScreen), findsOneWidget);
       expect(find.byType(LetterTile), findsOneWidget);
       expect(find.byType(ResponseRow), findsNWidgets(5));
@@ -108,27 +90,37 @@ void main() {
 
       await tester.tap(find.text('STOP'));
       await tester.pump();
-      await tester.pump(); // la validation passe (sans chrono)
+      await tester.pump(const Duration(milliseconds: 400));
 
-      // ── Résultats de manche : TERMINER (dernière manche) ───────────
-      expect(find.text('TERMINER'), findsOneWidget);
-
-      // ── Fin de partie : score + REJOUER ────────────────────────────
-      await tester.tap(find.text('TERMINER'));
+      // ── Résultats de manche (dernière manche → SCORE FINAL) ────────
+      expect(find.text('MANCHE 1 / 1'), findsOneWidget);
+      await tester.tap(find.widgetWithText(ArcadeButton, 'SCORE FINAL'));
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 400));
-      expect(find.text('PARTIE TERMINÉE'), findsOneWidget);
 
-      // ── REJOUER : même config, nouvelle roue, nouvelle manche ──────
+      // ── Score final : total + REJOUER ──────────────────────────────
+      expect(find.text('Ton score'), findsOneWidget);
       await tester.tap(find.text('REJOUER'));
-      pushManche = false;
-      for (var i = 0; i < 60 && !pushManche; i++) {
-        await tester.pump(const Duration(milliseconds: 300));
-        pushManche = find.byType(GameScreen).evaluate().isNotEmpty;
-      }
-      expect(pushManche, isTrue);
+      await _spinWheelAndGo(tester);
       expect(find.byType(GameScreen), findsOneWidget);
       expect(find.byType(ResponseRow), findsNWidgets(5));
     },
   );
+}
+
+/// Attend l'arrêt de la roue (3,4 s), puis appuie sur « C'EST PARTI ».
+/// Le temps des tickers avance frame par frame : boucle bornée.
+Future<void> _spinWheelAndGo(WidgetTester tester) async {
+  final go = find.widgetWithText(ArcadeButton, 'C’EST PARTI');
+  for (var i = 0; i < 60; i++) {
+    await tester.pump(const Duration(milliseconds: 300));
+    if (go.evaluate().isNotEmpty &&
+        tester.widget<ArcadeButton>(go).onPressed != null) {
+      break;
+    }
+  }
+  expect(tester.widget<ArcadeButton>(go).onPressed, isNotNull);
+  await tester.tap(go);
+  await tester.pump();
+  await tester.pump(const Duration(milliseconds: 400));
 }

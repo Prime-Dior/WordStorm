@@ -26,7 +26,7 @@ class StatusScreen extends StatelessWidget {
 
   static const Map<StatusKind, Color> _colors = {
     StatusKind.info: AppColors.yellow,
-    StatusKind.waiting: AppColors.teal,
+    StatusKind.waiting: AppColors.offWhite,
     StatusKind.error: AppColors.coral,
   };
 
@@ -44,25 +44,29 @@ class StatusScreen extends StatelessWidget {
             children: [
               if (isBusy)
                 const SizedBox(
-                  width: 64,
-                  height: 64,
+                  width: 62,
+                  height: 62,
                   child: CircularProgressIndicator(
-                    strokeWidth: 5,
-                    valueColor: AlwaysStoppedAnimation(AppColors.blueGray),
-                    backgroundColor: AppColors.yellow,
+                    strokeWidth: 6,
+                    strokeCap: StrokeCap.round,
+                    valueColor: AlwaysStoppedAnimation(AppColors.yellow),
+                    backgroundColor: Color(0xFF5A6A85),
                   ),
                 )
               else
-                WordstormIcons.warn(size: 58, color: color),
+                WordstormIcons.warn(size: 64, color: color),
               const SizedBox(height: 12),
               Text(
                 title.toUpperCase(),
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontFamily: AppTheme.displayFont,
-                  fontSize: 27,
-                  height: 1,
+                  fontSize: 30,
+                  height: 1.05,
                   color: color,
+                  shadows: const [
+                    Shadow(color: Color(0xFF0C1429), offset: Offset(0, 3)),
+                  ],
                 ),
               ),
               if (message.isNotEmpty) ...[
@@ -75,18 +79,18 @@ class StatusScreen extends StatelessWidget {
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                     height: 1.35,
-                    color: AppColors.blueGray,
+                    color: AppColors.offWhite,
                   ),
                 ),
               ],
               if (actionLabel != null) ...[
-                const SizedBox(height: 18),
+                const SizedBox(height: 22),
                 SizedBox(
                   width: double.infinity,
                   child: ArcadeButton(
                     label: actionLabel!,
                     variant: ArcadeButtonVariant.red,
-                    small: true,
+                    fontSize: 24,
                     onPressed: actionRoute == null
                         ? () => context.pop()
                         : () => context.push(actionRoute!),

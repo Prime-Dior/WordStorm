@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
 import '../theme/app_theme.dart';
+import 'pressable.dart';
 
 /// Bouton arcade extrudé de la maquette :
 /// ```css
@@ -17,7 +18,16 @@ import '../theme/app_theme.dart';
 /// dark, green, red.
 enum ArcadeButtonVariant { yellow, teal, purple, dark, green, red }
 
-class ArcadeButton extends StatefulWidget {
+/// Bouton principal du jeu.
+///
+/// États visuels (via [Pressable]) :
+/// - **survol** : le bouton se soulève, sa tranche s'épaissit et un halo
+///   de sa couleur apparaît ;
+/// - **focus clavier** : anneau clair autour du bouton ;
+/// - **appui** : la face descend sur sa tranche (comme `.b:active`) ;
+/// - **désactivé** (`onPressed == null`) : teinte kaki grisée de la
+///   maquette (« DÉMARRER · 1 JOUEUR », « EN ATTENTE DE L'HÔTE… »).
+class ArcadeButton extends StatelessWidget {
   const ArcadeButton({
     required this.label,
     super.key,
@@ -30,6 +40,8 @@ class ArcadeButton extends StatefulWidget {
     this.borderRadius,
     this.flex = 1,
     this.minHeight,
+    this.leading,
+    this.tooltip,
   });
 
   final String label;
@@ -46,121 +58,143 @@ class ArcadeButton extends StatefulWidget {
   final int flex;
   final double? minHeight;
 
-  @override
-  State<ArcadeButton> createState() => _ArcadeButtonState();
-}
+  /// Icône facultative avant le libellé (ex. bouton « COPIER »).
+  final Widget? leading;
+  final String? tooltip;
 
-class _ArcadeButtonState extends State<ArcadeButton> {
-  bool _pressed = false;
+  /// Couleurs (clair, base, tranche) de chaque variante.
+  static (Color, Color, Color) faces(ArcadeButtonVariant v) => switch (v) {
+    ArcadeButtonVariant.yellow => (
+      AppColors.yellowLight,
+      AppColors.yellow,
+      AppColors.yellowDark,
+    ),
+    ArcadeButtonVariant.teal => (
+      AppColors.tealLight,
+      AppColors.teal,
+      AppColors.tealDark,
+    ),
+    ArcadeButtonVariant.purple => (
+      AppColors.purpleLight,
+      AppColors.purple,
+      AppColors.purpleDark,
+    ),
+    ArcadeButtonVariant.dark => (
+      AppColors.darkButtonTop,
+      AppColors.darkButton,
+      AppColors.darkButtonDeep,
+    ),
+    ArcadeButtonVariant.green => (
+      const Color(0xFF5CF0A8),
+      const Color(0xFF2FD18A),
+      AppColors.validateDark,
+    ),
+    ArcadeButtonVariant.red => (
+      const Color(0xFFFF8A8E),
+      AppColors.coral,
+      AppColors.coralDark,
+    ),
+  };
 
-  (Color, Color, Color) _faces(ArcadeButtonVariant v, bool enabled) {
-    final (light, base, deep) = switch (v) {
-      ArcadeButtonVariant.yellow => (
-        AppColors.yellowLight,
-        AppColors.yellow,
-        AppColors.yellowDark,
-      ),
-      ArcadeButtonVariant.teal => (
-        AppColors.tealLight,
-        AppColors.teal,
-        AppColors.tealDark,
-      ),
-      ArcadeButtonVariant.purple => (
-        AppColors.purpleLight,
-        AppColors.purple,
-        AppColors.purpleDark,
-      ),
-      ArcadeButtonVariant.dark => (
-        AppColors.darkButtonTop,
-        AppColors.darkButton,
-        AppColors.darkButtonDeep,
-      ),
-      ArcadeButtonVariant.green => (
-        const Color(0xFF5CF0A8),
-        const Color(0xFF1FBF74),
-        AppColors.validateDark,
-      ),
-      ArcadeButtonVariant.red => (
-        const Color(0xFFFF8A8E),
-        AppColors.coral,
-        AppColors.coralDark,
-      ),
-    };
-    if (enabled) return (light, base, deep);
-    return (base, base, base); // état grisé (`.b.dis`).
-  }
+  /// Teinte kaki des boutons grisés de la maquette.
+  static const (Color, Color, Color) disabledFaces = (
+    Color(0xFFD9D0A6),
+    Color(0xFFB3A982),
+    Color(0xFF7A7254),
+  );
 
   @override
   Widget build(BuildContext context) {
-    final enabled = widget.onPressed != null;
-    final (light, base, deep) = _faces(widget.variant, enabled);
-    final radius = widget.borderRadius ?? (widget.small ? 12.0 : 18.0);
-    final depth = _pressed ? 1.0 : (widget.small ? 4.0 : 6.0);
-    final contrastText =
-        widget.textColor ??
-        (widget.variant == ArcadeButtonVariant.yellow
+    final enabled = onPressed != null;
+    final (light, base, deep) = enabled ? faces(variant) : disabledFaces;
+    final radius = borderRadius ?? (small ? 12.0 : 18.0);
+    final restDepth = small ? 4.0 : 6.0;
+    final ink =
+        textColor ??
+        (!enabled ||
+                variant == ArcadeButtonVariant.yellow ||
+                variant == ArcadeButtonVariant.green
             ? AppColors.navyBlue
             : Colors.white);
 
-    final inner = Text(
-      widget.label.toUpperCase(),
-      textAlign: TextAlign.center,
-      style: TextStyle(
-        fontFamily: AppTheme.displayFont,
-        fontSize: widget.small ? 18 : widget.fontSize,
-        letterSpacing: 1.6,
-        height: 1.1,
-        color: contrastText,
-      ),
-    );
+    final button = Pressable(
+      onPressed: onPressed,
+      semanticLabel: label,
+      tooltip: tooltip,
+      borderRadius: BorderRadius.circular(radius),
+      builder: (context, state) {
+        // Appui : la face descend sur la tranche (`.b:active`).
+        final depth = state.pressed
+            ? 1.0
+            : state.highlighted
+            ? restDepth + 2
+            : restDepth;
+        final sink = state.pressed ? restDepth - 1 : 0.0;
 
-    final child = GestureDetector(
-      onTapDown: enabled ? (_) => setState(() => _pressed = true) : null,
-      onTapCancel: enabled ? () => setState(() => _pressed = false) : null,
-      onTapUp: enabled ? (_) => setState(() => _pressed = false) : null,
-      onTap: widget.onPressed,
-      child: Container(
-        // Cible tactile de confort ≥ 48 dp (accessibilité, phase 6) ;
-        // la maquette garde la main via `minHeight` explicite.
-        constraints: BoxConstraints(minHeight: widget.minHeight ?? 48),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(radius),
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [light, base],
+        final text = Text(
+          label.toUpperCase(),
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontFamily: AppTheme.displayFont,
+            fontSize: small ? 18 : fontSize,
+            letterSpacing: 1.2,
+            height: 1.1,
+            color: ink,
           ),
-          boxShadow: [
-            BoxShadow(color: deep, offset: Offset(0, depth)),
-            const BoxShadow(
-              color: Color(0x99000000),
-              offset: Offset(0, 12),
-              blurRadius: 16,
+        );
+
+        return AnimatedContainer(
+          duration: const Duration(milliseconds: 110),
+          curve: Curves.easeOut,
+          transform: Matrix4.translationValues(0, sink, 0),
+          // Cible tactile de confort ≥ 48 dp (accessibilité) ;
+          // la maquette garde la main via `minHeight` explicite.
+          constraints: BoxConstraints(minHeight: minHeight ?? 48),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(radius),
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: state.highlighted
+                  ? [Color.lerp(light, Colors.white, .18)!, light]
+                  : [light, base],
             ),
-            const BoxShadow(color: Color(0x99FFFFFF), offset: Offset(0, 2)),
-          ],
-        ),
-        padding:
-            widget.padding ??
-            (widget.small
-                ? const EdgeInsets.symmetric(horizontal: 14, vertical: 8)
-                : const EdgeInsets.all(11)),
-        child: Center(child: inner),
-      ),
+            boxShadow: [
+              BoxShadow(color: deep, offset: Offset(0, depth)),
+              const BoxShadow(
+                color: Color(0x66000000),
+                offset: Offset(0, 12),
+                blurRadius: 16,
+              ),
+              if (state.highlighted && enabled)
+                BoxShadow(color: base.withAlpha(0x80), blurRadius: 18),
+            ],
+          ),
+          padding:
+              padding ??
+              (small
+                  ? const EdgeInsets.symmetric(horizontal: 14, vertical: 8)
+                  : const EdgeInsets.all(11)),
+          // Facteurs 1 : le bouton épouse son contenu quand rien ne
+          // l'étire (« FERMER »), et prend toute la largeur sinon.
+          child: Center(
+            widthFactor: 1,
+            heightFactor: 1,
+            child: leading == null
+                ? text
+                : Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      leading!,
+                      const SizedBox(width: 6),
+                      Flexible(child: text),
+                    ],
+                  ),
+          ),
+        );
+      },
     );
 
-    final interactive = MouseRegion(
-      cursor: enabled ? SystemMouseCursors.click : SystemMouseCursors.basic,
-      child: child,
-    );
-
-    return Semantics(
-      button: true,
-      enabled: enabled,
-      label: widget.label,
-      child: widget.flex > 1
-          ? Expanded(flex: widget.flex, child: interactive)
-          : interactive,
-    );
+    return flex > 1 ? Expanded(flex: flex, child: button) : button;
   }
 }

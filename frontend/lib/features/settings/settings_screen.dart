@@ -6,6 +6,7 @@ import '../../app/providers.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/arcade_button.dart';
+import '../../core/widgets/ui_kit.dart';
 import '../../data/settings/settings_repository.dart';
 import '../skeleton/status_screen.dart';
 
@@ -44,8 +45,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 350, maxHeight: 650),
         child: Material(
-          color: const Color(0xEE17223A),
-          borderRadius: BorderRadius.circular(22),
+          type: MaterialType.transparency,
           child: Padding(
             padding: const EdgeInsets.fromLTRB(18, 20, 18, 16),
             child: !_loaded
@@ -57,11 +57,17 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         'PARAMÈTRES',
                         style: TextStyle(
                           fontFamily: AppTheme.displayFont,
-                          fontSize: 28,
+                          fontSize: 30,
                           color: AppColors.offWhite,
+                          shadows: [
+                            Shadow(
+                              color: Color(0xFF0C1429),
+                              offset: Offset(0, 3),
+                            ),
+                          ],
                         ),
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 16),
                       _OptionRow(
                         label: 'Sons',
                         value: _sound,
@@ -132,32 +138,8 @@ class _OptionRow extends StatelessWidget {
   final ValueChanged<bool> onChanged;
 
   @override
-  Widget build(BuildContext context) => Container(
-    margin: const EdgeInsets.only(bottom: 8),
-    child: Material(
-      color: const Color(0xCC38475F),
-      borderRadius: BorderRadius.circular(11),
-      clipBehavior: Clip.antiAlias,
-      child: CheckboxListTile(
-        value: value,
-        onChanged: (v) => onChanged(v ?? false),
-        mouseCursor: SystemMouseCursors.click,
-        activeColor: AppColors.yellow,
-        checkColor: AppColors.navyBlue,
-        controlAffinity: ListTileControlAffinity.leading,
-        dense: true,
-        visualDensity: VisualDensity.compact,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 8),
-        title: Text(
-          label,
-          style: const TextStyle(
-            fontFamily: AppTheme.bodyFont,
-            fontSize: 11,
-            fontWeight: FontWeight.w600,
-            color: AppColors.offWhite,
-          ),
-        ),
-      ),
-    ),
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.only(bottom: 10),
+    child: CheckOptionRow(label: label, value: value, onChanged: onChanged),
   );
 }

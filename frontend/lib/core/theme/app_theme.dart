@@ -93,7 +93,7 @@ class AppTheme {
       style: ButtonStyle(
         mouseCursor: WidgetStateProperty.resolveWith(
           (states) => states.contains(WidgetState.disabled)
-              ? SystemMouseCursors.basic
+              ? SystemMouseCursors.forbidden
               : SystemMouseCursors.click,
         ),
       ),
@@ -102,7 +102,7 @@ class AppTheme {
       style: ButtonStyle(
         mouseCursor: WidgetStateProperty.resolveWith(
           (states) => states.contains(WidgetState.disabled)
-              ? SystemMouseCursors.basic
+              ? SystemMouseCursors.forbidden
               : SystemMouseCursors.click,
         ),
       ),

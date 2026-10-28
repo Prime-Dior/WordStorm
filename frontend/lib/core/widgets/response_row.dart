@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
 import 'letter_tile.dart';
+import 'ui_kit.dart';
 
 /// Ligne de réponse de la maquette (`.rw`) : pastille d'icône de catégorie,
 /// libellé, champ de saisie clair, coche verte quand la ligne est remplie.
@@ -18,6 +19,7 @@ class ResponseRow extends StatefulWidget {
     this.textInputAction = TextInputAction.next,
     this.onSubmitted,
     this.iconName,
+    this.alert = false,
   });
 
   final ValueChanged<String> onChanged;
@@ -33,6 +35,9 @@ class ResponseRow extends StatefulWidget {
   /// sinon le libellé de la catégorie sert d'identifiant.
   final String? iconName;
 
+  /// 10 dernières secondes : bordure corail (maquette 11).
+  final bool alert;
+
   @override
   State<ResponseRow> createState() => _ResponseRowState();
 }
@@ -40,6 +45,7 @@ class ResponseRow extends StatefulWidget {
 class _ResponseRowState extends State<ResponseRow> {
   final FocusNode _focus = FocusNode();
   bool _focused = false;
+  bool _hovered = false;
   late final TextEditingController _controller;
   bool _ownsController = false;
 
@@ -72,31 +78,48 @@ class _ResponseRowState extends State<ResponseRow> {
   @override
   Widget build(BuildContext context) {
     final filled = _controller.text.trim().isNotEmpty;
-    final border = filled
-        ? const Color(0xFF2FD18A)
+    final border = widget.alert && filled
+        ? const Color(0xFFFF8A8E)
         : _focused
         ? AppColors.teal
-        : const Color(0x22FFFFFF);
+        : filled
+        ? const Color(0xFF2FD18A)
+        : _hovered
+        ? const Color(0x55FFFFFF)
+        : const Color(0x1AFFFFFF);
 
-    return Container(
+    final editable = widget.enabled && !widget.turnLocked;
+    // Curseur texte sur toute la ligne (un clic place le curseur dans
+    // le champ) ; sens interdit quand la manche est verrouillée.
+    return MouseRegion(
+      cursor: editable
+          ? SystemMouseCursors.text
+          : SystemMouseCursors.forbidden,
+      onEnter: (_) => setState(() => _hovered = true),
+      onExit: (_) => setState(() => _hovered = false),
+      child: GestureDetector(
+        behavior: HitTestBehavior.translucent,
+        onTap: editable ? _focus.requestFocus : null,
+        child: AnimatedContainer(
+      duration: const Duration(milliseconds: 160),
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
       decoration: BoxDecoration(
-        color: const Color(0xAA0A1330),
-        borderRadius: BorderRadius.circular(16),
+        color: const Color(0xF015243F),
+        borderRadius: BorderRadius.circular(14),
         border: Border.all(color: border, width: 2),
         boxShadow: _focused
-            ? [BoxShadow(color: AppColors.teal.withAlpha(0xAA), blurRadius: 14)]
+            ? [BoxShadow(color: AppColors.teal.withAlpha(0x88), blurRadius: 14)]
             : const [],
       ),
       child: Row(
         children: [
           CategoryBadge(
             iconName: widget.iconName ?? widget.category,
-            color: widget.categoryColor,
+            color: widget.categoryColor ?? categoryColor(widget.category),
           ),
           const SizedBox(width: 8),
           SizedBox(
-            width: 96,
+            width: 92,
             child: Text(
               widget.category,
               style: const TextStyle(
@@ -112,7 +135,10 @@ class _ResponseRowState extends State<ResponseRow> {
             child: TextField(
               focusNode: _focus,
               controller: _controller,
-              enabled: widget.enabled && !widget.turnLocked,
+              enabled: editable,
+              mouseCursor: editable
+                  ? SystemMouseCursors.text
+                  : SystemMouseCursors.forbidden,
               textCapitalization: TextCapitalization.words,
               autocorrect: false,
               enableSuggestions: false,
@@ -141,7 +167,7 @@ class _ResponseRowState extends State<ResponseRow> {
                 isDense: true,
                 filled: true,
                 counterText: '',
-                fillColor: const Color(0xFFC9DDF5),
+                fillColor: const Color(0xFFCADDF3),
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: 10,
                   vertical: 9,
@@ -151,6 +177,10 @@ class _ResponseRowState extends State<ResponseRow> {
                   borderSide: BorderSide.none,
                 ),
                 hintText: 'Votre réponse…',
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: const BorderSide(color: AppColors.teal, width: 2),
+                ),
                 hintStyle: TextStyle(
                   color: const Color(0xFF1E2A44).withAlpha(0x88),
                 ),
@@ -182,6 +212,8 @@ class _ResponseRowState extends State<ResponseRow> {
             ),
           ),
         ],
+      ),
+      ),
       ),
     );
   }

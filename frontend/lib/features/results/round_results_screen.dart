@@ -9,14 +9,16 @@ import '../../core/widgets/arcade_button.dart';
 import '../../core/widgets/icons/wordstorm_icons.dart';
 import '../../core/widgets/letter_tile.dart';
 import '../../core/widgets/screen_scaffold.dart';
+import '../../core/widgets/ui_kit.dart';
 import '../../domain/scoring.dart';
+import '../multiplayer/demo_room.dart';
 import '../skeleton/status_screen.dart';
 
-/// Résultats de manche (Figma 12) : pour chaque catégorie, la réponse
-/// saisie, les points et la règle appliquée en français. En solo le
-/// palier 10 (réponse unique) ne s'y applique pas — toute réponse valide
-/// vaut le bonus du plus haut palier. Les conflits de règles portent le
-/// badge « Règle à trancher » (question Q1).
+/// Résultats de manche (maquette 12) : carte du score de la manche et
+/// du total, puis une ligne par catégorie (réponse, règle appliquée,
+/// points). Boutons : MANCHE SUIVANTE (ou SCORE FINAL) et MENU.
+///
+/// Les conflits de règles portent le badge « Règle à trancher ».
 class RoundResultsScreen extends ConsumerWidget {
   const RoundResultsScreen({super.key});
 
@@ -24,7 +26,7 @@ class RoundResultsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(soloSessionProvider);
     if (state.roundHistory.isEmpty) {
-      // Rechargé froid (aucune manche complétée) : retour menu.
+      // Page rechargée sans manche jouée : retour au menu.
       return const StatusScreen(
         title: 'Aucune manche',
         message:
@@ -37,87 +39,89 @@ class RoundResultsScreen extends ConsumerWidget {
     final result = state.roundHistory.last;
     final setup = state.setupOrDefault;
     final isLast = result.round >= setup.rounds;
-
-    final totalRows = [
+    final lines = [
       for (final category in setup.categories)
         result.score.lineFor('solo', category),
     ];
-    final total = totalRows.fold(0, (modified, line) => modified + line.points);
+    final roundTotal = lines.fold(0, (sum, line) => sum + line.points);
+    final grandTotal = state.roundHistory.fold(
+      0,
+      (sum, r) => sum + r.score.totalFor('solo'),
+    );
+    final multi = ref.watch(multiplayerGameProvider);
+
+    void next() {
+      if (isLast) {
+        context.pushReplacement(multi ? '/podium' : '/final');
+      } else {
+        ref.read(soloSessionProvider.notifier).nextRound();
+        context.pushReplacement('/wheel');
+      }
+    }
 
     return ScreenScaffold(
-      skylineHeight: 240,
+      skylineHeight: 0,
+      showSunburst: true,
+      burstTop: 0.1,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Row(
-            children: [
-              LetterTile(letter: result.letter, size: 54),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  'MANCHE ${result.round} — FIN',
-                  style: const TextStyle(
-                    fontFamily: AppTheme.displayFont,
-                    fontSize: 26,
-                    color: AppColors.offWhite,
-                  ),
-                ),
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    '$total',
-                    style: const TextStyle(
-                      fontFamily: AppTheme.monoFont,
-                      fontSize: 30,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.yellow,
-                    ),
-                  ),
-                  const Text(
-                    'POINTS',
-                    style: TextStyle(
-                      fontFamily: AppTheme.bodyFont,
-                      fontSize: 10,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 1,
-                      color: AppColors.blueGray,
-                    ),
-                  ),
-                ],
-              ),
-            ],
+          const SizedBox(height: 6),
+          ScreenTitle('Manche ${result.round} / ${setup.rounds}'),
+          const SizedBox(height: 10),
+          _ScoreCard(
+            letter: result.letter,
+            roundScore: roundTotal,
+            grandTotal: grandTotal,
           ),
           const SizedBox(height: 12),
+          const Text(
+            'Score personnel · réponses de cette manche',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontFamily: AppTheme.bodyFont,
+              fontSize: 11,
+              color: AppColors.blueGray,
+            ),
+          ),
+          const SizedBox(height: 14),
           Expanded(
             child: ListView.builder(
               padding: EdgeInsets.zero,
-              itemCount: totalRows.length,
+              itemCount: lines.length,
               itemBuilder: (context, i) {
                 final category = setup.categories[i];
-                final line = totalRows[i];
                 return _CategoryResultRow(
                   category: category,
-                  answer: state.answeredByCategory[category] ?? '',
-                  line: line,
+                  answer: (state.answeredByCategory[category] ?? '').trim(),
+                  line: lines[i],
                 );
               },
             ),
           ),
-          // Badge « règle à trancher » (conflits de règles, question Q1).
-          if (totalRows.any((l) => l.conflict)) const _RuleSignBadge(),
-          const SizedBox(height: 12),
-          ArcadeButton(
-            label: isLast ? 'Terminer' : 'Manche suivante',
-            onPressed: () {
-              if (isLast) {
-                context.pushReplacement('/final');
-              } else {
-                ref.read(soloSessionProvider.notifier).nextRound();
-                context.pushReplacement('/wheel');
-              }
-            },
+          if (lines.any((l) => l.conflict)) ...[
+            const _RuleSignBadge(),
+            const SizedBox(height: 10),
+          ],
+          const SizedBox(height: 6),
+          Row(
+            children: [
+              ArcadeButton(
+                label: isLast ? 'Score final' : 'Manche suivante',
+                fontSize: 24,
+                flex: 2,
+                onPressed: next,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: ArcadeButton(
+                  label: 'Menu',
+                  variant: ArcadeButtonVariant.dark,
+                  fontSize: 24,
+                  onPressed: () => context.go('/menu'),
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -125,7 +129,69 @@ class RoundResultsScreen extends ConsumerWidget {
   }
 }
 
-/// Ligne de résultat d'une catégorie (réponse + points + justification).
+/// Carte « Score de la manche · lettre R » : héros, score, total.
+class _ScoreCard extends StatelessWidget {
+  const _ScoreCard({
+    required this.letter,
+    required this.roundScore,
+    required this.grandTotal,
+  });
+
+  final String letter;
+  final int roundScore;
+  final int grandTotal;
+
+  @override
+  Widget build(BuildContext context) => DarkPanel(
+    padding: const EdgeInsets.fromLTRB(10, 8, 16, 10),
+    child: Row(
+      children: [
+        const HeroImage(width: 92),
+        const SizedBox(width: 18),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Score de la manche · lettre $letter',
+                style: const TextStyle(
+                  fontFamily: AppTheme.bodyFont,
+                  fontSize: 11,
+                  color: AppColors.blueGray,
+                ),
+              ),
+              TweenAnimationBuilder<int>(
+                tween: IntTween(begin: 0, end: roundScore),
+                duration: const Duration(milliseconds: 900),
+                curve: Curves.easeOut,
+                builder: (context, value, _) => Text(
+                  '$value',
+                  style: const TextStyle(
+                    fontFamily: AppTheme.monoFont,
+                    fontSize: 52,
+                    fontWeight: FontWeight.w700,
+                    height: 1.1,
+                    color: AppColors.yellow,
+                  ),
+                ),
+              ),
+              Text(
+                'Total : $grandTotal pt',
+                style: const TextStyle(
+                  fontFamily: AppTheme.bodyFont,
+                  fontSize: 11,
+                  color: AppColors.blueGray,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+/// Ligne de résultat : pastille, catégorie, « réponse · règle », points.
 class _CategoryResultRow extends StatelessWidget {
   const _CategoryResultRow({
     required this.category,
@@ -139,26 +205,29 @@ class _CategoryResultRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final empty = answer.trim().isEmpty;
+    final empty = answer.isEmpty;
     final points = line.points;
-    final color = switch (line.tier) {
-      ScoreTier.onlyValid => AppColors.validate,
-      ScoreTier.uniqueValid => AppColors.teal,
-      ScoreTier.shared || ScoreTier.reused => AppColors.yellow,
-      ScoreTier.invalid => AppColors.coral,
+    final detail = empty
+        ? '— · Pas de réponse'
+        : '$answer · ${line.reason}';
+    final pointsColor = switch (line.tier) {
+      ScoreTier.invalid => AppColors.blueGray,
+      _ => AppColors.yellow,
     };
 
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(
-        color: const Color(0xAA0A1330),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0x22FFFFFF), width: 2),
+        color: kPanelColor,
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
         children: [
-          CategoryBadge(iconName: categoryIconName(category)),
+          CategoryBadge(
+            iconName: categoryIconName(category),
+            color: categoryColor(category),
+          ),
           const SizedBox(width: 10),
           Expanded(
             child: Column(
@@ -168,41 +237,32 @@ class _CategoryResultRow extends StatelessWidget {
                   category,
                   style: const TextStyle(
                     fontFamily: AppTheme.bodyFont,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.blueGray,
-                  ),
-                ),
-                Text(
-                  empty ? 'Pas de réponse' : answer,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontFamily: AppTheme.bodyFont,
-                    fontSize: 15,
+                    fontSize: 13,
                     fontWeight: FontWeight.w600,
                     color: AppColors.offWhite,
                   ),
                 ),
                 Text(
-                  line.reason,
-                  style: TextStyle(
+                  detail,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
                     fontFamily: AppTheme.bodyFont,
                     fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                    color: empty ? AppColors.blueGray : color,
+                    color: AppColors.blueGray,
                   ),
                 ),
               ],
             ),
           ),
+          const SizedBox(width: 8),
           Text(
-            '+$points',
+            points > 0 ? '$points pt' : '–',
             style: TextStyle(
               fontFamily: AppTheme.monoFont,
-              fontSize: 22,
+              fontSize: 16,
               fontWeight: FontWeight.w700,
-              color: points > 0 ? color : AppColors.blueGray,
+              color: points > 0 ? pointsColor : AppColors.blueGray,
             ),
           ),
         ],
@@ -211,8 +271,7 @@ class _CategoryResultRow extends StatelessWidget {
   }
 }
 
-/// Badge « Règle à trancher » (résultats, quand un conflit de règles a
-/// été arbitré : question Q1, devise du prompt « pas de silence »).
+/// Badge « Règle à trancher » (conflit réutilisation / bonus, question Q1).
 class _RuleSignBadge extends StatelessWidget {
   const _RuleSignBadge();
 
