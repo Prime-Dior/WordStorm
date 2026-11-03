@@ -43,6 +43,19 @@ class RoomRepository {
     return RoomModel.fromJson(_readData(response));
   }
 
+  Future<List<Map<String, dynamic>>> getFinalResults(String code) async {
+    final response = await _apiClient.get('/rooms/${_safeCode(code)}/results');
+    final data = _readData(response);
+    final results = data['results'];
+    if (results is! List) {
+      throw const ApiException(
+        statusCode: 500,
+        message: 'Le serveur n’a pas renvoyé le classement final.',
+      );
+    }
+    return results.whereType<Map<String, dynamic>>().toList(growable: false);
+  }
+
   Future<RoomModel> startRoom(String code) async {
     final response = await _apiClient.post('/rooms/${_safeCode(code)}/start');
     return RoomModel.fromJson(_readData(response));

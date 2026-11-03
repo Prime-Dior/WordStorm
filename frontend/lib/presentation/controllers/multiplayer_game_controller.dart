@@ -8,6 +8,7 @@ import '../../data/api/api_client.dart';
 import '../../data/repository/room_repository.dart';
 import '../../domain/models/multiplayer_round_session.dart';
 import '../../domain/models/round_model.dart';
+import '../../presentation/pages/podium/podium_page.dart';
 
 class MultiplayerGameController extends GetxController {
   late final MultiplayerRoundSession session =
@@ -24,8 +25,10 @@ class MultiplayerGameController extends GetxController {
 
   Timer? _clockTimer;
   Timer? _pollTimer;
+  Timer? _saveTimer;
   bool _lockRequested = false;
   bool _routeRequested = false;
+  bool _finalResultsRequested = false;
 
   bool get hasTimer => session.durationSeconds > 0;
 
@@ -40,6 +43,37 @@ class MultiplayerGameController extends GetxController {
 
   void answerChanged(String value) {
     formRevision.value++;
+    if (hasTimer && round.value.status == 'active') {
+      _saveTimer?.cancel();
+      _saveTimer = Timer(const Duration(milliseconds: 600), _saveDraft);
+    }
+  }
+
+  Future<void> _saveDraft() async {
+    if (round.value.status != 'active' ||
+        secondsRemaining.value == 0 ||
+        isSaving.value) {
+      return;
+    }
+    isSaving.value = true;
+    try {
+      round.value = await Get.find<RoomRepository>().submitAnswers(
+        session.roomCode,
+        round.value.number,
+        {
+          for (final entry in answers.entries)
+            entry.key: entry.value.text.trim().isEmpty
+                ? null
+                : entry.value.text.trim(),
+        },
+      );
+    } on ApiException catch (exception) {
+      error.value = exception.message;
+    } catch (_) {
+      error.value = 'Les réponses n’ont pas pu être enregistrées.';
+    } finally {
+      isSaving.value = false;
+    }
   }
 
   @override
@@ -93,6 +127,7 @@ class MultiplayerGameController extends GetxController {
     error.value = null;
 
     try {
+      _saveTimer?.cancel();
       final values = <String, String?>{
         for (final entry in answers.entries)
           entry.key: entry.value.text.trim().isEmpty
@@ -126,6 +161,7 @@ class MultiplayerGameController extends GetxController {
     isLocking.value = true;
 
     try {
+      _saveTimer?.cancel();
       round.value = await Get.find<RoomRepository>().lockRound(
         session.roomCode,
         round.value.number,
@@ -262,10 +298,58 @@ class MultiplayerGameController extends GetxController {
     }
   }
 
+  Future<void> openFinalResults() async {
+    if (_finalResultsRequested) return;
+    _finalResultsRequested = true;
+    isSaving.value = true;
+    error.value = null;
+    try {
+      final results = await Get.find<RoomRepository>().getFinalResults(
+        session.roomCode,
+      );
+      final entries = results
+          .map((result) {
+            final nickname = result['nickname']?.toString() ?? 'Joueur';
+            final score = int.tryParse(result['score']?.toString() ?? '') ?? 0;
+            final isMe = nickname == session.nickname;
+            return PodiumEntry(
+              name: nickname,
+              avatar: _avatarFor(nickname),
+              score: score,
+              me: isMe,
+            );
+          })
+          .toList(growable: false);
+      Get.offNamed<void>(AppRoutes.podium, arguments: entries);
+    } on ApiException catch (exception) {
+      _finalResultsRequested = false;
+      error.value = exception.message;
+    } catch (_) {
+      _finalResultsRequested = false;
+      error.value = 'Le classement final n’a pas pu être chargé.';
+    } finally {
+      isSaving.value = false;
+    }
+  }
+
+  String _avatarFor(String nickname) {
+    final index = sessionNicknameSeed(nickname) % 4;
+    return <String>[
+      'assets/images/avatar_toi.png',
+      'assets/images/avatar_sami.png',
+      'assets/images/avatar_max.png',
+      'assets/images/avatar_lina.png',
+    ][index];
+  }
+
+  int sessionNicknameSeed(String nickname) =>
+      nickname.codeUnits.fold(0, (sum, unit) => sum + unit);
+
   @override
   void onClose() {
     _clockTimer?.cancel();
     _pollTimer?.cancel();
+    _saveTimer?.cancel();
     for (final controller in answers.values) {
       controller.dispose();
     }

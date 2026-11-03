@@ -11,7 +11,10 @@ class MenuController extends GetxController {
       Get.toNamed<void>(AppRoutes.config, parameters: {'mode': 'solo'});
   void openMultiplayer() =>
       Get.toNamed<void>(AppRoutes.config, parameters: {'mode': 'multi'});
-  void join() => Get.toNamed<void>(AppRoutes.join);
+  void join() => Get.toNamed<void>(
+    AppRoutes.join,
+    parameters: {'code': codeController.text.trim().toUpperCase()},
+  );
   void openHistory() => Get.toNamed<void>(AppRoutes.history);
 
   @override

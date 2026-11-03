@@ -136,9 +136,9 @@ class MultiplayerGameScreen extends GetView<MultiplayerGameController> {
   Widget _resultAction(MultiplayerGameController game) {
     if (game.isGameFinished.value) {
       return ArcadeButton(
-        label: 'Retour au menu',
+        label: game.isSaving.value ? 'Chargement…' : 'Classement final',
         variant: ArcadeButtonVariant.teal,
-        onPressed: game.returnToMenu,
+        onPressed: game.isSaving.value ? null : game.openFinalResults,
       );
     }
 

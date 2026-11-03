@@ -128,7 +128,7 @@ class MenuScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 16),
                       ArcadeButton(
-                        label: 'Classement',
+                        label: 'Historique solo',
                         small: true,
                         variant: ArcadeButtonVariant.dark,
                         onPressed: controller.openHistory,
