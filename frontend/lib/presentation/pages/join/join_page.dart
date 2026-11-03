@@ -54,12 +54,14 @@ class _JoinScreenState extends State<JoinScreen> {
               errorText: _controller.codeError.value,
               onChanged: _controller.onCodeChanged,
               onValidated: _submit,
-              trailing: Padding(
-                padding: const EdgeInsets.only(left: 8),
-                child: ArcadeButton(
-                  label: 'OK',
-                  small: true,
-                  onPressed: _submit,
+              trailing: Obx(
+                () => Padding(
+                  padding: const EdgeInsets.only(left: 8),
+                  child: ArcadeButton(
+                    label: _controller.isJoining.value ? '…' : 'OK',
+                    small: true,
+                    onPressed: _controller.isJoining.value ? null : _submit,
+                  ),
                 ),
               ),
             ),
@@ -93,10 +95,12 @@ class _JoinScreenState extends State<JoinScreen> {
               },
             ),
             const SizedBox(height: 22),
-            ArcadeButton(
-              label: 'Rejoindre',
-              variant: ArcadeButtonVariant.teal,
-              onPressed: _submit,
+            Obx(
+              () => ArcadeButton(
+                label: _controller.isJoining.value ? 'Connexion…' : 'Rejoindre',
+                variant: ArcadeButtonVariant.teal,
+                onPressed: _controller.isJoining.value ? null : _submit,
+              ),
             ),
           ],
         ),

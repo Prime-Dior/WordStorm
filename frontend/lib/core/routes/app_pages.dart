@@ -11,6 +11,7 @@ import '../../presentation/pages/home/home_page.dart';
 import '../../presentation/pages/join/join_page.dart';
 import '../../presentation/pages/lobby/lobby_page.dart';
 import '../../presentation/pages/menu/menu_page.dart';
+import '../../presentation/pages/multiplayer_game/multiplayer_game_page.dart';
 import '../../presentation/pages/results/round_results_page.dart';
 import '../../presentation/pages/rules/rules_page.dart';
 import '../../presentation/pages/settings/settings_page.dart';
@@ -44,6 +45,11 @@ abstract final class AppPages {
       name: AppRoutes.game,
       page: () => const GameScreen(),
       binding: GameBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.multiplayerGame,
+      page: () => const MultiplayerGameScreen(),
+      binding: MultiplayerGameBinding(),
     ),
     GetPage(
       name: AppRoutes.results,

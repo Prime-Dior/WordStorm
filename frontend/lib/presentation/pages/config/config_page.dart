@@ -211,9 +211,13 @@ class _ConfigScreenState extends State<ConfigScreen> {
               )
             else
               ArcadeButton(
-                label: 'Créer le salon',
+                label: _config.isCreatingRoom.value
+                    ? 'Création en cours…'
+                    : 'Créer le salon',
                 variant: ArcadeButtonVariant.teal,
-                onPressed: _canStart ? _previewLobby : null,
+                onPressed: _canStart && !_config.isCreatingRoom.value
+                    ? _previewLobby
+                    : null,
               ),
           ],
         ),

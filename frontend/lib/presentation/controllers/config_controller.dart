@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../core/routes/app_routes.dart';
-import '../../core/utils/salon_code.dart';
+import '../../data/api/api_client.dart';
+import '../../data/repository/auth_repository.dart';
+import '../../data/repository/room_repository.dart';
 import '../../data/settings/settings_repository.dart';
 import '../../domain/categories.dart';
 import '../../domain/draws.dart';
 import '../../domain/models/lobby_preview.dart';
-import '../../domain/models/lobby_setup.dart';
 import 'solo_session_controller.dart';
 
 class ConfigController extends GetxController {
@@ -22,6 +23,7 @@ class ConfigController extends GetxController {
   final nicknameController = TextEditingController();
   final nickname = ''.obs;
   final nicknameError = RxnString();
+  final isCreatingRoom = false.obs;
 
   @override
   void onInit() {
@@ -59,30 +61,58 @@ class ConfigController extends GetxController {
   }
 
   Future<void> previewLobby() async {
-    final playerName = nickname.value.trim();
-    if (playerName.isEmpty || playerName.length > 12) {
-      nicknameError.value = 'Saisis un pseudo de 1 à 12 caractères.';
+    if (isCreatingRoom.value) return;
 
+    final enteredNickname = nickname.value.trim();
+
+    if (enteredNickname.isEmpty || enteredNickname.length > 12) {
+      nicknameError.value = 'Saisis un pseudo de 1 à 12 caractères.';
       return;
     }
 
     nicknameError.value = null;
-    await Get.find<SettingsRepository>().setNickname(playerName);
-    Get.toNamed<void>(
-      AppRoutes.lobby,
-      arguments: LobbyPreview(
-        code: SalonCode.generate(),
-        nickname: playerName,
-        isHost: true,
-        setup: LobbySetup(
-          categories: _categories(),
-          durationSeconds: duration.value,
-          rounds: rounds.value,
-          allowHardLetters: hardLetters.value,
-          randomCategories: randomMode.value,
+    isCreatingRoom.value = true;
+
+    try {
+      final authRepository = Get.find<AuthRepository>();
+
+      // Réutilise une session déjà enregistrée.
+      // Si le téléphone n'en a pas encore, crée une session invitée.
+      final player =
+          await authRepository.restoreSession() ??
+          await authRepository.createGuestSession(enteredNickname);
+
+      // Le serveur fait foi pour le pseudo associé au jeton.
+      nickname.value = player.nickname;
+      nicknameController.text = player.nickname;
+      await Get.find<SettingsRepository>().setNickname(player.nickname);
+
+      final room = await Get.find<RoomRepository>().createRoom(
+        categoryMode: randomMode.value ? 'random' : 'custom',
+        categories: randomMode.value ? null : selected.toList(),
+        durationSeconds: duration.value,
+        roundCount: rounds.value,
+        allowHardLetters: hardLetters.value,
+      );
+
+      Get.toNamed<void>(
+        AppRoutes.lobby,
+        arguments: LobbyPreview.fromRoom(
+          room: room,
+          nickname: player.nickname,
+          isHost: true,
         ),
-      ),
-    );
+      );
+    } on ApiException catch (error) {
+      Get.snackbar('Création impossible', error.message);
+    } catch (_) {
+      Get.snackbar(
+        'Connexion impossible',
+        'Vérifie ta connexion Internet puis réessaie.',
+      );
+    } finally {
+      isCreatingRoom.value = false;
+    }
   }
 
   void setNickname(String value) {
