@@ -20,8 +20,8 @@ class HomeScreen extends StatelessWidget {
       child: LayoutBuilder(
         builder: (context, constraints) {
           final width = constraints.maxWidth.clamp(0.0, 560.0);
-          final heroHeight = (constraints.maxHeight * 0.46)
-              .clamp(250.0, 380.0)
+          final heroHeight = (constraints.maxHeight * 0.43)
+              .clamp(300.0, 360.0)
               .toDouble();
 
           return SingleChildScrollView(
@@ -33,6 +33,11 @@ class HomeScreen extends StatelessWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: WordstormLogo(width: width * 0.58),
+                      ),
+                      const SizedBox(height: 8),
                       SizedBox(
                         height: heroHeight,
                         child: Row(
@@ -45,8 +50,6 @@ class HomeScreen extends StatelessWidget {
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    WordstormLogo(width: width * 0.42),
-                                    const SizedBox(height: 8),
                                     const Text(
                                       'Des mots,\nun seul\nchampion !',
                                       style: TextStyle(
@@ -56,7 +59,7 @@ class HomeScreen extends StatelessWidget {
                                         height: 1.15,
                                       ),
                                     ),
-                                    const SizedBox(height: 12),
+                                    const SizedBox(height: 14),
                                     Text(
                                       'Joue en solo ou entre amis.',
                                       style: TextStyle(
@@ -66,19 +69,19 @@ class HomeScreen extends StatelessWidget {
                                         fontSize: 14,
                                       ),
                                     ),
-                                    const SizedBox(height: 18),
+                                    const SizedBox(height: 22),
                                     Row(
                                       children: [
                                         Image.asset(
                                           'assets/images/home_letter_r.png',
-                                          width: 44,
-                                          height: 44,
+                                          width: 56,
+                                          height: 56,
                                         ),
-                                        const SizedBox(width: 8),
+                                        const SizedBox(width: 12),
                                         Image.asset(
                                           'assets/images/home_letter_e.png',
-                                          width: 44,
-                                          height: 44,
+                                          width: 56,
+                                          height: 56,
                                         ),
                                       ],
                                     ),
@@ -104,7 +107,7 @@ class HomeScreen extends StatelessWidget {
                           ],
                         ),
                       ),
-                      const SizedBox(height: 14),
+                      const SizedBox(height: 18),
                       SizedBox(
                         width: width,
                         child: ArcadeButton(
@@ -112,7 +115,7 @@ class HomeScreen extends StatelessWidget {
                           onPressed: controller.play,
                         ),
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 14),
                       FractionallySizedBox(
                         widthFactor: 0.66,
                         child: ArcadeButton(
@@ -122,7 +125,7 @@ class HomeScreen extends StatelessWidget {
                           onPressed: controller.openSettings,
                         ),
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 12),
                       FractionallySizedBox(
                         widthFactor: 0.5,
                         child: ArcadeButton(
