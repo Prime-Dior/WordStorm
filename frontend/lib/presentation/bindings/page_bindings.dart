@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import '../controllers/config_controller.dart';
 import '../controllers/home_controller.dart';
 import '../controllers/menu_controller.dart' as page_menu;
+import '../controllers/multiplayer_game_controller.dart';
 import '../controllers/page_controllers.dart';
 import '../controllers/settings_controller.dart';
 
@@ -32,6 +33,11 @@ class WheelBinding extends Bindings {
 class GameBinding extends Bindings {
   @override
   void dependencies() => Get.lazyPut(GameController.new);
+}
+
+class MultiplayerGameBinding extends Bindings {
+  @override
+  void dependencies() => Get.lazyPut(MultiplayerGameController.new);
 }
 
 class RoundResultsBinding extends Bindings {
