@@ -3,42 +3,13 @@ import 'package:get/get.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/arcade_button.dart';
-import '../../../core/widgets/letter_tile.dart';
 import '../../../core/widgets/screen_scaffold.dart';
 import '../../../core/widgets/wordstorm_logo.dart';
 import '../../controllers/home_controller.dart';
 
 /// Première page : titre du jeu et boutons principaux.
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
-
-  @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _motion;
-  late final Animation<double> _bob;
-
-  @override
-  void initState() {
-    super.initState();
-    _motion = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1800),
-    )..repeat(reverse: true);
-    _bob = Tween<double>(
-      begin: -5,
-      end: 5,
-    ).animate(CurvedAnimation(parent: _motion, curve: Curves.easeInOut));
-  }
-
-  @override
-  void dispose() {
-    _motion.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -62,8 +33,6 @@ class _HomeScreenState extends State<HomeScreen>
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const WordstormLogo(fontSize: 38),
-                      const SizedBox(height: 12),
                       SizedBox(
                         height: heroHeight,
                         child: Row(
@@ -76,6 +45,8 @@ class _HomeScreenState extends State<HomeScreen>
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
+                                    WordstormLogo(width: width * 0.42),
+                                    const SizedBox(height: 8),
                                     const Text(
                                       'Des mots,\nun seul\nchampion !',
                                       style: TextStyle(
@@ -96,37 +67,20 @@ class _HomeScreenState extends State<HomeScreen>
                                       ),
                                     ),
                                     const SizedBox(height: 18),
-                                    AnimatedBuilder(
-                                      animation: _bob,
-                                      child: const Row(
-                                        children: [
-                                          LetterTile(
-                                            letter: 'R',
-                                            size: 38,
-                                            rotation: -0.12,
-                                            middleColor: AppColors.coral,
-                                            bottomColor: AppColors.coralDark,
-                                            textColor: Colors.white,
-                                          ),
-                                          SizedBox(width: 10),
-                                          LetterTile(
-                                            letter: 'E',
-                                            size: 38,
-                                            rotation: 0.1,
-                                          ),
-                                        ],
-                                      ),
-                                      builder: (context, child) =>
-                                          Transform.translate(
-                                            offset: Offset(
-                                              0,
-                                              -_bob.value * 0.35,
-                                            ),
-                                            child: Transform.rotate(
-                                              angle: _bob.value / 180,
-                                              child: child,
-                                            ),
-                                          ),
+                                    Row(
+                                      children: [
+                                        Image.asset(
+                                          'assets/images/home_letter_r.png',
+                                          width: 44,
+                                          height: 44,
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Image.asset(
+                                          'assets/images/home_letter_e.png',
+                                          width: 44,
+                                          height: 44,
+                                        ),
+                                      ],
                                     ),
                                   ],
                                 ),
@@ -134,18 +88,17 @@ class _HomeScreenState extends State<HomeScreen>
                             ),
                             Expanded(
                               flex: 6,
-                              child: AnimatedBuilder(
-                                animation: _bob,
+                              child: TweenAnimationBuilder<double>(
+                                tween: Tween(begin: 0.92, end: 1),
+                                duration: const Duration(milliseconds: 650),
+                                curve: Curves.easeOutBack,
                                 child: Image.asset(
                                   'assets/images/personnage_w.png',
                                   fit: BoxFit.contain,
                                   alignment: Alignment.centerRight,
                                 ),
-                                builder: (context, child) =>
-                                    Transform.translate(
-                                      offset: Offset(0, _bob.value),
-                                      child: child,
-                                    ),
+                                builder: (context, scale, child) =>
+                                    Transform.scale(scale: scale, child: child),
                               ),
                             ),
                           ],

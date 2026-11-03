@@ -52,7 +52,7 @@ class _FinalResultsScreenState extends State<FinalResultsScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const WordstormLogoSmall(),
+            const WordstormLogo(width: 126),
             const SizedBox(height: 30),
             const Text(
               'PARTIE TERMINÉE',

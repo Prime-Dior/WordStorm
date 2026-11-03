@@ -36,7 +36,7 @@ class _JoinScreenState extends State<JoinScreen> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const WordstormLogoSmall(),
+            const WordstormLogo(width: 126),
             const SizedBox(height: 30),
             const Text(
               'REJOINDRE UN SALON',
