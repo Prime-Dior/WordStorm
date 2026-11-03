@@ -18,11 +18,10 @@ library;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
-
 import 'package:wordstorm/core/widgets/letter_tile.dart';
 import 'package:wordstorm/core/widgets/response_row.dart';
-import 'package:wordstorm/features/game/game_screen.dart';
 import 'package:wordstorm/main.dart' as app;
+import 'package:wordstorm/presentation/pages/game/game_page.dart';
 
 Future<void> waitReal(WidgetTester tester, Duration d) async {
   await tester.runAsync(() => Future<void>.delayed(d));

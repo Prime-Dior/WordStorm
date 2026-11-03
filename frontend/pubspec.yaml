@@ -13,11 +13,8 @@ dependencies:
 
   cupertino_icons: ^1.0.8
 
-  # Gestion d'état (cahier §13 : évalué, retenu)
-  flutter_riverpod: ^2.6.1
-
-  # Navigation
-  go_router: ^14.6.2
+  # Gestion d'état, dépendances et navigation GetX.
+  get: ^4.7.3
 
   # Icônes vectorielles (aucun emoji dans l'interface)
   flutter_svg: ^2.0.17
@@ -25,6 +22,9 @@ dependencies:
   # Préférences locales (paramètres, dernier pseudo) — cahier §13
   shared_preferences: ^2.3.4
   audioplayers: ^6.8.1
+
+  http: ^1.2.2
+  flutter_secure_storage: ^9.2.4
 
 dev_dependencies:
   flutter_test:

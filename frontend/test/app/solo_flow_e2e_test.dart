@@ -1,28 +1,21 @@
-// Parcours solo de bout en bout, exécution **headless** (`flutter test`).
+// Parcours solo de bout en bout, exécution headless (flutter test).
 //
-// Identique au scénario d'`integration_test/solo_e2e_test.dart` (phase 5),
-// mais via les roues du framework de test : menu → config (sans chrono,
-// 1 manche) → tirage (C'EST PARTI) → saisie → STOP → résultats →
-// score final → REJOUER.
-//
-// Motivation : sur cette machine, `flutter drive -d chrome|edge` reste
-// bloqué au service de debug DWDS (aucune fenêtre navigateur ne
-// s'ouvre) — ce test couvre le même flux sans navigateur ; le test
-// `integration_test` reste écrit pour un environnement disposant d'un
-// navigateur ou d'un appareil (voir docs/RESTE_A_FAIRE.md).
+// Menu → configuration (sans chrono, 1 manche) → tirage (C'EST PARTI) →
+// saisie → STOP → résultats → score final → REJOUER.
+
 library;
 
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:wordstorm/app/app.dart';
-import 'package:wordstorm/app/providers.dart';
 import 'package:wordstorm/core/widgets/arcade_button.dart';
 import 'package:wordstorm/core/widgets/letter_tile.dart';
 import 'package:wordstorm/core/widgets/response_row.dart';
 import 'package:wordstorm/data/dictionary/asset_dictionary_repository.dart';
-import 'package:wordstorm/features/game/game_screen.dart';
+import 'package:wordstorm/presentation/pages/game/game_page.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -30,24 +23,14 @@ void main() {
   testWidgets(
     'Parcours solo : menu, config, tirage, manche, résultats, fin, rejouer',
     (tester) async {
-      final container = ProviderContainer(
-        overrides: [
-          dictionaryProvider.overrideWithValue(AssetDictionaryRepository()),
-        ],
-      );
-      addTearDown(container.dispose);
-
-      // Précharge le dictionnaire hors zone fake async (le chargement
-      // d'asset + `compute` résolvent dans l'univers réel) ; LANCER
-      // navigue alors au premier pump, sans attendre de chargement.
-      await tester.runAsync(() => container.read(dictionaryProvider).load());
-
-      await tester.pumpWidget(
-        UncontrolledProviderScope(
-          container: container,
-          child: const WordstormApp(),
-        ),
-      );
+      tester.view.physicalSize = const Size(393, 852);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      SharedPreferences.setMockInitialValues({});
+      await tester.pumpWidget(const WordstormApp());
+      await tester.pump(const Duration(milliseconds: 500));
+      await tester.runAsync(() => Get.find<AssetDictionaryRepository>().load());
 
       // ── Accueil → Menu ─────────────────────────────────────────────
       await tester.tap(find.text('JOUER'));
@@ -60,6 +43,10 @@ void main() {
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 400));
       expect(find.text('NOUVELLE PARTIE'), findsOneWidget);
+
+      // ── Config : catégories personnalisées (les 5 obligatoires) ────
+      await tester.tap(find.text('Personnalisé'));
+      await tester.pump();
 
       // ── Config : sans chrono (dernier cran du curseur) + 1 manche ──
       final slider = tester.getRect(find.byKey(const Key('duration-slider')));

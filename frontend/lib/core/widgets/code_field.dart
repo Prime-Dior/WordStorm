@@ -12,6 +12,7 @@ class CodeField extends StatefulWidget {
     required this.controller,
     super.key,
     this.onValidated,
+    this.onChanged,
     this.errorText,
     this.trailing,
     this.autofocus = false,
@@ -25,6 +26,7 @@ class CodeField extends StatefulWidget {
 
   /// Appelé à la validation clavier (touche Entrée).
   final VoidCallback? onValidated;
+  final ValueChanged<String>? onChanged;
   final bool autofocus;
 
   static const String allowedAlphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -56,20 +58,21 @@ class _CodeFieldState extends State<CodeField> {
   }
 
   // Majuscules uniquement, alphabet sans caractères ambigus.
-  static final TextInputFormatter _formatter = TextInputFormatter.withFunction(
-    (oldValue, newValue) {
-      final cleaned = newValue.text
-          .toUpperCase()
-          .split('')
-          .where(CodeField.allowedAlphabet.contains)
-          .join();
-      if (cleaned == newValue.text) return newValue;
-      return TextEditingValue(
-        text: cleaned,
-        selection: TextSelection.collapsed(offset: cleaned.length),
-      );
-    },
-  );
+  static final TextInputFormatter _formatter = TextInputFormatter.withFunction((
+    oldValue,
+    newValue,
+  ) {
+    final cleaned = newValue.text
+        .toUpperCase()
+        .split('')
+        .where(CodeField.allowedAlphabet.contains)
+        .join();
+    if (cleaned == newValue.text) return newValue;
+    return TextEditingValue(
+      text: cleaned,
+      selection: TextSelection.collapsed(offset: cleaned.length),
+    );
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -95,7 +98,12 @@ class _CodeFieldState extends State<CodeField> {
           borderRadius: BorderRadius.circular(10),
           border: Border.all(color: borderColor, width: 2),
           boxShadow: focused
-              ? [BoxShadow(color: AppColors.teal.withAlpha(0x66), blurRadius: 10)]
+              ? [
+                  BoxShadow(
+                    color: AppColors.teal.withAlpha(0x66),
+                    blurRadius: 10,
+                  ),
+                ]
               : const [],
         ),
         child: TextField(
@@ -109,6 +117,7 @@ class _CodeFieldState extends State<CodeField> {
           textCapitalization: TextCapitalization.characters,
           textInputAction: TextInputAction.go,
           inputFormatters: [_formatter],
+          onChanged: widget.onChanged,
           onSubmitted: (_) => widget.onValidated?.call(),
           cursorColor: AppColors.navyBlue,
           style: const TextStyle(
