@@ -119,104 +119,117 @@ class _GameScreenState extends State<GameScreen> {
       showSunburst: true,
       burstTop: 0.1,
       skylineHeight: 240,
-      padding: const EdgeInsets.fromLTRB(18, 6, 18, 14),
-      child: Column(
-        children: [
-          // En-tête : anneau de chrono + manche (maquette).
-          Row(
+      padding: EdgeInsets.zero,
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(18, 6, 18, 0),
+          child: Column(
             children: [
-              _TimerRing(remaining: _remaining, total: setup.durationSeconds),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'MANCHE ${state.round} / ${setup.rounds}',
-                      style: const TextStyle(
-                        fontFamily: AppTheme.displayFont,
-                        fontSize: 22,
-                        color: AppColors.offWhite,
-                      ),
+              // En-tête : anneau de chrono + manche (maquette).
+              Row(
+                children: [
+                  _TimerRing(
+                    remaining: _remaining,
+                    total: setup.durationSeconds,
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'MANCHE ${state.round} / ${setup.rounds}',
+                          style: const TextStyle(
+                            fontFamily: AppTheme.displayFont,
+                            fontSize: 22,
+                            color: AppColors.offWhite,
+                          ),
+                        ),
+                        Text(
+                          noTimer ? 'Sans chronomètre' : 'Temps restant',
+                          style: const TextStyle(
+                            fontFamily: AppTheme.bodyFont,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.offWhite,
+                          ),
+                        ),
+                      ],
                     ),
-                    Text(
-                      noTimer ? 'Sans chronomètre' : 'Temps restant',
-                      style: const TextStyle(
-                        fontFamily: AppTheme.bodyFont,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.offWhite,
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ],
-          ),
-          const SizedBox(height: 10),
+              const SizedBox(height: 10),
 
-          // Progression « n / N réponses » avec barre.
-          Row(
-            children: [
-              Text(
-                '$_filledCount / $total réponses',
-                style: const TextStyle(
-                  fontFamily: AppTheme.monoFont,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.offWhite,
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(999),
-                  child: LinearProgressIndicator(
-                    value: total == 0 ? 0 : _filledCount / total,
-                    minHeight: 8,
-                    backgroundColor: const Color(0x66000000),
-                    valueColor: const AlwaysStoppedAnimation<Color>(
-                      AppColors.teal,
+              // Progression « n / N réponses » avec barre.
+              Row(
+                children: [
+                  Text(
+                    '$_filledCount / $total réponses',
+                    style: const TextStyle(
+                      fontFamily: AppTheme.monoFont,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.offWhite,
                     ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(999),
+                      child: LinearProgressIndicator(
+                        value: total == 0 ? 0 : _filledCount / total,
+                        minHeight: 8,
+                        backgroundColor: const Color(0x66000000),
+                        valueColor: const AlwaysStoppedAnimation<Color>(
+                          AppColors.teal,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+
+              // Grosse tuile de la lettre tirée.
+              Center(child: LetterTile(letter: state.letter, size: 100)),
+              const SizedBox(height: 8),
+
+              // Lignes de réponses.
+              Expanded(
+                child: ListView.builder(
+                  padding: EdgeInsets.zero,
+                  itemCount: rows.length,
+                  itemBuilder: (context, i) => Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: rows[i],
                   ),
                 ),
               ),
+              const SizedBox(height: 10),
+
+              // CTA : VALIDER (chrono) · STOP (sans chrono, grisé jusqu'à
+              // remplissage complet de la liste — paquet maquette).
+              SafeArea(
+                top: false,
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: !noTimer
+                      ? ArcadeButton(
+                          label: 'Valider',
+                          variant: ArcadeButtonVariant.green,
+                          onPressed: _endTurn,
+                        )
+                      : ArcadeButton(
+                          label: 'Stop',
+                          variant: ArcadeButtonVariant.red,
+                          onPressed: _allFilled ? _endTurn : null,
+                        ),
+                ),
+              ),
             ],
           ),
-          const SizedBox(height: 8),
-
-          // Grosse tuile de la lettre tirée.
-          Center(child: LetterTile(letter: state.letter, size: 100)),
-          const SizedBox(height: 8),
-
-          // Lignes de réponses.
-          Expanded(
-            child: ListView.builder(
-              padding: EdgeInsets.zero,
-              itemCount: rows.length,
-              itemBuilder: (context, i) => Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: rows[i],
-              ),
-            ),
-          ),
-          const SizedBox(height: 10),
-
-          // CTA : VALIDER (chrono) · STOP (sans chrono, grisé jusqu'à
-          // remplissage complet de la liste — paquet maquette).
-          if (!noTimer)
-            ArcadeButton(
-              label: 'Valider',
-              variant: ArcadeButtonVariant.green,
-              onPressed: _endTurn,
-            )
-          else
-            ArcadeButton(
-              label: 'Stop',
-              variant: ArcadeButtonVariant.red,
-              onPressed: _allFilled ? _endTurn : null,
-            ),
-        ],
+        ),
       ),
     );
   }

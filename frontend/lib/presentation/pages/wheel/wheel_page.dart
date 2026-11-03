@@ -120,108 +120,114 @@ class _WheelScreenState extends State<WheelScreen>
       showSunburst: true,
       burstTop: 0.42,
       skylineHeight: 260,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const Text(
-            'TIRAGE DE LA LETTRE',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontFamily: AppTheme.displayFont,
-              fontSize: 34,
-              color: AppColors.offWhite,
-            ),
-          ),
-          const SizedBox(height: 28),
+      padding: EdgeInsets.zero,
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const Text(
+                'TIRAGE DE LA LETTRE',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontFamily: AppTheme.displayFont,
+                  fontSize: 34,
+                  color: AppColors.offWhite,
+                ),
+              ),
+              const SizedBox(height: 28),
 
-          // Roue + pointeur + disque central.
-          Center(
-            child: SizedBox(
-              width: _wheelSize,
-              height: _wheelSize,
-              child: Stack(
-                clipBehavior: Clip.none,
-                alignment: Alignment.center,
-                children: [
-                  Transform.rotate(
-                    angle: _angle,
-                    child: CustomPaint(
-                      size: const Size(_wheelSize, _wheelSize),
-                      painter: _WheelPainter(letters: _letters),
-                    ),
-                  ),
-                  // Disque central avec la lettre tirée (« pop » à l'arrêt).
-                  Container(
-                    width: _wheelSize * 0.42,
-                    height: _wheelSize * 0.42,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: AppColors.navyBlue,
-                      border: Border.all(
-                        color: const Color(0xFF0B1222),
-                        width: 5,
-                      ),
-                    ),
+              // Roue + pointeur + disque central.
+              Center(
+                child: SizedBox(
+                  width: _wheelSize,
+                  height: _wheelSize,
+                  child: Stack(
+                    clipBehavior: Clip.none,
                     alignment: Alignment.center,
-                    child: AnimatedScale(
-                      scale: _done ? 1 : 0.3,
-                      duration: const Duration(milliseconds: 350),
-                      curve: Curves.easeOutBack,
-                      child: AnimatedOpacity(
-                        opacity: _done ? 1 : 0,
-                        duration: const Duration(milliseconds: 200),
-                        child: Text(
-                          letter,
-                          style: const TextStyle(
-                            fontFamily: AppTheme.displayFont,
-                            fontSize: 72,
-                            color: AppColors.yellow,
+                    children: [
+                      Transform.rotate(
+                        angle: _angle,
+                        child: CustomPaint(
+                          size: const Size(_wheelSize, _wheelSize),
+                          painter: _WheelPainter(letters: _letters),
+                        ),
+                      ),
+                      // Disque central avec la lettre tirée (« pop » à l'arrêt).
+                      Container(
+                        width: _wheelSize * 0.42,
+                        height: _wheelSize * 0.42,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: AppColors.navyBlue,
+                          border: Border.all(
+                            color: const Color(0xFF0B1222),
+                            width: 5,
+                          ),
+                        ),
+                        alignment: Alignment.center,
+                        child: AnimatedScale(
+                          scale: _done ? 1 : 0.3,
+                          duration: const Duration(milliseconds: 350),
+                          curve: Curves.easeOutBack,
+                          child: AnimatedOpacity(
+                            opacity: _done ? 1 : 0,
+                            duration: const Duration(milliseconds: 200),
+                            child: Text(
+                              letter,
+                              style: const TextStyle(
+                                fontFamily: AppTheme.displayFont,
+                                fontSize: 72,
+                                color: AppColors.yellow,
+                              ),
+                            ),
                           ),
                         ),
                       ),
-                    ),
+                      // Pointeur blanc en haut, pointe vers la roue.
+                      const Positioned(
+                        top: -18,
+                        child: CustomPaint(
+                          size: Size(32, 40),
+                          painter: _PointerPainter(),
+                        ),
+                      ),
+                    ],
                   ),
-                  // Pointeur blanc en haut, pointe vers la roue.
-                  const Positioned(
-                    top: -18,
-                    child: CustomPaint(
-                      size: Size(32, 40),
-                      painter: _PointerPainter(),
-                    ),
+                ),
+              ),
+              const SizedBox(height: 18),
+
+              Text(
+                _done
+                    ? '$roundLabel · lettre $letter'
+                    : '$roundLabel · la roue tourne…',
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontFamily: AppTheme.bodyFont,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.offWhite,
+                ),
+              ),
+              const Spacer(),
+
+              // « C'est parti » : visible seulement quand la roue est arrêtée.
+              Opacity(
+                opacity: _done ? 1 : 0,
+                child: IgnorePointer(
+                  ignoring: !_done,
+                  child: ArcadeButton(
+                    label: "C'est parti",
+                    variant: ArcadeButtonVariant.green,
+                    onPressed: () => Get.offNamed('/game'),
                   ),
-                ],
+                ),
               ),
-            ),
+            ],
           ),
-          const SizedBox(height: 18),
-
-          Text(
-            _done
-                ? '$roundLabel · lettre $letter'
-                : '$roundLabel · la roue tourne…',
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontFamily: AppTheme.bodyFont,
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-              color: AppColors.offWhite,
-            ),
-          ),
-          const Spacer(),
-
-          // « C'est parti » : visible seulement quand la roue est arrêtée.
-          Opacity(
-            opacity: _done ? 1 : 0,
-            child: IgnorePointer(
-              ignoring: !_done,
-              child: ArcadeButton(
-                label: "C'est parti",
-                variant: ArcadeButtonVariant.green,
-                onPressed: () => Get.offNamed('/game'),
-              ),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
