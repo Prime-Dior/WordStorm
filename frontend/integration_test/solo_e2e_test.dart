@@ -90,13 +90,13 @@ void main() {
       await tester.tap(find.text('STOP'));
       await waitReal(tester, const Duration(seconds: 2));
 
-      // ── Résultats de manche (dernière manche → TERMINER) ─────────
-      expect(find.text('TERMINER'), findsOneWidget);
+      // ── Résultats de manche (dernière manche → SCORE FINAL) ─────────
+      expect(find.text('SCORE FINAL'), findsOneWidget);
 
       // ── Fin de partie : score + REJOUER ──────────────────────────
-      await tester.tap(find.text('TERMINER'));
+      await tester.tap(find.text('SCORE FINAL'));
       await waitReal(tester, const Duration(seconds: 1));
-      expect(find.text('PARTIE TERMINÉE'), findsOneWidget);
+      expect(find.text('Ton score'), findsOneWidget);
 
       // ── REJOUER : même config, nouvelle roue, nouvelle manche ────
       await tester.tap(find.text('REJOUER'));

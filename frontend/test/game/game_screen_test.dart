@@ -42,7 +42,7 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 500));
 
-    expect(find.text('+15'), findsOneWidget);
+    expect(find.text('15 pt'), findsOneWidget);
     expect(find.text('VALIDER'), findsNothing);
     Get.reset();
   });

@@ -55,6 +55,8 @@ class JoinController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    // Code déjà saisi dans le menu (facultatif).
+    code.text = Get.parameters['code'] ?? '';
     _loadNickname();
   }
 

@@ -239,6 +239,7 @@ class _RoundResults extends StatelessWidget {
         final source = switch (answer.dictionarySource) {
           'local' => 'dictionnaire local',
           'wiktionary' => 'Wiktionnaire',
+          'gemini' => 'l’arbitre IA',
           _ => null,
         };
         return source == null ? ' · validé' : ' · validé par $source';

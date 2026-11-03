@@ -6,12 +6,14 @@ import '../../presentation/bindings/page_bindings.dart';
 import '../../presentation/pages/config/config_page.dart';
 import '../../presentation/pages/final_results/final_results_page.dart';
 import '../../presentation/pages/game/game_page.dart';
+import '../../presentation/pages/game/time_up_page.dart';
 import '../../presentation/pages/history/history_page.dart';
 import '../../presentation/pages/home/home_page.dart';
 import '../../presentation/pages/join/join_page.dart';
 import '../../presentation/pages/lobby/lobby_page.dart';
 import '../../presentation/pages/menu/menu_page.dart';
 import '../../presentation/pages/multiplayer_game/multiplayer_game_page.dart';
+import '../../presentation/pages/podium/podium_page.dart';
 import '../../presentation/pages/results/round_results_page.dart';
 import '../../presentation/pages/rules/rules_page.dart';
 import '../../presentation/pages/settings/settings_page.dart';
@@ -46,6 +48,7 @@ abstract final class AppPages {
       page: () => const GameScreen(),
       binding: GameBinding(),
     ),
+    GetPage(name: AppRoutes.timeUp, page: () => const TimeUpScreen()),
     GetPage(
       name: AppRoutes.multiplayerGame,
       page: () => const MultiplayerGameScreen(),
@@ -61,6 +64,7 @@ abstract final class AppPages {
       page: () => const FinalResultsScreen(),
       binding: FinalResultsBinding(),
     ),
+    GetPage(name: AppRoutes.podium, page: () => const PodiumScreen()),
     GetPage(
       name: AppRoutes.join,
       page: () => const JoinScreen(),

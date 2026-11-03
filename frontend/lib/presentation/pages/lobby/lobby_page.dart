@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -5,13 +8,23 @@ import 'package:get/get.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/arcade_button.dart';
-import '../../../core/widgets/player_card.dart';
+import '../../../core/widgets/icons/wordstorm_icons.dart';
 import '../../../core/widgets/screen_scaffold.dart';
+import '../../../core/widgets/ui_kit.dart';
 import '../../../domain/models/lobby_preview.dart';
 import '../../../domain/models/lobby_setup.dart';
+import '../../../domain/models/room_model.dart';
 import '../../controllers/page_controllers.dart';
 
-/// Aperçu local de l'écran de salon ; la création en ligne sera branchée à l'API.
+/// Écran du salon multijoueur (maquettes 23, 04 et 09).
+///
+/// - **Hôte** : code d'invitation copiable, réglages de la partie, liste
+///   des joueurs. Seul au départ (« DÉMARRER · 1 JOUEUR » grisé), le
+///   bouton s'active dès qu'un invité a rejoint.
+/// - **Invité** : même écran, le bouton affiche « EN ATTENTE DE L'HÔTE… ».
+///
+/// Le salon est actualisé par [LobbyController] (API) ; le retour quitte
+/// le salon.
 class LobbyScreen extends StatefulWidget {
   const LobbyScreen({super.key, this.preview});
 
@@ -22,14 +35,24 @@ class LobbyScreen extends StatefulWidget {
 }
 
 class _LobbyScreenState extends State<LobbyScreen> {
-  late final LobbyPreview? _preview;
-  late final LobbyController _controller;
+  /// Taille d'un salon (cahier : 2 à 8 joueurs).
+  static const int _minPlayers = 2;
+  static const int _maxPlayers = 8;
 
-  String get _code => _controller.code;
-  LobbySetup? get _setup {
-    final room = _controller.room.value;
+  /// Avatars attribués aux autres joueurs, dans l'ordre d'arrivée.
+  static const List<String> _guestAvatars = [
+    'assets/images/avatar_lina.png',
+    'assets/images/avatar_max.png',
+    'assets/images/avatar_sami.png',
+  ];
+
+  late final LobbyController _controller = Get.find<LobbyController>();
+  late final LobbyPreview? _preview = widget.preview ?? _controller.preview;
+  Timer? _copiedReset;
+  bool _copied = false;
+
+  LobbySetup? _setup(RoomModel? room) {
     if (room == null) return _preview?.setup;
-
     return LobbySetup(
       categories: room.configuration.categories,
       durationSeconds: room.configuration.durationSeconds,
@@ -39,361 +62,355 @@ class _LobbyScreenState extends State<LobbyScreen> {
     );
   }
 
+  List<_LobbyPlayer> _players(RoomModel room) {
+    var guestIndex = 0;
+    return [
+      for (final p in room.players)
+        if (p.nickname == _controller.nickname)
+          _LobbyPlayer(
+            id: p.id,
+            name: p.nickname,
+            avatar: 'assets/images/avatar_toi.png',
+            host: p.isHost,
+            me: true,
+          )
+        else
+          _LobbyPlayer(
+            id: p.id,
+            name: p.nickname,
+            avatar: _guestAvatars[guestIndex++ % _guestAvatars.length],
+            host: p.isHost,
+          ),
+    ];
+  }
+
   @override
-  void initState() {
-    super.initState();
-    _controller = Get.find<LobbyController>();
-    _preview = widget.preview ?? _controller.preview;
+  void dispose() {
+    _copiedReset?.cancel();
+    super.dispose();
   }
 
   Future<void> _copyCode() async {
-    await Clipboard.setData(ClipboardData(text: _code));
+    await Clipboard.setData(ClipboardData(text: _controller.code));
     if (!mounted) return;
-    ScaffoldMessenger.of(context)
-        .showSnackBar(const SnackBar(content: Text('Code du salon copié.')));
+    // Le bouton affiche « COPIÉ ! » pendant deux secondes.
+    setState(() => _copied = true);
+    _copiedReset?.cancel();
+    _copiedReset = Timer(const Duration(seconds: 2), () {
+      if (mounted) setState(() => _copied = false);
+    });
   }
 
   String _durationLabel(int seconds) =>
-      seconds == 0 ? 'Sans chrono' : '$seconds s / manche';
+      seconds == 0 ? 'sans chrono' : '$seconds s';
 
   @override
   Widget build(BuildContext context) {
-    final setup = _setup;
     return ScreenScaffold(
-      skylineHeight: 250,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Row(
-            children: [
-              IconButton(
-                tooltip: 'Quitter le salon',
-                onPressed: _controller.leaveRoom,
-                icon: const Icon(Icons.arrow_back, color: AppColors.offWhite),
-              ),
-              const Expanded(
-                child: Text(
-                  'SALON MULTIJOUEUR',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontFamily: AppTheme.displayFont,
-                    fontSize: 26,
-                    color: AppColors.offWhite,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 48),
-            ],
-          ),
-          const SizedBox(height: 14),
-          Obx(() => _CodePanel(code: _code, onCopy: _copyCode)),
-          const SizedBox(height: 14),
-          Row(
-            children: [
-              const Expanded(
-                child: Text(
-                  'JOUEURS',
-                  style: TextStyle(
-                    fontFamily: AppTheme.displayFont,
-                    fontSize: 21,
-                    color: AppColors.yellow,
-                  ),
-                ),
-              ),
-              Obx(
-                () => Text(
-                  _controller.room.value == null
-                      ? 'Connexion au salon…'
-                      : '${_controller.room.value!.players.length} / 8 joueurs',
-                  style: const TextStyle(
-                    fontFamily: AppTheme.bodyFont,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 12,
-                    color: AppColors.blueGray,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Obx(() {
-            final currentRoom = _controller.room.value;
-            if (currentRoom == null) {
-              return _controller.isLoading.value
-                  ? const Padding(
-                      padding: EdgeInsets.all(24),
-                      child: Center(child: CircularProgressIndicator()),
-                    )
-                  : Text(
-                      _controller.error.value ?? 'Salon indisponible.',
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(color: AppColors.coral),
-                    );
-            }
+      skylineHeight: 300,
+      child: Obx(() {
+        final room = _controller.room.value;
+        final setup = _setup(room);
+        final isHost = _controller.isHost;
+        final players = room == null ? const <_LobbyPlayer>[] : _players(room);
+        final count = players.length;
+        final starting = _controller.isStarting.value;
+        final canStart =
+            isHost &&
+            room?.status == 'waiting' &&
+            count >= _minPlayers &&
+            !starting;
+        // Toujours au moins une place libre visible ; quatre quand on est seul.
+        final emptySlots = room == null
+            ? 0
+            : min(_maxPlayers - count, max(1, 5 - count));
 
-            return Column(
-              children: [
-                for (final player in currentRoom.players) ...[
-                  PlayerCard(
-                    name: player.isHost
-                        ? '${player.nickname} · Hôte'
-                        : player.nickname,
-                    host: player.isHost,
-                    avatar: player.nickname == _controller.nickname
-                        ? 'assets/images/avatar_toi.png'
-                        : null,
+        final String buttonLabel;
+        if (starting) {
+          buttonLabel = 'Démarrage…';
+        } else if (!isHost) {
+          buttonLabel = 'En attente de l’hôte…';
+        } else if (room == null) {
+          buttonLabel = 'Chargement du salon…';
+        } else if (room.status == 'in_progress') {
+          buttonLabel = 'Partie en cours…';
+        } else {
+          buttonLabel = 'Démarrer · $count joueur${count > 1 ? 's' : ''}';
+        }
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const SizedBox(height: 6),
+            ScreenTitle('Salon', onBack: _controller.leaveRoom),
+            const SizedBox(height: 8),
+            const FieldLabel('Code d’invitation'),
+            const SizedBox(height: 8),
+            _CodePanel(
+              code: _controller.code,
+              copied: _copied,
+              onCopy: _copyCode,
+            ),
+            const SizedBox(height: 12),
+            if (setup != null) ...[
+              Row(
+                children: [
+                  Flexible(
+                    child: InfoPill(
+                      'Catégories : '
+                      '${setup.randomCategories ? 'Aléatoire' : 'Personnalisé'}',
+                    ),
                   ),
-                  const SizedBox(height: 7),
+                  const SizedBox(width: 10),
+                  const Spacer(),
+                  Text(
+                    '${setup.rounds} manche${setup.rounds > 1 ? 's' : ''} · '
+                    '${_durationLabel(setup.durationSeconds)}',
+                    style: const TextStyle(
+                      fontFamily: AppTheme.bodyFont,
+                      fontSize: 11,
+                      color: AppColors.blueGray,
+                    ),
+                  ),
                 ],
-                if (currentRoom.players.length < 8)
-                  _EmptyPlacesPreview(count: 8 - currentRoom.players.length),
-              ],
-            );
-          }),
-          const SizedBox(height: 12),
-          Expanded(
-            child: SingleChildScrollView(
-              child: setup == null
-                  ? const _JoinPreviewNotice()
-                  : _SetupSummary(
-                      setup: setup,
-                      durationLabel: _durationLabel(setup.durationSeconds),
+              ),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 6,
+                runSpacing: 6,
+                children: [for (final c in setup.categories) CategoryChip(c)],
+              ),
+              const SizedBox(height: 14),
+            ],
+            FieldLabel(
+              room == null
+                  ? 'Joueurs · connexion au salon…'
+                  : 'Joueurs $count/$_maxPlayers · '
+                        '$_minPlayers à $_maxPlayers',
+            ),
+            const SizedBox(height: 8),
+            Expanded(
+              child: room == null
+                  ? Center(
+                      child: _controller.isLoading.value
+                          ? const CircularProgressIndicator()
+                          : Text(
+                              _controller.error.value ?? 'Salon indisponible.',
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                fontFamily: AppTheme.bodyFont,
+                                color: AppColors.coral,
+                              ),
+                            ),
+                    )
+                  : ListView(
+                      padding: EdgeInsets.zero,
+                      children: [
+                        for (final p in players)
+                          Padding(
+                            key: ValueKey(p.id),
+                            padding: const EdgeInsets.only(bottom: 8),
+                            child: _PlayerRow(player: p),
+                          ),
+                        for (var i = 0; i < emptySlots; i++)
+                          const Padding(
+                            padding: EdgeInsets.only(bottom: 8),
+                            child: _EmptySlotRow(),
+                          ),
+                      ],
                     ),
             ),
-          ),
-          const SizedBox(height: 8),
-          Obx(() {
-            final currentRoom = _controller.room.value;
-            final canStart =
-                _controller.isHost &&
-                currentRoom?.status == 'waiting' &&
-                (currentRoom?.players.length ?? 0) >= 2 &&
-                !_controller.isStarting.value;
-
-            final label = _controller.isStarting.value
-                ? 'Démarrage…'
-                : !_controller.isHost
-                ? 'En attente de l’hôte'
-                : currentRoom == null
-                ? 'Chargement du salon…'
-                : currentRoom.players.length < 2
-                ? 'En attente d’un joueur'
-                : currentRoom.status == 'in_progress'
-                ? 'Partie en cours…'
-                : 'Démarrer la partie';
-
-            return ArcadeButton(
-              label: label,
-              variant: ArcadeButtonVariant.teal,
-              onPressed: canStart ? _controller.startGame : null,
-            );
-          }),
-          Obx(() {
-            final message = _controller.error.value;
-            if (message == null) return const SizedBox.shrink();
-
-            return Padding(
-              padding: const EdgeInsets.only(top: 8),
-              child: Text(
-                message,
+            if (isHost && room != null && count < _minPlayers) ...[
+              const SizedBox(height: 6),
+              const Text(
+                'En attente des invités…',
                 textAlign: TextAlign.center,
-                style: const TextStyle(color: AppColors.coral),
+                style: TextStyle(
+                  fontFamily: AppTheme.bodyFont,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.offWhite,
+                ),
               ),
-            );
-          }),
-          const SizedBox(height: 8),
-          ArcadeButton(
-            label: 'Quitter le salon',
-            variant: ArcadeButtonVariant.dark,
-            small: true,
-            onPressed: _controller.leaveRoom,
+              const SizedBox(height: 4),
+              const Text(
+                '$_minPlayers joueurs minimum pour démarrer',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontFamily: AppTheme.bodyFont,
+                  fontSize: 11,
+                  color: AppColors.blueGray,
+                ),
+              ),
+            ],
+            // Erreur d'actualisation alors que le salon est déjà affiché.
+            if (room != null && _controller.error.value != null) ...[
+              const SizedBox(height: 6),
+              Text(
+                _controller.error.value!,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontFamily: AppTheme.bodyFont,
+                  fontSize: 12,
+                  color: AppColors.coral,
+                ),
+              ),
+            ],
+            const SizedBox(height: 10),
+            ArcadeButton(
+              label: buttonLabel,
+              fontSize: 25,
+              onPressed: canStart ? _controller.startGame : null,
+            ),
+          ],
+        );
+      }),
+    );
+  }
+}
+
+/// Joueur tel qu'affiché dans le salon.
+class _LobbyPlayer {
+  const _LobbyPlayer({
+    required this.id,
+    required this.name,
+    required this.avatar,
+    this.host = false,
+    this.me = false,
+  });
+
+  final int id;
+  final String name;
+  final String avatar;
+  final bool host;
+
+  /// `true` : c'est l'utilisateur de cet appareil (« Toi »).
+  final bool me;
+}
+
+/// Panneau du code d'invitation + bouton « COPIER ».
+class _CodePanel extends StatelessWidget {
+  const _CodePanel({
+    required this.code,
+    required this.copied,
+    required this.onCopy,
+  });
+
+  final String code;
+  final bool copied;
+  final VoidCallback onCopy;
+
+  @override
+  Widget build(BuildContext context) => DarkPanel(
+    padding: const EdgeInsets.fromLTRB(16, 12, 12, 12),
+    child: Row(
+      children: [
+        Expanded(
+          child: SelectableText(
+            code,
+            maxLines: 1,
+            style: const TextStyle(
+              fontFamily: AppTheme.monoFont,
+              fontSize: 26,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 1.5,
+              color: AppColors.yellow,
+            ),
           ),
-        ],
+        ),
+        Tooltip(
+          message: 'Copier le code',
+          child: ArcadeButton(
+            label: copied ? 'Copié !' : 'Copier',
+            variant: copied
+                ? ArcadeButtonVariant.green
+                : ArcadeButtonVariant.dark,
+            small: true,
+            minHeight: 40,
+            onPressed: onCopy,
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+/// Ligne d'un joueur : avatar cerclé, pseudo, couronne pour l'hôte.
+/// Apparaît en fondu glissé quand le joueur arrive.
+class _PlayerRow extends StatelessWidget {
+  const _PlayerRow({required this.player});
+
+  final _LobbyPlayer player;
+
+  @override
+  Widget build(BuildContext context) {
+    final name =
+        '${player.me ? 'Toi' : player.name}'
+        '${player.host ? ' (Hôte)' : ''}';
+    return TweenAnimationBuilder<double>(
+      tween: Tween<double>(begin: 0.0, end: 1.0),
+      duration: const Duration(milliseconds: 380),
+      curve: Curves.easeOutCubic,
+      builder: (context, t, child) => Opacity(
+        opacity: t,
+        child: Transform.translate(
+          offset: Offset(0, 12 * (1 - t)),
+          child: child,
+        ),
+      ),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(
+          color: kGlassRowColor,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            PlayerAvatar(asset: player.avatar),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                name,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontFamily: AppTheme.bodyFont,
+                  fontWeight: FontWeight.w500,
+                  fontSize: 15,
+                  color: AppColors.offWhite,
+                ),
+              ),
+            ),
+            if (player.host)
+              WordstormIcons.crown(size: 20, color: AppColors.yellow),
+          ],
+        ),
       ),
     );
   }
 }
 
-class _JoinPreviewNotice extends StatelessWidget {
-  const _JoinPreviewNotice();
+/// Place libre en pointillés.
+class _EmptySlotRow extends StatelessWidget {
+  const _EmptySlotRow();
 
   @override
-  Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.all(12),
-    decoration: BoxDecoration(
-      color: const Color(0x14FFFFFF),
-      borderRadius: BorderRadius.circular(14),
-    ),
-    child: const Text(
-      'Aperçu local uniquement. Les détails du salon seront chargés après la connexion au serveur.',
-      textAlign: TextAlign.center,
-      style: TextStyle(
-        fontFamily: AppTheme.bodyFont,
-        fontSize: 12,
-        color: AppColors.blueGray,
-      ),
-    ),
-  );
-}
-
-class _CodePanel extends StatelessWidget {
-  const _CodePanel({required this.code, required this.onCopy});
-
-  final String code;
-  final VoidCallback onCopy;
-
-  @override
-  Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-    decoration: BoxDecoration(
-      color: const Color(0xCC000000),
-      borderRadius: BorderRadius.circular(16),
-      border: Border.all(color: const Color(0x33FFFFFF)),
-    ),
+  Widget build(BuildContext context) => DashedBox(
+    color: const Color(0x40FFFFFF),
+    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 15),
     child: Row(
       children: [
-        const Expanded(
-          child: Text(
-            'CODE DU SALON',
-            style: TextStyle(
-              fontFamily: AppTheme.bodyFont,
-              fontSize: 11,
-              fontWeight: FontWeight.w700,
-              color: AppColors.blueGray,
-            ),
-          ),
-        ),
-        Text(
-          code,
-          style: const TextStyle(
-            fontFamily: AppTheme.monoFont,
-            fontSize: 23,
-            fontWeight: FontWeight.w700,
-            letterSpacing: 3,
-            color: AppColors.yellow,
-          ),
-        ),
-        const SizedBox(width: 8),
-        IconButton(
-          tooltip: 'Copier le code local',
-          onPressed: onCopy,
-          icon: const Icon(Icons.copy, color: AppColors.offWhite, size: 20),
-        ),
-      ],
-    ),
-  );
-}
-
-/// Indique combien de places restent dans le salon.
-class _EmptyPlacesPreview extends StatelessWidget {
-  const _EmptyPlacesPreview({required this.count});
-
-  final int count;
-
-  @override
-  Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-    decoration: BoxDecoration(
-      color: const Color(0x12FFFFFF),
-      borderRadius: BorderRadius.circular(14),
-      border: Border.all(color: const Color(0x22FFFFFF)),
-    ),
-    child: Row(
-      children: [
-        const Icon(Icons.group_outlined, color: AppColors.blueGray, size: 20),
-        const SizedBox(width: 8),
-        Expanded(
-          child: Text(
-            '$count place${count == 1 ? '' : 's'} libre${count == 1 ? '' : 's'}',
-            style: const TextStyle(
-              fontFamily: AppTheme.bodyFont,
-              fontSize: 11,
-              color: AppColors.blueGray,
-            ),
-          ),
-        ),
-      ],
-    ),
-  );
-}
-
-class _SetupSummary extends StatelessWidget {
-  const _SetupSummary({required this.setup, required this.durationLabel});
-
-  final LobbySetup setup;
-  final String durationLabel;
-
-  @override
-  Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.all(12),
-    decoration: BoxDecoration(
-      color: const Color(0x14FFFFFF),
-      borderRadius: BorderRadius.circular(14),
-    ),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
+        WordstormIcons.users(size: 18, color: const Color(0x66FFFFFF)),
+        const SizedBox(width: 16),
         const Text(
-          'PARAMÈTRES DE LA PARTIE',
+          'Place libre',
           style: TextStyle(
-            fontFamily: AppTheme.displayFont,
-            fontSize: 18,
-            color: AppColors.teal,
-          ),
-        ),
-        const SizedBox(height: 6),
-        Text(
-          '${setup.rounds} manche${setup.rounds == 1 ? '' : 's'} · $durationLabel',
-          style: const TextStyle(
             fontFamily: AppTheme.bodyFont,
-            fontSize: 12,
-            fontWeight: FontWeight.w600,
-            color: AppColors.offWhite,
+            fontSize: 13,
+            color: Color(0x80FFFFFF),
           ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          'Catégories ${setup.randomCategories ? 'aléatoires (figées)' : 'personnalisées'} · '
-          'lettres difficiles ${setup.allowHardLetters ? 'activées' : 'désactivées'}',
-          style: const TextStyle(
-            fontFamily: AppTheme.bodyFont,
-            fontSize: 11,
-            color: AppColors.blueGray,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Wrap(
-          spacing: 6,
-          runSpacing: 6,
-          children: setup.categories
-              .map((category) => _CategoryChip(category))
-              .toList(growable: false),
         ),
       ],
-    ),
-  );
-}
-
-class _CategoryChip extends StatelessWidget {
-  const _CategoryChip(this.label);
-
-  final String label;
-
-  @override
-  Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-    decoration: BoxDecoration(
-      color: AppColors.navyBlue,
-      borderRadius: BorderRadius.circular(20),
-      border: Border.all(color: AppColors.teal.withAlpha(0x88)),
-    ),
-    child: Text(
-      label,
-      style: const TextStyle(
-        fontFamily: AppTheme.bodyFont,
-        fontSize: 10,
-        color: AppColors.offWhite,
-      ),
     ),
   );
 }

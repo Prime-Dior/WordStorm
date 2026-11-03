@@ -5,9 +5,11 @@ abstract final class AppRoutes {
   static const config = '/config';
   static const wheel = '/wheel';
   static const game = '/game';
+  static const timeUp = '/time-up';
   static const multiplayerGame = '/multiplayer-game';
   static const results = '/results';
   static const finalResults = '/final';
+  static const podium = '/podium';
   static const join = '/join';
   static const lobby = '/lobby';
   static const settings = '/settings';

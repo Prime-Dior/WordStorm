@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-
 import 'package:get/get.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/arcade_button.dart';
 import '../../../core/widgets/screen_scaffold.dart';
+import '../../../core/widgets/ui_kit.dart';
 import '../../../data/history/history_repository.dart';
 import '../../controllers/page_controllers.dart';
 
@@ -68,15 +68,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Text(
-              'TON HISTORIQUE',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontFamily: AppTheme.displayFont,
-                fontSize: 30,
-                color: AppColors.yellow,
-              ),
-            ),
+            const SizedBox(height: 6),
+            ScreenTitle('Classement', onBack: () => Get.back<void>()),
             const SizedBox(height: 14),
             Expanded(
               child: _controller.isLoading.value
@@ -91,7 +84,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 ArcadeButton(
                   label: 'Menu',
                   small: true,
-                  onPressed: () => Get.toNamed('/menu'),
+                  onPressed: () => Get.toNamed<void>('/menu'),
                 ),
                 // Caché tant que l'historique est vide (ou vient d'être
                 // effacé) : pas d'action destructrice disponible à vide.
@@ -141,7 +134,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
         ArcadeButton(
           label: 'JOUER',
           small: true,
-          onPressed: () => Get.toNamed('/menu'),
+          onPressed: () => Get.toNamed<void>('/menu'),
         ),
       ],
     ),

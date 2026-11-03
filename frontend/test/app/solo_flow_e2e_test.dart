@@ -111,15 +111,16 @@ void main() {
       await tester.pump();
       await tester.pump();
 
-      // Résultats de manche
-      expect(find.text('TERMINER'), findsOneWidget);
+      // Résultats de manche (dernière manche → SCORE FINAL)
+      await tester.pump(const Duration(milliseconds: 400));
+      expect(find.text('SCORE FINAL'), findsOneWidget);
 
-      await tester.tap(find.text('TERMINER'));
+      await tester.tap(find.text('SCORE FINAL'));
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 400));
 
-      // Fin de partie
-      expect(find.text('PARTIE TERMINÉE'), findsOneWidget);
+      // Score final
+      expect(find.text('Ton score'), findsOneWidget);
 
       // REJOUER → nouvelle roue → nouvelle manche
       await tester.tap(find.text('REJOUER'));
