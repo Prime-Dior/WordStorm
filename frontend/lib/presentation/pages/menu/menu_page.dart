@@ -42,7 +42,7 @@ class MenuScreen extends StatelessWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const WordstormLogo(fontSize: 28),
+                          const WordstormLogo(width: 126),
                           IconButton(
                             tooltip: 'Paramètres',
                             onPressed: controller.openSettings,
