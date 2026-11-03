@@ -65,7 +65,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
                 onPressed: () => Get.back(),
                 icon: const Icon(Icons.arrow_back, color: AppColors.offWhite),
               ),
-              Expanded(
+              const Expanded(
                 child: Text(
                   'SALON MULTIJOUEUR',
                   textAlign: TextAlign.center,
@@ -84,7 +84,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
           const SizedBox(height: 14),
           const Row(
             children: [
-              const Expanded(
+              Expanded(
                 child: Text(
                   'JOUEURS',
                   style: TextStyle(
