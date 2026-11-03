@@ -51,6 +51,7 @@ class RoundAnswerModel {
     required this.category,
     this.value,
     this.validationStatus,
+    this.dictionarySource,
     this.points,
     this.scoreReason,
   });
@@ -60,6 +61,7 @@ class RoundAnswerModel {
   final String category;
   final String? value;
   final String? validationStatus;
+  final String? dictionarySource;
   final int? points;
   final String? scoreReason;
 
@@ -70,6 +72,7 @@ class RoundAnswerModel {
       category: json['category']?.toString() ?? '',
       value: json['value']?.toString(),
       validationStatus: json['validation_status']?.toString(),
+      dictionarySource: json['dictionary_source']?.toString(),
       points: _readNullableInt(json['points']),
       scoreReason: json['score_reason']?.toString(),
     );

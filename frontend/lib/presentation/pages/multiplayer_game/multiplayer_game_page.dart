@@ -207,7 +207,8 @@ class _RoundResults extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.only(top: 4),
                       child: Text(
-                        '${answer.nickname ?? 'Joueur'} : ${answer.value ?? '—'} · ${answer.points ?? 0} pts',
+                        '${answer.nickname ?? 'Joueur'} : ${answer.value ?? '—'} · '
+                        '${answer.points ?? 0} pts${_validationLabel(answer)}',
                         style: const TextStyle(
                           fontFamily: AppTheme.bodyFont,
                           color: AppColors.offWhite,
@@ -221,5 +222,30 @@ class _RoundResults extends StatelessWidget {
           ),
       ],
     );
+  }
+
+  String _validationLabel(RoundAnswerModel answer) {
+    switch (answer.validationStatus) {
+      case 'unverified':
+        final reason = switch (answer.scoreReason) {
+          'dictionary_unavailable' => 'dictionnaire indisponible',
+          'no_french_definition' => 'pas de définition française',
+          _ => 'à vérifier',
+        };
+        return ' · non vérifié ($reason)';
+      case 'invalid':
+        return ' · refusé';
+      case 'valid':
+        final source = switch (answer.dictionarySource) {
+          'local' => 'dictionnaire local',
+          'wiktionary' => 'Wiktionnaire',
+          _ => null,
+        };
+        return source == null ? ' · validé' : ' · validé par $source';
+      case 'blank':
+        return ' · vide';
+      default:
+        return '';
+    }
   }
 }
