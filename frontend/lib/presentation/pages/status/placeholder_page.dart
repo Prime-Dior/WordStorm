@@ -4,9 +4,6 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/screen_scaffold.dart';
 
-/// Écran de démonstration du routage, phase 1 : chaque écran réel est
-/// implémenté à la phase 4 (voir `docs/PLAN.md`).
-///
 /// Le contenu est volontairement minimal et clairement marqué : les
 /// visuels exacts sont dans la maquette, la phase 4 les reproduit.
 class PlaceholderScreen extends StatelessWidget {
