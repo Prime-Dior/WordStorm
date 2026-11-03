@@ -10,38 +10,33 @@ import '../../../core/utils/salon_code.dart';
 import '../../../core/widgets/arcade_button.dart';
 import '../../../core/widgets/player_card.dart';
 import '../../../core/widgets/screen_scaffold.dart';
+import '../../../domain/models/lobby_preview.dart';
 import '../../../domain/models/lobby_setup.dart';
 import '../../controllers/page_controllers.dart';
 
-/// Prévisualisation de l'écran de salon prévu par la maquette.
-/// Le code et le joueur hôte sont locaux ; aucun salon en ligne n'est créé.
+/// Aperçu local de l'écran de salon ; la création en ligne sera branchée à l'API.
 class LobbyScreen extends StatefulWidget {
-  const LobbyScreen({super.key, this.setup});
+  const LobbyScreen({super.key, this.preview});
 
-  final LobbySetup? setup;
+  final LobbyPreview? preview;
 
   @override
   State<LobbyScreen> createState() => _LobbyScreenState();
 }
 
 class _LobbyScreenState extends State<LobbyScreen> {
+  late final LobbyPreview? _preview;
   late final String _code;
 
-  LobbySetup? get _setup =>
-      widget.setup ??
-      Get.find<LobbyController>().setup ??
-      const LobbySetup(
-        categories: ['Prénom', 'Ville', 'Pays', 'Animal', 'Objet'],
-        durationSeconds: 60,
-        rounds: 3,
-        allowHardLetters: false,
-        randomCategories: false,
-      );
+  LobbySetup? get _setup => _preview?.setup;
+  String get _nickname => _preview?.nickname ?? 'Toi';
+  bool get _isHost => _preview?.isHost ?? true;
 
   @override
   void initState() {
     super.initState();
-    _code = SalonCode.generate(Random.secure());
+    _preview = widget.preview ?? Get.find<LobbyController>().preview;
+    _code = _preview?.code ?? SalonCode.generate(Random.secure());
   }
 
   Future<void> _copyCode() async {
@@ -57,7 +52,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final setup = _setup!;
+    final setup = _setup;
     return ScreenScaffold(
       skylineHeight: 250,
       child: Column(
@@ -70,7 +65,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
                 onPressed: () => Get.back(),
                 icon: const Icon(Icons.arrow_back, color: AppColors.offWhite),
               ),
-              const Expanded(
+              Expanded(
                 child: Text(
                   'SALON MULTIJOUEUR',
                   textAlign: TextAlign.center,
@@ -89,7 +84,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
           const SizedBox(height: 14),
           const Row(
             children: [
-              Expanded(
+              const Expanded(
                 child: Text(
                   'JOUEURS',
                   style: TextStyle(
@@ -100,7 +95,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
                 ),
               ),
               Text(
-                '1 / 8 joueurs',
+                '1 / 8 · aperçu local',
                 style: TextStyle(
                   fontFamily: AppTheme.bodyFont,
                   fontWeight: FontWeight.w700,
@@ -111,25 +106,27 @@ class _LobbyScreenState extends State<LobbyScreen> {
             ],
           ),
           const SizedBox(height: 8),
-          const PlayerCard(
-            name: 'Toi · Hôte',
-            host: true,
-            avatar: 'assets/images/avatar_toi.png',
+          PlayerCard(
+            name: _isHost ? '$_nickname · Hôte' : _nickname,
+            host: _isHost,
+            avatar: _isHost ? 'assets/images/avatar_toi.png' : null,
           ),
           const SizedBox(height: 7),
           const _EmptyPlacesPreview(),
           const SizedBox(height: 12),
           Expanded(
             child: SingleChildScrollView(
-              child: _SetupSummary(
-                setup: setup,
-                durationLabel: _durationLabel(setup.durationSeconds),
-              ),
+              child: setup == null
+                  ? const _JoinPreviewNotice()
+                  : _SetupSummary(
+                      setup: setup,
+                      durationLabel: _durationLabel(setup.durationSeconds),
+                    ),
             ),
           ),
           const SizedBox(height: 8),
           const ArcadeButton(
-            label: 'Démarrer · 1 joueur',
+            label: 'Démarrage indisponible hors ligne',
             variant: ArcadeButtonVariant.teal,
           ),
           const SizedBox(height: 8),
@@ -143,6 +140,28 @@ class _LobbyScreenState extends State<LobbyScreen> {
       ),
     );
   }
+}
+
+class _JoinPreviewNotice extends StatelessWidget {
+  const _JoinPreviewNotice();
+
+  @override
+  Widget build(BuildContext context) => Container(
+    padding: const EdgeInsets.all(12),
+    decoration: BoxDecoration(
+      color: const Color(0x14FFFFFF),
+      borderRadius: BorderRadius.circular(14),
+    ),
+    child: const Text(
+      'Aperçu local uniquement. Les détails du salon seront chargés après la connexion au serveur.',
+      textAlign: TextAlign.center,
+      style: TextStyle(
+        fontFamily: AppTheme.bodyFont,
+        fontSize: 12,
+        color: AppColors.blueGray,
+      ),
+    ),
+  );
 }
 
 class _CodePanel extends StatelessWidget {

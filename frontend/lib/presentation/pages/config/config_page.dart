@@ -39,8 +39,12 @@ class _ConfigScreenState extends State<ConfigScreen> {
 
   bool get _isSolo => _config.isSolo;
 
-  bool get _canStart =>
+  bool get _hasValidCategories =>
       _randomMode || Categories.isValidSelection(_selected.toList());
+
+  bool get _canStart =>
+      _hasValidCategories &&
+      (_isSolo || _config.nickname.value.trim().isNotEmpty);
 
   void _toggle(String name) {
     _config.toggle(name);
@@ -50,8 +54,8 @@ class _ConfigScreenState extends State<ConfigScreen> {
     await _config.launchSolo();
   }
 
-  void _previewLobby() {
-    _config.previewLobby();
+  Future<void> _previewLobby() async {
+    await _config.previewLobby();
   }
 
   @override
@@ -72,6 +76,33 @@ class _ConfigScreenState extends State<ConfigScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
+                    if (!_isSolo) ...[
+                      _sectionLabel('TON PSEUDO'),
+                      TextField(
+                        controller: _config.nicknameController,
+                        maxLength: 12,
+                        textCapitalization: TextCapitalization.words,
+                        onChanged: _config.setNickname,
+                        decoration: InputDecoration(
+                          counterText: '',
+                          filled: true,
+                          fillColor: AppColors.offWhite,
+                          hintText: 'Champion',
+                          errorText: _config.nicknameError.value,
+                          helperText: 'Obligatoire pour créer un salon.',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide.none,
+                          ),
+                        ),
+                        style: const TextStyle(
+                          fontFamily: AppTheme.bodyFont,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.navyBlue,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                    ],
                     _sectionLabel('OBLIGATOIRES'),
                     ...Categories.mandatory.map(
                       (name) => CheckRow(
@@ -159,7 +190,7 @@ class _ConfigScreenState extends State<ConfigScreen> {
                 ),
               ),
             ),
-            if (!_canStart)
+            if (!_hasValidCategories)
               const Padding(
                 padding: EdgeInsets.only(bottom: 6),
                 child: Text(

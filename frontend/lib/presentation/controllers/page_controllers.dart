@@ -3,7 +3,8 @@ import 'package:get/get.dart';
 
 import '../../core/utils/salon_code.dart';
 import '../../data/history/history_repository.dart';
-import '../../domain/models/lobby_setup.dart';
+import '../../data/settings/settings_repository.dart';
+import '../../domain/models/lobby_preview.dart';
 import 'solo_session_controller.dart';
 
 class WheelController extends GetxController {
@@ -39,16 +40,49 @@ class FinalResultsController extends GetxController {
 class JoinController extends GetxController {
   final code = TextEditingController();
   final nickname = TextEditingController();
-  final error = RxnString();
+  final codeError = RxnString();
+  final nicknameError = RxnString();
 
-  void submit() {
-    final normalized = code.text.trim().toUpperCase();
+  @override
+  void onInit() {
+    super.onInit();
+    _loadNickname();
+  }
+
+  Future<void> submit() async {
+    final normalized = SalonCode.normalized(code.text);
     if (!SalonCode.isWellFormed(normalized)) {
-      error.value = 'Code : 6 lettres/chiffres (sans 0, O, 1, I).';
+      codeError.value = 'Code : 6 lettres/chiffres (sans 0, O, 1, I).';
       return;
     }
-    error.value = null;
-    Get.toNamed<void>('/lobby', parameters: {'code': normalized});
+    codeError.value = null;
+
+    final playerName = nickname.text.trim();
+    if (playerName.isEmpty || playerName.length > 12) {
+      nicknameError.value = 'Saisis un pseudo de 1 à 12 caractères.';
+      return;
+    }
+
+    codeError.value = null;
+    nicknameError.value = null;
+    await Get.find<SettingsRepository>().setNickname(playerName);
+    Get.toNamed<void>(
+      '/lobby',
+      arguments: LobbyPreview(
+        code: normalized,
+        nickname: playerName,
+        isHost: false,
+      ),
+    );
+  }
+
+  Future<void> _loadNickname() async {
+    final saved = await Get.find<SettingsRepository>().nickname();
+    if (nickname.text.isEmpty) nickname.text = saved;
+  }
+
+  void onCodeChanged(String value) {
+    codeError.value = null;
   }
 
   @override
@@ -60,7 +94,7 @@ class JoinController extends GetxController {
 }
 
 class LobbyController extends GetxController {
-  late final LobbySetup? setup = Get.arguments as LobbySetup?;
+  late final LobbyPreview? preview = Get.arguments as LobbyPreview?;
 }
 
 class RulesController extends GetxController {

@@ -9,10 +9,9 @@ import '../../../core/widgets/screen_scaffold.dart';
 import '../../../core/widgets/wordstorm_logo.dart';
 import '../../controllers/page_controllers.dart';
 
-/// Écran « Rejoindre un salon » (Figma, ajout prévu) : code 6 signes
-/// sans ambigus + pseudo. Validation de la **forme** locale ici ; la
-/// recherche réelle du salon (et l'écran « Salon introuvable ») passe
-/// par le scrutin Firestore à la phase 7 — rien n'est simulé.
+/// Écran « Rejoindre un salon » : code de six signes et pseudo.
+/// Le contrôle local est prêt ; la recherche du salon viendra avec le
+/// raccordement de l'API Laravel.
 class JoinScreen extends StatefulWidget {
   const JoinScreen({super.key});
 
@@ -23,9 +22,9 @@ class JoinScreen extends StatefulWidget {
 class _JoinScreenState extends State<JoinScreen> {
   late final JoinController _controller = Get.find<JoinController>();
 
-  void _submit() {
-    _controller.submit();
-    setState(() {});
+  Future<void> _submit() async {
+    await _controller.submit();
+    if (mounted) setState(() {});
   }
 
   @override
@@ -52,7 +51,8 @@ class _JoinScreenState extends State<JoinScreen> {
             const _Label('CODE DU SALON'),
             CodeField(
               controller: _controller.code,
-              errorText: _controller.error.value,
+              errorText: _controller.codeError.value,
+              onChanged: _controller.onCodeChanged,
               onValidated: _submit,
               trailing: Padding(
                 padding: const EdgeInsets.only(left: 8),
@@ -75,6 +75,7 @@ class _JoinScreenState extends State<JoinScreen> {
                 filled: true,
                 fillColor: AppColors.offWhite,
                 hintText: 'Champion',
+                errorText: _controller.nicknameError.value,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide.none,
@@ -85,6 +86,11 @@ class _JoinScreenState extends State<JoinScreen> {
                 fontWeight: FontWeight.w600,
                 color: AppColors.navyBlue,
               ),
+              onChanged: (value) {
+                if (value.trim().isNotEmpty && value.trim().length <= 12) {
+                  _controller.nicknameError.value = null;
+                }
+              },
             ),
             const SizedBox(height: 22),
             ArcadeButton(

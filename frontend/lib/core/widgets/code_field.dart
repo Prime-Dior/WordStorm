@@ -13,6 +13,7 @@ class CodeField extends StatelessWidget {
     super.key,
     this.readOnly = false,
     this.onValidated,
+    this.onChanged,
     this.errorText,
     this.trailing,
   });
@@ -24,6 +25,7 @@ class CodeField extends StatelessWidget {
 
   /// Handler du bouton « OK » (champ de saisie uniquement).
   final VoidCallback? onValidated;
+  final ValueChanged<String>? onChanged;
 
   static const String allowedAlphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 
@@ -75,6 +77,7 @@ class CodeField extends StatelessWidget {
                   text: c,
                   selection: TextSelection.collapsed(offset: cursor),
                 );
+                onChanged?.call(c);
               },
               onSubmitted: (_) => onValidated?.call(),
               style: const TextStyle(

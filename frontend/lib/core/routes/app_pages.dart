@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../domain/models/lobby_setup.dart';
+import '../../domain/models/lobby_preview.dart';
 import '../../presentation/bindings/page_bindings.dart';
 import '../../presentation/pages/config/config_page.dart';
 import '../../presentation/pages/final_results/final_results_page.dart';
@@ -62,7 +62,7 @@ abstract final class AppPages {
     ),
     GetPage(
       name: AppRoutes.lobby,
-      page: () => LobbyScreen(setup: Get.arguments as LobbySetup?),
+      page: () => LobbyScreen(preview: Get.arguments as LobbyPreview?),
       binding: LobbyBinding(),
     ),
     GetPage(
