@@ -105,28 +105,32 @@ class HomeScreen extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 14),
-                      ArcadeButton(label: 'Jouer', onPressed: controller.play),
+                      SizedBox(
+                        width: width,
+                        child: ArcadeButton(
+                          label: 'Jouer',
+                          onPressed: controller.play,
+                        ),
+                      ),
                       const SizedBox(height: 10),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: ArcadeButton(
-                              label: 'Paramètres',
-                              small: true,
-                              variant: ArcadeButtonVariant.dark,
-                              onPressed: controller.openSettings,
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: ArcadeButton(
-                              label: 'Quitter',
-                              small: true,
-                              variant: ArcadeButtonVariant.dark,
-                              onPressed: controller.quit,
-                            ),
-                          ),
-                        ],
+                      FractionallySizedBox(
+                        widthFactor: 0.66,
+                        child: ArcadeButton(
+                          label: 'Paramètres',
+                          small: true,
+                          variant: ArcadeButtonVariant.dark,
+                          onPressed: controller.openSettings,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      FractionallySizedBox(
+                        widthFactor: 0.5,
+                        child: ArcadeButton(
+                          label: 'Quitter',
+                          small: true,
+                          variant: ArcadeButtonVariant.dark,
+                          onPressed: controller.quit,
+                        ),
                       ),
                     ],
                   ),
