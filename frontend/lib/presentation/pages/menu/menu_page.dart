@@ -28,16 +28,47 @@ class MenuScreen extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    const WordstormLogo(fontSize: 32),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Choisis comment jouer',
-                      textAlign: TextAlign.center,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const WordstormLogo(fontSize: 28),
+                        IconButton(
+                          tooltip: 'Paramètres',
+                          onPressed: controller.openSettings,
+                          style: IconButton.styleFrom(
+                            backgroundColor: AppColors.navyBlue,
+                            foregroundColor: AppColors.yellow,
+                          ),
+                          icon: const Icon(Icons.settings_outlined),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    const Row(
+                      children: [
+                        CircleAvatar(
+                          radius: 17,
+                          backgroundImage: AssetImage(
+                            'assets/images/avatar_toi.png',
+                          ),
+                        ),
+                        SizedBox(width: 10),
+                        Text(
+                          'Salut, champion !',
+                          style: TextStyle(fontWeight: FontWeight.w600),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 22),
+                    const Text(
+                      'Choisis ton mode de jeu',
                       style: TextStyle(
-                        color: AppColors.offWhite.withValues(alpha: 0.75),
+                        color: AppColors.offWhite,
+                        fontSize: 21,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const SizedBox(height: 30),
+                    const SizedBox(height: 14),
                     ArcadeButton(label: 'Solo', onPressed: controller.openSolo),
                     const SizedBox(height: 12),
                     ArcadeButton(
