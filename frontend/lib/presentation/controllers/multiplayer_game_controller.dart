@@ -27,6 +27,7 @@ class MultiplayerGameController extends GetxController {
   Timer? _pollTimer;
   Timer? _saveTimer;
   bool _lockRequested = false;
+  bool _isSavingDraft = false;
   bool _routeRequested = false;
   bool _finalResultsRequested = false;
 
@@ -55,7 +56,7 @@ class MultiplayerGameController extends GetxController {
         isSaving.value) {
       return;
     }
-    isSaving.value = true;
+    _isSavingDraft = true;
     try {
       round.value = await Get.find<RoomRepository>().submitAnswers(
         session.roomCode,
@@ -72,7 +73,7 @@ class MultiplayerGameController extends GetxController {
     } catch (_) {
       error.value = 'Les réponses n’ont pas pu être enregistrées.';
     } finally {
-      isSaving.value = false;
+      _isSavingDraft = false;
     }
   }
 
@@ -113,7 +114,7 @@ class MultiplayerGameController extends GetxController {
   }
 
   Future<void> submitAnswers() async {
-    if (!canEdit) return;
+    if (!canEdit || _isSavingDraft) return;
 
     if (!hasTimer && session.isHost && !allCategoriesFilled) {
       Get.snackbar(
@@ -162,6 +163,9 @@ class MultiplayerGameController extends GetxController {
 
     try {
       _saveTimer?.cancel();
+      while (_isSavingDraft) {
+        await Future<void>.delayed(const Duration(milliseconds: 50));
+      }
       round.value = await Get.find<RoomRepository>().lockRound(
         session.roomCode,
         round.value.number,
@@ -311,7 +315,7 @@ class MultiplayerGameController extends GetxController {
           .map((result) {
             final nickname = result['nickname']?.toString() ?? 'Joueur';
             final score = int.tryParse(result['score']?.toString() ?? '') ?? 0;
-            final isMe = nickname == session.nickname;
+            final isMe = result['is_me'] == true;
             return PodiumEntry(
               name: nickname,
               avatar: _avatarFor(nickname),

@@ -9,8 +9,21 @@ import '../../../core/widgets/wordstorm_logo.dart';
 import '../../controllers/menu_controller.dart' as page_menu;
 
 /// Menu : choisir un mode ou rejoindre un salon avec son code.
-class MenuScreen extends StatelessWidget {
+class MenuScreen extends StatefulWidget {
   const MenuScreen({super.key});
+
+  @override
+  State<MenuScreen> createState() => _MenuScreenState();
+}
+
+class _MenuScreenState extends State<MenuScreen> {
+  final codeController = TextEditingController();
+
+  @override
+  void dispose() {
+    codeController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -112,14 +125,16 @@ class MenuScreen extends StatelessWidget {
                             ),
                             const SizedBox(height: 10),
                             CodeField(
-                              controller: controller.codeController,
-                              onValidated: controller.join,
+                              controller: codeController,
+                              onValidated: () =>
+                                  controller.join(codeController.text),
                               trailing: Padding(
                                 padding: const EdgeInsets.only(left: 8),
                                 child: ArcadeButton(
                                   label: 'OK',
                                   small: true,
-                                  onPressed: controller.join,
+                                  onPressed: () =>
+                                      controller.join(codeController.text),
                                 ),
                               ),
                             ),
