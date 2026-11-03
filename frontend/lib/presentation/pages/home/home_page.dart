@@ -9,8 +9,36 @@ import '../../../core/widgets/wordstorm_logo.dart';
 import '../../controllers/home_controller.dart';
 
 /// Première page : titre du jeu et boutons principaux.
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _motion;
+  late final Animation<double> _bob;
+
+  @override
+  void initState() {
+    super.initState();
+    _motion = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1800),
+    )..repeat(reverse: true);
+    _bob = Tween<double>(
+      begin: -5,
+      end: 5,
+    ).animate(CurvedAnimation(parent: _motion, curve: Curves.easeInOut));
+  }
+
+  @override
+  void dispose() {
+    _motion.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -68,23 +96,37 @@ class HomeScreen extends StatelessWidget {
                                       ),
                                     ),
                                     const SizedBox(height: 18),
-                                    const Row(
-                                      children: [
-                                        LetterTile(
-                                          letter: 'R',
-                                          size: 38,
-                                          rotation: -0.12,
-                                          middleColor: AppColors.coral,
-                                          bottomColor: AppColors.coralDark,
-                                          textColor: Colors.white,
-                                        ),
-                                        SizedBox(width: 10),
-                                        LetterTile(
-                                          letter: 'E',
-                                          size: 38,
-                                          rotation: 0.1,
-                                        ),
-                                      ],
+                                    AnimatedBuilder(
+                                      animation: _bob,
+                                      child: const Row(
+                                        children: [
+                                          LetterTile(
+                                            letter: 'R',
+                                            size: 38,
+                                            rotation: -0.12,
+                                            middleColor: AppColors.coral,
+                                            bottomColor: AppColors.coralDark,
+                                            textColor: Colors.white,
+                                          ),
+                                          SizedBox(width: 10),
+                                          LetterTile(
+                                            letter: 'E',
+                                            size: 38,
+                                            rotation: 0.1,
+                                          ),
+                                        ],
+                                      ),
+                                      builder: (context, child) =>
+                                          Transform.translate(
+                                            offset: Offset(
+                                              0,
+                                              -_bob.value * 0.35,
+                                            ),
+                                            child: Transform.rotate(
+                                              angle: _bob.value / 180,
+                                              child: child,
+                                            ),
+                                          ),
                                     ),
                                   ],
                                 ),
@@ -92,10 +134,18 @@ class HomeScreen extends StatelessWidget {
                             ),
                             Expanded(
                               flex: 6,
-                              child: Image.asset(
-                                'assets/images/personnage_w.png',
-                                fit: BoxFit.contain,
-                                alignment: Alignment.centerRight,
+                              child: AnimatedBuilder(
+                                animation: _bob,
+                                child: Image.asset(
+                                  'assets/images/personnage_w.png',
+                                  fit: BoxFit.contain,
+                                  alignment: Alignment.centerRight,
+                                ),
+                                builder: (context, child) =>
+                                    Transform.translate(
+                                      offset: Offset(0, _bob.value),
+                                      child: child,
+                                    ),
                               ),
                             ),
                           ],
