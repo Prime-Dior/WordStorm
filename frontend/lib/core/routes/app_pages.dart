@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../domain/models/lobby_setup.dart';
+import '../../domain/models/lobby_preview.dart';
 import '../../presentation/bindings/page_bindings.dart';
 import '../../presentation/pages/config/config_page.dart';
 import '../../presentation/pages/final_results/final_results_page.dart';
@@ -11,6 +11,7 @@ import '../../presentation/pages/home/home_page.dart';
 import '../../presentation/pages/join/join_page.dart';
 import '../../presentation/pages/lobby/lobby_page.dart';
 import '../../presentation/pages/menu/menu_page.dart';
+import '../../presentation/pages/multiplayer_game/multiplayer_game_page.dart';
 import '../../presentation/pages/results/round_results_page.dart';
 import '../../presentation/pages/rules/rules_page.dart';
 import '../../presentation/pages/settings/settings_page.dart';
@@ -46,6 +47,11 @@ abstract final class AppPages {
       binding: GameBinding(),
     ),
     GetPage(
+      name: AppRoutes.multiplayerGame,
+      page: () => const MultiplayerGameScreen(),
+      binding: MultiplayerGameBinding(),
+    ),
+    GetPage(
       name: AppRoutes.results,
       page: () => const RoundResultsScreen(),
       binding: RoundResultsBinding(),
@@ -62,7 +68,7 @@ abstract final class AppPages {
     ),
     GetPage(
       name: AppRoutes.lobby,
-      page: () => LobbyScreen(setup: Get.arguments as LobbySetup?),
+      page: () => LobbyScreen(preview: Get.arguments as LobbyPreview?),
       binding: LobbyBinding(),
     ),
     GetPage(

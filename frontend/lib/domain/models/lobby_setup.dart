@@ -1,5 +1,5 @@
-/// Paramètres choisis dans la configuration et transmis à l'aperçu du salon.
-/// Ce modèle reste indépendant de Firebase : aucun salon réel n'est créé.
+/// Paramètres locaux transmis à l'aperçu du salon.
+/// Aucun salon réel n'est créé avant le raccordement du backend.
 class LobbySetup {
   const LobbySetup({
     required this.categories,
