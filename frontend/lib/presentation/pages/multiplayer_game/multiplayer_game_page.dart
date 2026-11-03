@@ -247,8 +247,6 @@ class _RoundResults extends StatelessWidget {
         return ' · vide';
       default:
         return '';
-        
     }
   }
-  
 }

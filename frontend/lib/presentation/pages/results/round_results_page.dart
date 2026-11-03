@@ -58,7 +58,6 @@ class RoundResultsScreen extends StatelessWidget {
     }
 
     return ScreenScaffold(
-      skylineHeight: 0,
       showSunburst: true,
       burstTop: 0.1,
       child: Column(

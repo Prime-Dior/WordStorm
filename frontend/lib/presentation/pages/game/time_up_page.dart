@@ -29,7 +29,6 @@ class TimeUpScreen extends StatelessWidget {
     return ScreenScaffold(
       showSunburst: true,
       burstTop: 0.12,
-      skylineHeight: 0,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [

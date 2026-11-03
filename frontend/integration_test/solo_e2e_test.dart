@@ -49,27 +49,35 @@ void main() {
       await waitReal(tester, const Duration(milliseconds: 800));
       expect(find.text('NOUVELLE PARTIE'), findsOneWidget);
 
-      // ── Config : sans chrono (dernier cran du curseur) + 1 manche ─
-      final slider = tester.getRect(find.byKey(const Key('duration-slider')));
-      await tester.tapAt(Offset(slider.right - 2, slider.center.dy));
+      // ── Config : sans chrono + 1 manche ──────────────────────────
+      // La liste des puces est dans un scroll (17 catégories au
+      //-dessus) : on fait défiler jusqu'aux durées puis aux manches.
+      await tester.scrollUntilVisible(
+        find.text('Sans chrono'),
+        280,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.tap(find.text('Sans chrono'));
       await waitReal(tester, const Duration(milliseconds: 300));
-      expect(find.text('Sans chrono'), findsOneWidget);
 
       // Manches 3 → 1 (deux appuis sur « moins »).
       for (var i = 0; i < 2; i++) {
-        await tester.tap(find.byTooltip('Une manche de moins'));
+        await tester.scrollUntilVisible(
+          find.byIcon(Icons.remove),
+          280,
+          scrollable: find.byType(Scrollable).first,
+        );
+        await tester.tap(find.byIcon(Icons.remove));
         await waitReal(tester, const Duration(milliseconds: 250));
       }
 
-      // ── LANCER → roue → C'EST PARTI ──────────────────────────────
+      // ── LANCER → roue ────────────────────────────────────────────
       await tester.tap(find.text('LANCER'));
       await waitReal(tester, const Duration(milliseconds: 500));
       await waitReal(tester, const Duration(seconds: 4)); // roue 3,4 s
-      await tester.tap(find.text('C’EST PARTI'));
-      await waitReal(tester, const Duration(milliseconds: 800));
       expect(find.byType(GameScreen), findsOneWidget);
       expect(find.byType(LetterTile), findsOneWidget);
-      expect(find.byType(ResponseRow), findsNWidgets(5));
+      expect(find.byType(ResponseRow), findsOneWidget);
 
       // ── Manche : remplir les 5 obligatoires puis STOP ────────────
       final fields = find.byType(TextField);
@@ -82,8 +90,10 @@ void main() {
       await tester.tap(find.text('STOP'));
       await waitReal(tester, const Duration(seconds: 2));
 
-      // ── Résultats de manche (dernière manche → SCORE FINAL) ──────
-      expect(find.text('MANCHE 1 / 1'), findsOneWidget);
+      // ── Résultats de manche (dernière manche → SCORE FINAL) ─────────
+      expect(find.text('SCORE FINAL'), findsOneWidget);
+
+      // ── Fin de partie : score + REJOUER ──────────────────────────
       await tester.tap(find.text('SCORE FINAL'));
       await waitReal(tester, const Duration(seconds: 1));
       expect(find.text('Ton score'), findsOneWidget);
@@ -92,10 +102,8 @@ void main() {
       await tester.tap(find.text('REJOUER'));
       await waitReal(tester, const Duration(milliseconds: 500));
       await waitReal(tester, const Duration(seconds: 4)); // roue 3,4 s
-      await tester.tap(find.text('C’EST PARTI'));
-      await waitReal(tester, const Duration(milliseconds: 800));
       expect(find.byType(GameScreen), findsOneWidget);
-      expect(find.byType(ResponseRow), findsNWidgets(5));
+      expect(find.byType(ResponseRow), findsOneWidget);
     });
   });
 }

@@ -71,7 +71,6 @@ class _PodiumScreenState extends State<PodiumScreen> {
     return ScreenScaffold(
       showSunburst: true,
       burstTop: 0.3,
-      skylineHeight: 0,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [

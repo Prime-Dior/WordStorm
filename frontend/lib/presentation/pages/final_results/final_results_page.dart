@@ -42,7 +42,6 @@ class _FinalResultsScreenState extends State<FinalResultsScreen> {
     return ScreenScaffold(
       showSunburst: true,
       burstTop: 0.1,
-      skylineHeight: 0,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [

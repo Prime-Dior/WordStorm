@@ -1,32 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
-import '../../../core/theme/app_colors.dart';
-import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/arcade_button.dart';
-import '../../../core/widgets/check_row.dart';
-import '../../../core/widgets/icons/wordstorm_icons.dart';
-import '../../../core/widgets/nickname_field.dart';
 import '../../../core/widgets/screen_scaffold.dart';
-import '../../../core/widgets/ui_kit.dart';
 import '../../../domain/categories.dart';
 import '../../../domain/rules_config.dart';
 import '../../controllers/config_controller.dart';
 
-/// Écran « Nouvelle partie » (maquettes 03, 08, 20, 21).
-///
-/// - Mode de jeu : **Solo** ou **Multijoueur** (onglets) ;
-/// - Catégories **Aléatoire** (5 obligatoires + 4 tirées au sort au
-///   lancement, non modifiable) ou **Personnalisé** (cases à cocher,
-///   12 au maximum) ; les 5 obligatoires portent un cadenas ;
-/// - Manches 1 à 5 (boutons − et +), temps par manche (curseur :
-///   20 s Speed, 30, 45, 60, 90, 120 s, sans chrono), lettres difficiles ;
-/// - Bouton final : LANCER (solo) ou CRÉER LE SALON (multijoueur).
+/// Réglages d'une partie. Les règles restent dans ConfigController.
 class ConfigScreen extends StatefulWidget {
   const ConfigScreen({super.key, required this.mode});
 
-  /// 'solo' ou 'multi' (paramètre de l'adresse, choisi dans le menu).
   final String mode;
 
   @override
@@ -35,433 +19,235 @@ class ConfigScreen extends StatefulWidget {
 
 class _ConfigScreenState extends State<ConfigScreen> {
   late final ConfigController _config = Get.find<ConfigController>();
-  late bool _solo = widget.mode != 'multi';
-  bool _randomMode = true;
-  bool _hardLetters = false;
-  int _durationIndex = RulesConfig.turnDurations.indexOf(60);
-  int _rounds = 3;
-  final Set<String> _selected = {...Categories.mandatory};
 
-  int get _duration => RulesConfig.turnDurations[_durationIndex];
+  bool get _categoriesValid =>
+      _config.randomMode.value ||
+      Categories.isValidSelection(_config.selected.toList());
 
-  void _toggle(String name) {
-    setState(() {
-      if (_selected.contains(name)) {
-        _selected.remove(name);
-      } else if (_selected.length < Categories.maxPerGame) {
-        _selected.add(name);
-      }
-    });
-  }
-
-  /// Transmet les choix de l'écran au [ConfigController], qui lance la
-  /// partie solo ou crée le salon côté API (multijoueur).
-  Future<void> _launch() async {
-    _config
-      ..randomMode.value = _randomMode
-      ..hardLetters.value = _hardLetters
-      ..duration.value = _duration
-      ..rounds.value = _rounds;
-    // Obligatoires d'abord, puis les optionnelles dans l'ordre de la liste.
-    _config.selected
-      ..clear()
-      ..addAll([
-        ...Categories.mandatory,
-        ...Categories.optional.where(_selected.contains),
-      ]);
-    if (_solo) {
-      await _config.launchSolo();
-    } else {
-      await _config.previewLobby();
-    }
-  }
-
-  static String durationLabel(int seconds) => switch (seconds) {
-    0 => 'Sans chrono',
-    20 => '20 s · Speed',
-    _ => '$seconds s',
-  };
+  bool get _canStart =>
+      _categoriesValid &&
+      (_config.isSolo || _config.nickname.value.trim().isNotEmpty);
 
   @override
   Widget build(BuildContext context) {
-    final countLabel = _randomMode
-        ? '${Categories.mandatory.length + Categories.randomExtras} catégories'
-        : '${_selected.length} / ${Categories.maxPerGame}';
+    return Obx(() {
+      final solo = _config.isSolo;
+      final random = _config.randomMode.value;
 
-    return ScreenScaffold(
-      skylineHeight: 300,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const SizedBox(height: 6),
-          ScreenTitle('Nouvelle partie', onBack: () => Get.back<void>()),
-          const SizedBox(height: 8),
-          const FieldLabel('Mode de jeu'),
-          const SizedBox(height: 8),
-          SegmentedChoice<bool>(
-            options: const {true: 'Solo', false: 'Multijoueur'},
-            value: _solo,
-            onChanged: (v) => setState(() => _solo = v),
-          ),
-          const SizedBox(height: 14),
-          Row(
-            children: [
-              const Expanded(child: FieldLabel('Catégories')),
-              InfoPill(countLabel),
-            ],
-          ),
-          const SizedBox(height: 8),
-          SegmentedChoice<bool>(
-            options: const {true: 'Aléatoire', false: 'Personnalisé'},
-            value: _randomMode,
-            onChanged: (v) => setState(() => _randomMode = v),
-          ),
-          const SizedBox(height: 10),
-
-          // Liste des catégories (défile si elle dépasse).
-          Expanded(
-            child: ListView(
-              padding: const EdgeInsets.only(bottom: 6),
-              children: [
-                for (final name in Categories.mandatory)
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 7),
-                    child: CheckRow(
-                      label: name,
-                      iconName: categoryIconName(name),
-                      selected: true,
-                      locked: true,
-                    ),
-                  ),
-                if (_randomMode)
-                  const _RandomExtrasHint()
-                else
-                  for (final name in Categories.optional)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 7),
-                      child: CheckRow(
-                        label: name,
-                        iconName: categoryIconName(name),
-                        selected: _selected.contains(name),
-                        onToggle: () => _toggle(name),
-                      ),
-                    ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 10),
-
-          // Manches.
-          Row(
-            children: [
-              const Expanded(child: FieldLabel('Manches')),
-              _RoundStepper(
-                value: _rounds,
-                min: RulesConfig.minRounds,
-                max: RulesConfig.maxRounds,
-                onChanged: (v) => setState(() => _rounds = v),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-
-          // Temps par manche.
-          Row(
-            children: [
-              const Expanded(child: FieldLabel('Temps')),
-              Text(
-                durationLabel(_duration),
-                style: const TextStyle(
-                  fontFamily: AppTheme.monoFont,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.offWhite,
+      return ScreenScaffold(
+        padding: EdgeInsets.zero,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            SafeArea(
+              bottom: false,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
                 ),
-              ),
-            ],
-          ),
-          _DurationSlider(
-            key: const Key('duration-slider'),
-            count: RulesConfig.turnDurations.length,
-            index: _durationIndex,
-            semanticValue: durationLabel(_duration),
-            onChanged: (i) => setState(() => _durationIndex = i),
-          ),
-          CheckOptionRow(
-            label: 'Inclure les lettres difficiles (K W X Y Z)',
-            value: _hardLetters,
-            glass: false,
-            onChanged: (v) => setState(() => _hardLetters = v),
-          ),
-          if (!_solo) ...[
-            const SizedBox(height: 6),
-            Obx(
-              () => NicknameField(
-                controller: _config.nicknameController,
-                errorText: _config.nicknameError.value,
-                onChanged: _config.setNickname,
-                onSubmitted: _launch,
-                hintText: 'Ton pseudo',
-              ),
-            ),
-          ],
-          const SizedBox(height: 10),
-          Obx(
-            () => ArcadeButton(
-              label: _solo
-                  ? 'Lancer'
-                  : _config.isCreatingRoom.value
-                  ? 'Création…'
-                  : 'Créer le salon',
-              onPressed: _config.isCreatingRoom.value ? null : _launch,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-/// Ligne en pointillés du mode aléatoire : « + 4 catégories tirées au
-/// sort au lancement ».
-class _RandomExtrasHint extends StatelessWidget {
-  const _RandomExtrasHint();
-
-  @override
-  Widget build(BuildContext context) => DashedBox(
-    child: Row(
-      children: [
-        WordstormIcons.bolt(size: 20, color: AppColors.blueGray),
-        const SizedBox(width: 12),
-        const Expanded(
-          child: Text(
-            '+ ${Categories.randomExtras} catégories tirées au sort au lancement',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontFamily: AppTheme.bodyFont,
-              fontSize: 12,
-              color: AppColors.blueGray,
-            ),
-          ),
-        ),
-      ],
-    ),
-  );
-}
-
-/// Sélecteur du nombre de manches : boutons jaunes − et + (maquette).
-class _RoundStepper extends StatelessWidget {
-  const _RoundStepper({
-    required this.value,
-    required this.min,
-    required this.max,
-    required this.onChanged,
-  });
-
-  final int value;
-  final int min;
-  final int max;
-  final ValueChanged<int> onChanged;
-
-  Widget _button(String label, String tooltip, VoidCallback? onPressed) =>
-      SizedBox(
-        width: 44,
-        child: ArcadeButton(
-          label: label,
-          small: true,
-          minHeight: 42,
-          padding: EdgeInsets.zero,
-          borderRadius: 12,
-          tooltip: tooltip,
-          onPressed: onPressed,
-        ),
-      );
-
-  @override
-  Widget build(BuildContext context) => Row(
-    mainAxisSize: MainAxisSize.min,
-    children: [
-      _button(
-        '-',
-        'Une manche de moins',
-        value > min ? () => onChanged(value - 1) : null,
-      ),
-      SizedBox(
-        width: 44,
-        child: Text(
-          '$value',
-          textAlign: TextAlign.center,
-          style: const TextStyle(
-            fontFamily: AppTheme.bodyFont,
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: AppColors.offWhite,
-          ),
-        ),
-      ),
-      _button(
-        '+',
-        'Une manche de plus',
-        value < max ? () => onChanged(value + 1) : null,
-      ),
-    ],
-  );
-}
-
-/// Intention clavier « avancer / reculer d'un cran » du curseur.
-class _StepIntent extends Intent {
-  const _StepIntent(this.delta);
-
-  final int delta;
-}
-
-/// Curseur du temps par manche (piste dégradée turquoise → jaune,
-/// bouton jaune). Crans fixes ; souris, doigt ou flèches du clavier.
-/// Survol : le bouton grossit ; focus clavier : le bouton est cerclé
-/// de blanc.
-class _DurationSlider extends StatefulWidget {
-  const _DurationSlider({
-    required this.count,
-    super.key,
-    required this.index,
-    required this.semanticValue,
-    required this.onChanged,
-  });
-
-  final int count;
-  final int index;
-  final String semanticValue;
-  final ValueChanged<int> onChanged;
-
-  @override
-  State<_DurationSlider> createState() => _DurationSliderState();
-}
-
-class _DurationSliderState extends State<_DurationSlider> {
-  static const double _pad = 12;
-  bool _hovered = false;
-  bool _focused = false;
-  bool _dragging = false;
-
-  void _select(int i) {
-    final clamped = i.clamp(0, widget.count - 1);
-    if (clamped != widget.index) widget.onChanged(clamped);
-  }
-
-  void _fromPosition(double dx, double width) {
-    final usable = width - 2 * _pad;
-    if (usable <= 0) return;
-    final t = ((dx - _pad) / usable).clamp(0.0, 1.0);
-    _select((t * (widget.count - 1)).round());
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return FocusableActionDetector(
-      // Main ouverte au survol, main fermée pendant le glissement.
-      mouseCursor: _dragging
-          ? SystemMouseCursors.grabbing
-          : SystemMouseCursors.grab,
-      onShowHoverHighlight: (v) => setState(() => _hovered = v),
-      onShowFocusHighlight: (v) => setState(() => _focused = v),
-      shortcuts: const <ShortcutActivator, Intent>{
-        SingleActivator(LogicalKeyboardKey.arrowLeft): _StepIntent(-1),
-        SingleActivator(LogicalKeyboardKey.arrowDown): _StepIntent(-1),
-        SingleActivator(LogicalKeyboardKey.arrowRight): _StepIntent(1),
-        SingleActivator(LogicalKeyboardKey.arrowUp): _StepIntent(1),
-      },
-      actions: <Type, Action<Intent>>{
-        _StepIntent: CallbackAction<_StepIntent>(
-          onInvoke: (intent) {
-            _select(widget.index + intent.delta);
-            return null;
-          },
-        ),
-      },
-      child: Semantics(
-        slider: true,
-        label: 'Temps par manche',
-        value: widget.semanticValue,
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            final width = constraints.maxWidth;
-            final t = widget.count <= 1
-                ? 0.0
-                : widget.index / (widget.count - 1);
-            final knobX = _pad + t * (width - 2 * _pad);
-            final big = _hovered || _dragging || _focused;
-            return GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onTapDown: (d) => _fromPosition(d.localPosition.dx, width),
-              onHorizontalDragStart: (d) {
-                setState(() => _dragging = true);
-                _fromPosition(d.localPosition.dx, width);
-              },
-              onHorizontalDragUpdate: (d) =>
-                  _fromPosition(d.localPosition.dx, width),
-              onHorizontalDragEnd: (_) => setState(() => _dragging = false),
-              child: SizedBox(
-                height: 34,
-                child: Stack(
-                  clipBehavior: Clip.none,
+                child: Row(
                   children: [
-                    Positioned(
-                      left: 0,
-                      right: 0,
-                      top: 13,
-                      child: Container(
-                        height: 8,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(999),
-                          gradient: const LinearGradient(
-                            colors: [AppColors.teal, AppColors.yellow],
-                          ),
+                    TextButton(
+                      onPressed: Get.back,
+                      child: const Text('Retour'),
+                    ),
+                    Expanded(
+                      child: Text(
+                        solo ? 'NOUVELLE PARTIE' : 'MULTIJOUEUR',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 0.5,
+                          color: Color(0xFFFFB703),
                         ),
                       ),
                     ),
-                    AnimatedPositioned(
-                      duration: const Duration(milliseconds: 140),
-                      curve: Curves.easeOut,
-                      left: knobX - 12,
-                      top: 5,
-                      child: AnimatedScale(
-                        duration: const Duration(milliseconds: 140),
-                        scale: big ? 1.18 : 1,
-                        child: Container(
-                          width: 24,
-                          height: 24,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: AppColors.yellow,
-                            border: Border.all(
-                              color: _focused
-                                  ? AppColors.offWhite
-                                  : AppColors.navyBlue,
-                              width: 3,
-                            ),
-                            boxShadow: [
-                              const BoxShadow(
-                                color: Color(0x66000000),
-                                offset: Offset(0, 2),
-                                blurRadius: 4,
-                              ),
-                              if (big)
-                                BoxShadow(
-                                  color: AppColors.yellow.withAlpha(0x88),
-                                  blurRadius: 12,
-                                ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
+                    const SizedBox(width: 64),
                   ],
                 ),
               ),
-            );
-          },
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Wrap(
+                spacing: 8,
+                children: [
+                  ChoiceChip(
+                    label: const Text('Aléatoire'),
+                    selected: random,
+                    selectedColor: const Color(0xFFFFB703),
+                    onSelected: (_) => _config.chooseRandom(),
+                  ),
+                  ChoiceChip(
+                    label: const Text('Personnalisé'),
+                    selected: !random,
+                    selectedColor: const Color(0xFF2EC4B6),
+                    onSelected: (_) => _config.chooseCustom(),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: ListView(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+                children: [
+                  if (!solo)
+                    TextField(
+                      controller: _config.nicknameController,
+                      maxLength: 12,
+                      onChanged: _config.setNickname,
+                      decoration: InputDecoration(
+                        labelText: 'Pseudo',
+                        errorText: _config.nicknameError.value,
+                        helperText: 'Obligatoire pour créer un salon.',
+                        counterText: '',
+                        filled: true,
+                        fillColor: const Color(0xFF243451),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                    ),
+                  const Padding(
+                    padding: EdgeInsets.fromLTRB(4, 10, 4, 4),
+                    child: Text(
+                      'CATÉGORIES OBLIGATOIRES',
+                      style: TextStyle(
+                        color: Color(0xFFFFB703),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  for (final category in Categories.mandatory)
+                    ListTile(
+                      dense: true,
+                      visualDensity: VisualDensity.compact,
+                      leading: const Icon(Icons.lock),
+                      title: Text(category),
+                      trailing: const Icon(Icons.check),
+                    ),
+                  const Padding(
+                    padding: EdgeInsets.fromLTRB(4, 10, 4, 4),
+                    child: Text(
+                      'CATÉGORIES FACULTATIVES',
+                      style: TextStyle(
+                        color: Color(0xFFFFB703),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  for (final category in Categories.optional)
+                    CheckboxListTile(
+                      dense: true,
+                      visualDensity: VisualDensity.compact,
+                      title: Text(category),
+                      value: _config.selected.contains(category),
+                      onChanged: random
+                          ? null
+                          : (_) => _config.toggle(category),
+                    ),
+                  Text(
+                    random
+                        ? '5 catégories fixes et 4 tirées au sort.'
+                        : '${_config.selected.length} / ${Categories.maxPerGame} catégories',
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      color: Color(0xFF2EC4B6),
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.fromLTRB(4, 16, 4, 8),
+                    child: Text(
+                      'DURÉE DE LA MANCHE',
+                      style: TextStyle(
+                        color: Color(0xFFFFB703),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  Wrap(
+                    spacing: 8,
+                    children: [
+                      for (final seconds in RulesConfig.turnDurations)
+                        ChoiceChip(
+                          label: Text(
+                            seconds == 0 ? 'Sans chrono' : '$seconds s',
+                          ),
+                          selected: _config.duration.value == seconds,
+                          selectedColor: const Color(0xFF2EC4B6),
+                          onSelected: (_) => _config.chooseDuration(seconds),
+                        ),
+                    ],
+                  ),
+                  ListTile(
+                    title: const Text('Nombre de manches'),
+                    subtitle: Text('${_config.rounds.value}'),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 4),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          onPressed:
+                              _config.rounds.value > RulesConfig.minRounds
+                              ? () => _config.chooseRounds(
+                                  _config.rounds.value - 1,
+                                )
+                              : null,
+                          icon: const Icon(Icons.remove),
+                        ),
+                        IconButton(
+                          onPressed:
+                              _config.rounds.value < RulesConfig.maxRounds
+                              ? () => _config.chooseRounds(
+                                  _config.rounds.value + 1,
+                                )
+                              : null,
+                          icon: const Icon(Icons.add),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SwitchListTile(
+                    title: const Text('Lettres difficiles K, W, X, Y, Z'),
+                    value: _config.hardLetters.value,
+                    onChanged: _config.toggleHardLetters,
+                  ),
+                  if (!_categoriesValid)
+                    const Text(
+                      'Maximum 12 catégories, obligatoires incluses.',
+                      textAlign: TextAlign.center,
+                    ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: SafeArea(
+                top: false,
+                child: ArcadeButton(
+                  label: solo
+                      ? 'Lancer'
+                      : _config.isCreatingRoom.value
+                      ? 'Création en cours…'
+                      : 'Créer le salon',
+                  variant: solo
+                      ? ArcadeButtonVariant.yellow
+                      : ArcadeButtonVariant.teal,
+                  onPressed: !_canStart || _config.isCreatingRoom.value
+                      ? null
+                      : solo
+                      ? _config.launchSolo
+                      : _config.previewLobby,
+                ),
+              ),
+            ),
+          ],
         ),
-      ),
-    );
+      );
+    });
   }
 }

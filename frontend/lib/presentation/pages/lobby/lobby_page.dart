@@ -318,18 +318,17 @@ class _CodePanel extends StatelessWidget {
             ),
           ),
         ),
-        ArcadeButton(
-          label: copied ? 'Copié !' : 'Copier',
-          variant: copied
-              ? ArcadeButtonVariant.green
-              : ArcadeButtonVariant.dark,
-          small: true,
-          minHeight: 40,
-          tooltip: 'Copier le code',
-          leading: copied
-              ? const Icon(Icons.check, size: 16, color: AppColors.navyBlue)
-              : WordstormIcons.copy(size: 16, color: AppColors.offWhite),
-          onPressed: onCopy,
+        Tooltip(
+          message: 'Copier le code',
+          child: ArcadeButton(
+            label: copied ? 'Copié !' : 'Copier',
+            variant: copied
+                ? ArcadeButtonVariant.green
+                : ArcadeButtonVariant.dark,
+            small: true,
+            minHeight: 40,
+            onPressed: onCopy,
+          ),
         ),
       ],
     ),

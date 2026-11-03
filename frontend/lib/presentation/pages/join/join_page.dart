@@ -70,7 +70,6 @@ class _JoinScreenState extends State<JoinScreen> {
                       errorText: _controller.codeError.value,
                       onChanged: _controller.onCodeChanged,
                       onValidated: _submit,
-                      autofocus: _controller.code.text.isEmpty,
                     ),
                     const SizedBox(height: 18),
                     const Text(
