@@ -58,6 +58,17 @@ class MultiplayerGameScreen extends GetView<MultiplayerGameController> {
                 color: AppColors.teal,
               ),
             ),
+            if (finished && currentRound.stoppedBy != null) ...[
+              const SizedBox(height: 4),
+              Text(
+                '${currentRound.stoppedBy} a appuyé sur STOP',
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: AppColors.yellow,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
             const SizedBox(height: 12),
             Expanded(
               child: SingleChildScrollView(
@@ -74,6 +85,12 @@ class MultiplayerGameScreen extends GetView<MultiplayerGameController> {
                                 textCapitalization: TextCapitalization.words,
                                 decoration: InputDecoration(
                                   labelText: category,
+                                  labelStyle: const TextStyle(
+                                    color: AppColors.blueGray,
+                                  ),
+                                  floatingLabelStyle: const TextStyle(
+                                    color: AppColors.navyBlue,
+                                  ),
                                   filled: true,
                                   fillColor: AppColors.offWhite,
                                   border: OutlineInputBorder(
@@ -81,6 +98,8 @@ class MultiplayerGameScreen extends GetView<MultiplayerGameController> {
                                     borderSide: BorderSide.none,
                                   ),
                                 ),
+                                style: const TextStyle(color: Colors.black),
+                                cursorColor: AppColors.navyBlue,
                                 onChanged: controller.answerChanged,
                               ),
                             ),
@@ -104,15 +123,13 @@ class MultiplayerGameScreen extends GetView<MultiplayerGameController> {
                 controller.formRevision.value;
                 final canStop =
                     controller.session.durationSeconds > 0 ||
-                    !controller.session.isHost ||
                     controller.allCategoriesFilled;
 
                 return ArcadeButton(
                   label: controller.isSaving.value || controller.isLocking.value
                       ? 'Envoi…'
-                      : controller.session.durationSeconds == 0 &&
-                            controller.session.isHost
-                      ? 'STOP · voir les résultats'
+                      : controller.session.durationSeconds == 0
+                      ? 'STOP · terminer la manche'
                       : 'Enregistrer mes réponses',
                   variant: ArcadeButtonVariant.teal,
                   onPressed: controller.canEdit && canStop

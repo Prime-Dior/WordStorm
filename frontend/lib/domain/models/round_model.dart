@@ -5,6 +5,7 @@ class RoundModel {
     this.letter,
     this.startsAt,
     this.endsAt,
+    this.stoppedBy,
     this.answers = const [],
   });
 
@@ -13,6 +14,7 @@ class RoundModel {
   final String? letter;
   final DateTime? startsAt;
   final DateTime? endsAt;
+  final String? stoppedBy;
   final List<RoundAnswerModel> answers;
 
   factory RoundModel.fromJson(Map<String, dynamic> json) {
@@ -24,6 +26,7 @@ class RoundModel {
       letter: json['letter']?.toString(),
       startsAt: _readDate(json['starts_at']),
       endsAt: _readDate(json['ends_at']),
+      stoppedBy: json['stopped_by']?.toString(),
       answers: rawAnswers is List
           ? rawAnswers
                 .whereType<Map<String, dynamic>>()

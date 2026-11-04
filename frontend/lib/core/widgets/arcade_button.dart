@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../theme/app_colors.dart';
+
 /// Bouton simple réutilisé dans les pages.
 enum ArcadeButtonVariant { yellow, teal, purple, dark, green, red }
 
@@ -34,7 +36,7 @@ class ArcadeButton extends StatelessWidget {
       case ArcadeButtonVariant.yellow:
         return const Color(0xFFFFB703);
       case ArcadeButtonVariant.teal:
-        return const Color(0xFF2EC4B6);
+        return AppColors.validate;
       case ArcadeButtonVariant.purple:
         return const Color(0xFF7B61FF);
       case ArcadeButtonVariant.green:

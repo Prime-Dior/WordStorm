@@ -43,7 +43,7 @@ En solo, toute réponse valide est la seule → 15 pts ; le palier 10 n'existe q
 ### Manche
 - Lettre tirée à la roue (ou par le serveur en ligne, identique pour tous).
 - Durées : 20 s (« Speed »), 30, 45, 60, 90, 120 s, ou sans chrono ; manches 1–5 (borne provisoire) ; option « lettres difficiles » (K W X Y Z) **exclues par défaut**.
-- Sans chrono : bouton **STOP** (grisé tant que toutes les catégories ne sont pas remplies) termine la manche pour tous ; STOP réservé à ce mode (provisoire).
+- Sans chrono : le premier joueur qui a rempli toutes les catégories peut déclencher **STOP**; cela termine la manche pour tous. Le bouton reste grisé tant que ses propres catégories ne sont pas toutes remplies. STOP est réservé à ce mode.
 - En ligne : l'heure de fin est fixée par le **serveur** (Cloud Functions) ; expulsion après 20 min d'inactivité en mode sans chrono.
 
 ### Multijoueur Firebase

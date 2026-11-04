@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../theme/app_colors.dart';
 import 'letter_tile.dart';
 
 /// Nom d'une catégorie avec le champ où écrire sa réponse.
@@ -55,9 +56,14 @@ class ResponseRow extends StatelessWidget {
                 onSubmitted: onSubmitted,
                 decoration: const InputDecoration(
                   hintText: 'Ta réponse',
+                  hintStyle: TextStyle(color: AppColors.blueGray),
                   counterText: '',
+                  filled: true,
+                  fillColor: AppColors.offWhite,
                   border: OutlineInputBorder(),
                 ),
+                style: const TextStyle(color: Colors.black),
+                cursorColor: AppColors.navyBlue,
               ),
             ),
           ],

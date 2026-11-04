@@ -28,6 +28,7 @@ class MultiplayerGameController extends GetxController {
   Timer? _saveTimer;
   bool _lockRequested = false;
   bool _isSavingDraft = false;
+  bool _draftSaveRequested = false;
   bool _routeRequested = false;
   bool _finalResultsRequested = false;
 
@@ -44,18 +45,24 @@ class MultiplayerGameController extends GetxController {
 
   void answerChanged(String value) {
     formRevision.value++;
-    if (hasTimer && round.value.status == 'active') {
+    if (round.value.status == 'active') {
       _saveTimer?.cancel();
-      _saveTimer = Timer(const Duration(milliseconds: 600), _saveDraft);
+      _saveTimer = Timer(const Duration(milliseconds: 350), _saveDraft);
     }
   }
 
   Future<void> _saveDraft() async {
     if (round.value.status != 'active' ||
-        secondsRemaining.value == 0 ||
+        (hasTimer && secondsRemaining.value == 0) ||
         isSaving.value) {
       return;
     }
+
+    if (_isSavingDraft) {
+      _draftSaveRequested = true;
+      return;
+    }
+
     _isSavingDraft = true;
     try {
       round.value = await Get.find<RoomRepository>().submitAnswers(
@@ -74,6 +81,11 @@ class MultiplayerGameController extends GetxController {
       error.value = 'Les réponses n’ont pas pu être enregistrées.';
     } finally {
       _isSavingDraft = false;
+      if (_draftSaveRequested) {
+        _draftSaveRequested = false;
+        _saveTimer?.cancel();
+        _saveTimer = Timer(const Duration(milliseconds: 100), _saveDraft);
+      }
     }
   }
 
@@ -114,9 +126,9 @@ class MultiplayerGameController extends GetxController {
   }
 
   Future<void> submitAnswers() async {
-    if (!canEdit || _isSavingDraft) return;
+    if (!canEdit) return;
 
-    if (!hasTimer && session.isHost && !allCategoriesFilled) {
+    if (!hasTimer && !allCategoriesFilled) {
       Get.snackbar(
         'Réponses incomplètes',
         'Remplis toutes les catégories avant d’arrêter la manche.',
@@ -129,6 +141,9 @@ class MultiplayerGameController extends GetxController {
 
     try {
       _saveTimer?.cancel();
+      while (_isSavingDraft) {
+        await Future<void>.delayed(const Duration(milliseconds: 50));
+      }
       final values = <String, String?>{
         for (final entry in answers.entries)
           entry.key: entry.value.text.trim().isEmpty
@@ -142,7 +157,7 @@ class MultiplayerGameController extends GetxController {
         values,
       );
 
-      if (!hasTimer && session.isHost) {
+      if (!hasTimer) {
         await _lockRound();
       } else {
         Get.snackbar('Réponses enregistrées', 'Tu peux encore les modifier.');

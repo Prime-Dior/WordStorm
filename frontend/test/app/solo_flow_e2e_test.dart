@@ -120,7 +120,7 @@ void main() {
       await tester.pump(const Duration(milliseconds: 400));
 
       // Score final
-      expect(find.text('Ton score'), findsOneWidget);
+      expect(find.text('SCORE TOTAL'), findsOneWidget);
 
       // REJOUER → nouvelle roue → nouvelle manche
       await tester.tap(find.text('REJOUER'));
