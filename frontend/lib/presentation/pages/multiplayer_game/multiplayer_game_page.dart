@@ -313,6 +313,7 @@ class _RoundResults extends StatelessWidget {
           'local' => 'dictionnaire local',
           'wiktionary' => 'Wiktionnaire',
           'gemini' => 'Gemini',
+          'rule' => 'règle des prénoms',
           _ => null,
         };
         return source == null ? ' · validé' : ' · validé par $source';

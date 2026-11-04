@@ -240,6 +240,7 @@ class MultiplayerGameController extends GetxController {
 
   Future<void> _checkForNextRound() async {
     if (_routeRequested) return;
+    _routeRequested = true;
 
     try {
       final room = await Get.find<RoomRepository>().getRoom(session.roomCode);
@@ -256,23 +257,37 @@ class MultiplayerGameController extends GetxController {
                 candidate.status == 'active',
           )
           .toList(growable: false);
-      if (nextRounds.isEmpty) return;
+      if (nextRounds.isEmpty) {
+        _routeRequested = false;
+        return;
+      }
 
-      _routeRequested = true;
-      Get.offNamed<void>(
-        AppRoutes.multiplayerGame,
-        arguments: MultiplayerRoundSession.fromRoom(
-          room: room,
-          round: nextRounds.first,
-          nickname: session.nickname,
-          isHost: session.isHost,
-        ),
-      );
+      _showRound(nextRounds.first);
     } on ApiException catch (exception) {
       error.value = exception.message;
+      _routeRequested = false;
     } catch (_) {
       error.value = 'Impossible de vérifier la manche suivante.';
+      _routeRequested = false;
     }
+  }
+
+  void _showRound(RoundModel nextRound) {
+    if (nextRound.number <= round.value.number) {
+      _routeRequested = false;
+      return;
+    }
+
+    for (final answer in answers.values) {
+      answer.clear();
+    }
+    round.value = nextRound;
+    formRevision.value++;
+    error.value = null;
+    isGameFinished.value = false;
+    _lockRequested = false;
+    _routeRequested = false;
+    _updateCountdown();
   }
 
   Future<void> startNextRound() async {
@@ -280,6 +295,7 @@ class MultiplayerGameController extends GetxController {
 
     isSaving.value = true;
     error.value = null;
+    _routeRequested = true;
 
     try {
       final nextNumber = round.value.number + 1;
@@ -287,21 +303,13 @@ class MultiplayerGameController extends GetxController {
         session.roomCode,
         nextNumber,
       );
-      final room = await Get.find<RoomRepository>().getRoom(session.roomCode);
-
-      Get.offNamed<void>(
-        AppRoutes.multiplayerGame,
-        arguments: MultiplayerRoundSession.fromRoom(
-          room: room,
-          round: nextRound,
-          nickname: session.nickname,
-          isHost: session.isHost,
-        ),
-      );
+      _showRound(nextRound);
     } on ApiException catch (exception) {
       error.value = exception.message;
+      _routeRequested = false;
     } catch (_) {
       error.value = 'La manche suivante n’a pas pu démarrer.';
+      _routeRequested = false;
     } finally {
       isSaving.value = false;
     }
