@@ -5,7 +5,6 @@ import '../../../core/routes/app_routes.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/arcade_button.dart';
-import '../../../core/widgets/icons/wordstorm_icons.dart';
 import '../../../core/widgets/screen_scaffold.dart';
 import '../../../core/widgets/ui_kit.dart';
 import '../../controllers/solo_session_controller.dart';
@@ -108,7 +107,7 @@ class _LockedAnswerRow extends StatelessWidget {
     ),
     child: Row(
       children: [
-        WordstormIcons.lock(size: 16, color: AppColors.blueGray),
+        const Icon(Icons.lock_outline, size: 16, color: AppColors.blueGray),
         const SizedBox(width: 10),
         Text(
           category,

@@ -4,7 +4,6 @@ import 'package:get/get.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/arcade_button.dart';
-import '../../../core/widgets/ui_kit.dart';
 import '../../controllers/settings_controller.dart';
 import '../status/status_page.dart';
 
@@ -49,20 +48,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           ),
                         ),
                         const SizedBox(height: 16),
-                        _OptionRow(
-                          label: 'Sons',
+                        SwitchListTile(
+                          title: const Text('Sons'),
                           value: _controller.sound.value,
                           onChanged: _controller.setSound,
+                          activeTrackColor: AppColors.teal,
                         ),
-                        _OptionRow(
-                          label: 'Vibrations (si le mobile le permet)',
+                        SwitchListTile(
+                          title: const Text('Vibrations'),
                           value: _controller.vibration.value,
                           onChanged: _controller.setVibration,
+                          activeTrackColor: AppColors.teal,
                         ),
-                        _OptionRow(
-                          label: 'Réduire les animations',
+                        SwitchListTile(
+                          title: const Text('Réduire les animations'),
                           value: _controller.reduceAnimations.value,
                           onChanged: _controller.setReduceAnimations,
+                          activeTrackColor: AppColors.teal,
                         ),
                         const SizedBox(height: 12),
                         ArcadeButton(
@@ -97,22 +99,4 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
     );
   }
-}
-
-class _OptionRow extends StatelessWidget {
-  const _OptionRow({
-    required this.label,
-    required this.value,
-    required this.onChanged,
-  });
-
-  final String label;
-  final bool value;
-  final ValueChanged<bool> onChanged;
-
-  @override
-  Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.only(bottom: 10),
-    child: CheckOptionRow(label: label, value: value, onChanged: onChanged),
-  );
 }

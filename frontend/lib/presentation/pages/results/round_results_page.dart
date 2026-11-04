@@ -157,19 +157,14 @@ class _ScoreCard extends StatelessWidget {
                   color: AppColors.blueGray,
                 ),
               ),
-              TweenAnimationBuilder<int>(
-                tween: IntTween(begin: 0, end: roundScore),
-                duration: const Duration(milliseconds: 900),
-                curve: Curves.easeOut,
-                builder: (context, value, _) => Text(
-                  '$value',
-                  style: const TextStyle(
-                    fontFamily: AppTheme.monoFont,
-                    fontSize: 52,
-                    fontWeight: FontWeight.w700,
-                    height: 1.1,
-                    color: AppColors.yellow,
-                  ),
+              Text(
+                '$roundScore',
+                style: const TextStyle(
+                  fontFamily: AppTheme.monoFont,
+                  fontSize: 52,
+                  fontWeight: FontWeight.w700,
+                  height: 1.1,
+                  color: AppColors.yellow,
                 ),
               ),
               Text(

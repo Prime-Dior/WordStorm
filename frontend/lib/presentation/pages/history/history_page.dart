@@ -69,7 +69,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             const SizedBox(height: 6),
-            ScreenTitle('Classement', onBack: () => Get.back<void>()),
+            ScreenTitle('Historique', onBack: () => Get.back<void>()),
             const SizedBox(height: 14),
             Expanded(
               child: _controller.isLoading.value

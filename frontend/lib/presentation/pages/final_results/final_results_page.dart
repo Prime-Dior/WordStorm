@@ -66,19 +66,14 @@ class _FinalResultsScreenState extends State<FinalResultsScreen> {
                           color: AppColors.blueGray,
                         ),
                       ),
-                      TweenAnimationBuilder<int>(
-                        tween: IntTween(begin: 0, end: total),
-                        duration: const Duration(milliseconds: 900),
-                        curve: Curves.easeOut,
-                        builder: (context, value, _) => Text(
-                          '$value',
-                          style: const TextStyle(
-                            fontFamily: AppTheme.monoFont,
-                            fontSize: 56,
-                            fontWeight: FontWeight.w700,
-                            height: 1.1,
-                            color: AppColors.yellow,
-                          ),
+                      Text(
+                        '$total',
+                        style: const TextStyle(
+                          fontFamily: AppTheme.monoFont,
+                          fontSize: 56,
+                          fontWeight: FontWeight.w700,
+                          height: 1.1,
+                          color: AppColors.yellow,
                         ),
                       ),
                       Text(
