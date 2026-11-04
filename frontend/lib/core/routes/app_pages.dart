@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../domain/models/lobby_preview.dart';
+import '../../domain/models/multiplayer_round_session.dart';
 import '../../presentation/bindings/page_bindings.dart';
 import '../../presentation/pages/config/config_page.dart';
 import '../../presentation/pages/final_results/final_results_page.dart';
@@ -50,7 +51,9 @@ abstract final class AppPages {
     GetPage(name: AppRoutes.timeUp, page: () => const TimeUpScreen()),
     GetPage(
       name: AppRoutes.multiplayerGame,
-      page: () => const MultiplayerGameScreen(),
+      page: () => Get.arguments is MultiplayerRoundSession
+          ? const MultiplayerGameScreen()
+          : const MissingMultiplayerGameSessionScreen(),
       binding: MultiplayerGameBinding(),
     ),
     GetPage(

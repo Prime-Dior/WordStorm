@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../core/routes/app_routes.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/arcade_button.dart';
@@ -232,6 +233,44 @@ class MultiplayerGameScreen extends GetView<MultiplayerGameController> {
       ),
     );
   }
+}
+
+/// Affiché si la manche est ouverte directement ou après rechargement du navigateur.
+class MissingMultiplayerGameSessionScreen extends StatelessWidget {
+  const MissingMultiplayerGameSessionScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) => ScreenScaffold(
+    child: Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Text(
+            'Session multijoueur introuvable',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: AppColors.offWhite,
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 12),
+          const Text(
+            'Cette page a été rechargée et les informations du salon ne sont plus disponibles. '
+            'Retourne au menu et rejoins le salon avec son code.',
+            textAlign: TextAlign.center,
+            style: TextStyle(color: AppColors.blueGray),
+          ),
+          const SizedBox(height: 20),
+          ArcadeButton(
+            label: 'Retour au menu',
+            variant: ArcadeButtonVariant.dark,
+            onPressed: () => Get.offAllNamed<void>(AppRoutes.menu),
+          ),
+        ],
+      ),
+    ),
+  );
 }
 
 class _RoundResults extends StatelessWidget {
