@@ -114,23 +114,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
             color: AppColors.offWhite,
           ),
         ),
-        const SizedBox(height: 8),
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 20),
-          child: Text(
-            'Joue une partie en solo : elle sera enregistrée ici '
-            'automatiquement à la fin.',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontFamily: AppTheme.bodyFont,
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              height: 1.5,
-              color: AppColors.blueGray,
-            ),
-          ),
-        ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 16),
         ArcadeButton(
           label: 'JOUER',
           small: true,

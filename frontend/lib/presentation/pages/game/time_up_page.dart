@@ -67,15 +67,6 @@ class TimeUpScreen extends StatelessWidget {
                 const SizedBox(height: 10),
                 GradientProgressBar(value: total == 0 ? 0 : filled / total),
                 const SizedBox(height: 12),
-                const Text(
-                  'Réponses verrouillées · vérification à la fin de la manche…',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontFamily: AppTheme.bodyFont,
-                    fontSize: 11,
-                    color: AppColors.blueGray,
-                  ),
-                ),
               ],
             ),
           ),

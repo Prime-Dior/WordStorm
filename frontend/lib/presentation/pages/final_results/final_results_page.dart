@@ -11,9 +11,7 @@ import '../../../core/widgets/screen_scaffold.dart';
 import '../../../core/widgets/ui_kit.dart';
 import '../../controllers/page_controllers.dart';
 
-/// Score final en solo (maquette 07) : carte « Ton score » avec le total,
-/// détail de chaque manche (lettre et points), rappel « pas de
-/// classement en solo », boutons REJOUER et MENU.
+/// Résumé de la partie solo et score de chaque manche.
 class FinalResultsScreen extends StatefulWidget {
   const FinalResultsScreen({super.key});
 
@@ -41,56 +39,61 @@ class _FinalResultsScreenState extends State<FinalResultsScreen> {
 
     return ScreenScaffold(
       showSunburst: true,
-      burstTop: 0.1,
+      burstTop: 0.08,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const SizedBox(height: 6),
-          const ScreenTitle('Score final'),
-          const SizedBox(height: 10),
+          const SizedBox(height: 2),
+          const ScreenTitle('Partie terminée'),
+          const SizedBox(height: 14),
           DarkPanel(
-            padding: const EdgeInsets.fromLTRB(10, 8, 16, 10),
-            child: Row(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: Column(
               children: [
-                const HeroImage(width: 92),
-                const SizedBox(width: 18),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Ton score',
-                        style: TextStyle(
-                          fontFamily: AppTheme.bodyFont,
-                          fontSize: 13,
-                          color: AppColors.blueGray,
-                        ),
-                      ),
-                      Text(
-                        '$total',
-                        style: const TextStyle(
-                          fontFamily: AppTheme.monoFont,
-                          fontSize: 56,
-                          fontWeight: FontWeight.w700,
-                          height: 1.1,
-                          color: AppColors.yellow,
-                        ),
-                      ),
-                      Text(
-                        '${rounds.length} manche${rounds.length > 1 ? 's' : ''}',
-                        style: const TextStyle(
-                          fontFamily: AppTheme.bodyFont,
-                          fontSize: 12,
-                          color: AppColors.blueGray,
-                        ),
-                      ),
-                    ],
+                const HeroImage(width: 112),
+                const SizedBox(height: 4),
+                const Text(
+                  'SCORE TOTAL',
+                  style: TextStyle(
+                    fontFamily: AppTheme.bodyFont,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 1.2,
+                    color: AppColors.blueGray,
+                  ),
+                ),
+                Text(
+                  '$total',
+                  style: const TextStyle(
+                    fontFamily: AppTheme.monoFont,
+                    fontSize: 58,
+                    fontWeight: FontWeight.w700,
+                    height: 1.05,
+                    color: AppColors.yellow,
+                  ),
+                ),
+                Text(
+                  '${rounds.length} manche${rounds.length > 1 ? 's' : ''}',
+                  style: const TextStyle(
+                    fontFamily: AppTheme.bodyFont,
+                    fontSize: 12,
+                    color: AppColors.blueGray,
                   ),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
+          const Text(
+            'Détail des manches',
+            style: TextStyle(
+              fontFamily: AppTheme.bodyFont,
+              fontSize: 15,
+              fontWeight: FontWeight.w700,
+              color: AppColors.offWhite,
+            ),
+          ),
+          const SizedBox(height: 8),
           Expanded(
             child: ListView(
               padding: EdgeInsets.zero,
@@ -101,16 +104,6 @@ class _FinalResultsScreenState extends State<FinalResultsScreen> {
                     letter: r.letter,
                     points: r.score.totalFor('solo'),
                   ),
-                const SizedBox(height: 8),
-                const Text(
-                  'Mode solo : score personnel uniquement, pas de classement.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontFamily: AppTheme.bodyFont,
-                    fontSize: 11,
-                    color: AppColors.blueGray,
-                  ),
-                ),
               ],
             ),
           ),

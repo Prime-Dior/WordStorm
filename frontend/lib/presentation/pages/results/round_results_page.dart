@@ -71,16 +71,6 @@ class RoundResultsScreen extends StatelessWidget {
             roundScore: roundTotal,
             grandTotal: grandTotal,
           ),
-          const SizedBox(height: 12),
-          const Text(
-            'Score personnel · réponses de cette manche',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontFamily: AppTheme.bodyFont,
-              fontSize: 11,
-              color: AppColors.blueGray,
-            ),
-          ),
           const SizedBox(height: 14),
           Expanded(
             child: ListView.builder(
