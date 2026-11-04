@@ -131,7 +131,8 @@ class LobbyScreen extends StatelessWidget {
               ),
               const SizedBox(height: 6),
               Wrap(
-                spacing: 4,
+                spacing: 8,
+                runSpacing: 4,
                 alignment: WrapAlignment.center,
                 children: [
                   for (final category in setup.categories)
