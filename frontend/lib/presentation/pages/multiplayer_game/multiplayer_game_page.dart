@@ -4,6 +4,8 @@ import 'package:get/get.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/arcade_button.dart';
+import '../../../core/widgets/letter_tile.dart';
+import '../../../core/widgets/response_row.dart';
 import '../../../core/widgets/screen_scaffold.dart';
 import '../../../domain/models/round_model.dart';
 import '../../controllers/multiplayer_game_controller.dart';
@@ -16,135 +18,189 @@ class MultiplayerGameScreen extends GetView<MultiplayerGameController> {
     return Obx(() {
       final currentRound = controller.round.value;
       final finished = currentRound.status == 'completed';
+      final categories = controller.session.categories;
+      final total = categories.length;
+      final filled = controller.answers.values
+          .where((answer) => answer.text.trim().isNotEmpty)
+          .length;
+      final hasTimer = controller.session.durationSeconds > 0;
+      final timerColor = controller.secondsRemaining.value <= 10 && hasTimer
+          ? AppColors.coral
+          : AppColors.yellow;
 
       return ScreenScaffold(
-        skylineHeight: 250,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(
-              'SALON ${controller.session.roomCode}',
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontFamily: AppTheme.displayFont,
-                fontSize: 24,
-                color: AppColors.offWhite,
-              ),
-            ),
-            const SizedBox(height: 6),
-            Text(
-              'MANCHE ${currentRound.number} / ${controller.session.roundCount}',
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontFamily: AppTheme.displayFont,
-                fontSize: 20,
-                color: AppColors.yellow,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              finished
-                  ? controller.isGameFinished.value
-                        ? 'PARTIE TERMINÉE'
-                        : 'RÉSULTATS DE LA MANCHE'
-                  : controller.session.durationSeconds == 0
-                  ? 'LETTRE : ${currentRound.letter ?? '…'} · SANS CHRONO'
-                  : 'LETTRE : ${currentRound.letter ?? '…'} · ${controller.secondsRemaining.value} s',
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontFamily: AppTheme.bodyFont,
-                fontWeight: FontWeight.w700,
-                fontSize: 14,
-                color: AppColors.teal,
-              ),
-            ),
-            if (finished && currentRound.stoppedBy != null) ...[
-              const SizedBox(height: 4),
-              Text(
-                '${currentRound.stoppedBy} a appuyé sur STOP',
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  color: AppColors.yellow,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-            const SizedBox(height: 12),
-            Expanded(
-              child: SingleChildScrollView(
-                child: finished
-                    ? _RoundResults(answers: currentRound.answers)
-                    : Column(
+        showSunburst: true,
+        burstTop: 0.1,
+        skylineHeight: 240,
+        padding: EdgeInsets.zero,
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(18, 6, 18, 0),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    SizedBox(
+                      width: 84,
+                      height: 84,
+                      child: Stack(
+                        alignment: Alignment.center,
                         children: [
-                          for (final category in controller.session.categories)
-                            Padding(
-                              padding: const EdgeInsets.only(bottom: 10),
-                              child: TextField(
-                                controller: controller.answers[category],
-                                enabled: controller.canEdit,
-                                textCapitalization: TextCapitalization.words,
-                                decoration: InputDecoration(
-                                  labelText: category,
-                                  labelStyle: const TextStyle(
-                                    color: AppColors.blueGray,
-                                  ),
-                                  floatingLabelStyle: const TextStyle(
-                                    color: AppColors.navyBlue,
-                                  ),
-                                  filled: true,
-                                  fillColor: AppColors.offWhite,
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                    borderSide: BorderSide.none,
-                                  ),
-                                ),
-                                style: const TextStyle(color: Colors.black),
-                                cursorColor: AppColors.navyBlue,
-                                onChanged: controller.answerChanged,
+                          SizedBox.expand(
+                            child: CircularProgressIndicator(
+                              value: hasTimer
+                                  ? controller.secondsRemaining.value /
+                                        controller.session.durationSeconds
+                                  : 1,
+                              strokeWidth: 9,
+                              backgroundColor: const Color(0xFF0B1330),
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                timerColor,
                               ),
                             ),
+                          ),
+                          Text(
+                            hasTimer
+                                ? '${controller.secondsRemaining.value}'
+                                : '∞',
+                            style: TextStyle(
+                              fontFamily: AppTheme.monoFont,
+                              fontSize: 30,
+                              fontWeight: FontWeight.w700,
+                              color: timerColor,
+                            ),
+                          ),
                         ],
                       ),
-              ),
-            ),
-            if (controller.error.value != null)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: Text(
-                  controller.error.value!,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(color: AppColors.coral),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'MANCHE ${currentRound.number} / ${controller.session.roundCount}',
+                            style: const TextStyle(
+                              fontFamily: AppTheme.displayFont,
+                              fontSize: 22,
+                              color: AppColors.offWhite,
+                            ),
+                          ),
+                          Text(
+                            'SALON ${controller.session.roomCode}',
+                            style: const TextStyle(
+                              fontFamily: AppTheme.bodyFont,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.offWhite,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-            if (finished)
-              _resultAction(controller)
-            else
-              Obx(() {
-                controller.formRevision.value;
-                final canStop =
-                    controller.session.durationSeconds > 0 ||
-                    controller.allCategoriesFilled;
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    Text(
+                      '$filled / $total réponses',
+                      style: const TextStyle(
+                        fontFamily: AppTheme.monoFont,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.offWhite,
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(999),
+                        child: LinearProgressIndicator(
+                          value: total == 0 ? 0 : filled / total,
+                          minHeight: 8,
+                          backgroundColor: const Color(0x66000000),
+                          valueColor: const AlwaysStoppedAnimation<Color>(
+                            AppColors.teal,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Center(
+                  child: LetterTile(
+                    letter: currentRound.letter ?? '…',
+                    size: 100,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Expanded(
+                  child: finished
+                      ? SingleChildScrollView(
+                          child: _RoundResults(answers: currentRound.answers),
+                        )
+                      : ListView.builder(
+                          padding: EdgeInsets.zero,
+                          itemCount: categories.length,
+                          itemBuilder: (context, index) {
+                            final category = categories[index];
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 8),
+                              child: ResponseRow(
+                                key: ValueKey(category),
+                                category: category,
+                                controller: controller.answers[category],
+                                enabled: controller.canEdit,
+                                onChanged: controller.answerChanged,
+                              ),
+                            );
+                          },
+                        ),
+                ),
+                if (controller.error.value != null)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: Text(
+                      controller.error.value!,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(color: AppColors.coral),
+                    ),
+                  ),
+                if (finished)
+                  _resultAction(controller)
+                else
+                  Obx(() {
+                    controller.formRevision.value;
+                    final canStop =
+                        controller.session.durationSeconds > 0 ||
+                        controller.allCategoriesFilled;
 
-                return ArcadeButton(
-                  label: controller.isSaving.value || controller.isLocking.value
-                      ? 'Envoi…'
-                      : controller.session.durationSeconds == 0
-                      ? 'STOP · terminer la manche'
-                      : 'Enregistrer mes réponses',
-                  variant: ArcadeButtonVariant.teal,
-                  onPressed: controller.canEdit && canStop
-                      ? controller.submitAnswers
-                      : null,
-                );
-              }),
-            const SizedBox(height: 8),
-            ArcadeButton(
-              label: 'Quitter la partie',
-              variant: ArcadeButtonVariant.dark,
-              small: true,
-              onPressed: controller.returnToMenu,
+                    return ArcadeButton(
+                      label:
+                          controller.isSaving.value ||
+                              controller.isLocking.value
+                          ? 'Envoi…'
+                          : controller.session.durationSeconds == 0
+                          ? 'STOP · terminer la manche'
+                          : 'Enregistrer mes réponses',
+                      variant: ArcadeButtonVariant.teal,
+                      onPressed: controller.canEdit && canStop
+                          ? controller.submitAnswers
+                          : null,
+                    );
+                  }),
+                const SizedBox(height: 8),
+                ArcadeButton(
+                  label: 'Quitter la partie',
+                  variant: ArcadeButtonVariant.dark,
+                  small: true,
+                  onPressed: controller.returnToMenu,
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       );
     });
