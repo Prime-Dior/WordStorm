@@ -5,7 +5,6 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/arcade_button.dart';
 import '../../../core/widgets/icons/wordstorm_icons.dart';
-import '../../controllers/page_controllers.dart';
 
 /// États de la maquette 14 à 17, présentés comme des fenêtres au-dessus
 /// de l'écran courant.
@@ -93,8 +92,8 @@ class StatusScreen extends StatelessWidget {
                     variant: ArcadeButtonVariant.red,
                     fontSize: 24,
                     onPressed: actionRoute == null
-                        ? () => Get.find<StatusController>().close()
-                        : () => Get.find<StatusController>().open(actionRoute!),
+                        ? () => Get.back<void>()
+                        : () => Get.offNamed<void>(actionRoute!),
                   ),
                 ),
               ],
@@ -103,7 +102,7 @@ class StatusScreen extends StatelessWidget {
                 label: 'Fermer',
                 variant: ArcadeButtonVariant.dark,
                 small: true,
-                onPressed: () => Get.find<StatusController>().close(),
+                onPressed: () => Get.back<void>(),
               ),
             ],
           ),
@@ -114,32 +113,3 @@ class StatusScreen extends StatelessWidget {
 }
 
 enum StatusKind { info, waiting, error }
-
-/// Démos rapides des pages d'état dans les paramètres.
-class StatusDemoButtons extends StatelessWidget {
-  const StatusDemoButtons({super.key});
-
-  @override
-  Widget build(BuildContext context) => Wrap(
-    alignment: WrapAlignment.center,
-    spacing: 8,
-    runSpacing: 8,
-    children: [
-      _demo(context, 'Attente', '/waiting', ArcadeButtonVariant.dark),
-      _demo(context, 'Chargement', '/loading', ArcadeButtonVariant.dark),
-      _demo(context, 'Erreur', '/connection-error', ArcadeButtonVariant.red),
-    ],
-  );
-
-  Widget _demo(
-    BuildContext context,
-    String label,
-    String route,
-    ArcadeButtonVariant variant,
-  ) => ArcadeButton(
-    label: label,
-    variant: variant,
-    small: true,
-    onPressed: () => Get.toNamed(route),
-  );
-}

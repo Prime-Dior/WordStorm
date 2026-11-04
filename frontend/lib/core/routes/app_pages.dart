@@ -17,7 +17,6 @@ import '../../presentation/pages/podium/podium_page.dart';
 import '../../presentation/pages/results/round_results_page.dart';
 import '../../presentation/pages/rules/rules_page.dart';
 import '../../presentation/pages/settings/settings_page.dart';
-import '../../presentation/pages/status/status_page.dart';
 import '../../presentation/pages/wheel/wheel_page.dart';
 import 'app_routes.dart';
 
@@ -91,55 +90,6 @@ abstract final class AppPages {
       name: AppRoutes.history,
       page: () => const HistoryScreen(),
       binding: HistoryBinding(),
-    ),
-    GetPage(
-      name: AppRoutes.waiting,
-      page: () => _overlay(
-        const StatusScreen(
-          title: 'En attente d’autres joueurs…',
-          message: 'En attente d’autres joueurs',
-          kind: StatusKind.waiting,
-        ),
-      ),
-      binding: StatusBinding(),
-      opaque: false,
-    ),
-    GetPage(
-      name: AppRoutes.loading,
-      page: () => _overlay(
-        const StatusScreen(
-          title: 'Ça se prépare…',
-          message: 'Écran de démonstration',
-          kind: StatusKind.waiting,
-        ),
-      ),
-      binding: StatusBinding(),
-      opaque: false,
-    ),
-    GetPage(
-      name: AppRoutes.connectionError,
-      page: () => _overlay(
-        const StatusScreen(
-          title: 'Problème de connexion',
-          message: 'Vérifie ta connexion Internet et réessaie. Tes réponses restent sur l’appareil.',
-          kind: StatusKind.error,
-          actionLabel: 'Réessayer',
-        ),
-      ),
-      binding: StatusBinding(),
-      opaque: false,
-    ),
-    GetPage(
-      name: AppRoutes.notFound,
-      page: () => _overlay(
-        const StatusScreen(
-          title: 'Salon introuvable',
-          message: 'Aucun salon ne correspond à ce code.',
-          kind: StatusKind.error,
-        ),
-      ),
-      binding: StatusBinding(),
-      opaque: false,
     ),
   ];
 

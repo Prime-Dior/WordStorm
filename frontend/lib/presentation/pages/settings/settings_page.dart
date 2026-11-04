@@ -5,7 +5,6 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/arcade_button.dart';
 import '../../controllers/settings_controller.dart';
-import '../status/status_page.dart';
 
 /// Fenêtre Paramètres (maquette 18), au-dessus du menu.
 class SettingsScreen extends StatefulWidget {
@@ -74,16 +73,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           onPressed: _controller.openRules,
                         ),
                         const SizedBox(height: 8),
-                        const Text(
-                          'Démonstration',
-                          style: TextStyle(
-                            fontFamily: AppTheme.bodyFont,
-                            fontSize: 11,
-                            color: AppColors.blueGray,
-                          ),
-                        ),
-                        const SizedBox(height: 6),
-                        const StatusDemoButtons(),
                         const SizedBox(height: 12),
                         ArcadeButton(
                           label: 'Fermer',

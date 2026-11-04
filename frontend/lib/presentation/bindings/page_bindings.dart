@@ -74,8 +74,3 @@ class HistoryBinding extends Bindings {
   @override
   void dependencies() => Get.lazyPut(HistoryController.new);
 }
-
-class StatusBinding extends Bindings {
-  @override
-  void dependencies() => Get.lazyPut(StatusController.new);
-}

@@ -270,9 +270,3 @@ class HistoryController extends GetxController {
     records.clear();
   }
 }
-
-class StatusController extends GetxController {
-  void close() => Get.back<void>();
-
-  void open(String route) => Get.toNamed<void>(route);
-}
